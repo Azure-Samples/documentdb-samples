@@ -1,57 +1,20 @@
-# Project Name
+# Azure DocumentDB Samples
 
-(short, 1-3 sentenced, description of the project)
+This repository contains code samples for working with Azure DocumentDB, including AI-powered vector search implementations across multiple programming languages.
 
-## Features
+## Vector Search Samples
 
-This project framework provides the following features:
+Explore vector similarity search with Azure DocumentDB using different algorithms (IVF, HNSW, and DiskANN) and Azure OpenAI embeddings:
 
-* Feature 1
-* Feature 2
-* ...
+- **[.NET](./ai/vector-search-dotnet/)** - Vector search sample using .NET 8.0
+- **[Python](./ai/vector-search-python/)** - Vector search implementation in Python
+- **[Go](./ai/vector-search-go/)** - Vector search examples using Go
+- **[TypeScript](./ai/vector-search-typescript/)** - Vector search with TypeScript/Node.js
 
-## Getting Started
-
-### Prerequisites
-
-(ideally very short, if any)
-
-- OS
-- Library version
-- ...
-
-### Installation
-
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
+Each sample demonstrates how to generate embeddings, create vector indexes, and perform semantic similarity searches with hotel data.
 
 ## Resources
 
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+- [Azure DocumentDB Documentation](https://learn.microsoft.com/azure/documentdb/)
+- [Vector Search in DocumentDB](https://learn.microsoft.com/azure/documentdb/vector-search)
+- [Azure OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/)
