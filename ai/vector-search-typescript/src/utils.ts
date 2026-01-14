@@ -63,15 +63,17 @@ export function getClientsPasswordless(): { aiClient: AzureOpenAI | null; dbClie
 
     // For Cosmos DB with DefaultAzureCredential
     const clusterName = process.env.MONGO_CLUSTER_NAME!;
+    const managedIdentityPrincipalId = process.env.AZURE_MANAGED_IDENTITY_PRINCIPAL_ID!;
 
-    if (clusterName) {
+    if (clusterName && managedIdentityPrincipalId) {
         const credential = new DefaultAzureCredential();
 
         dbClient = new MongoClient(
-            `mongodb+srv://${clusterName}.global.mongocluster.cosmos.azure.com/`, {
-            connectTimeoutMS: 30000,
+            `mongodb+srv://${managedIdentityPrincipalId}@${clusterName}.mongocluster.cosmos.azure.com/`, {
+            connectTimeoutMS: 120000,
             tls: true,
-            retryWrites: true,
+            retryWrites: false,
+            maxIdleTimeMS: 120000,
             authMechanism: 'MONGODB-OIDC',
             authMechanismProperties: {
                 OIDC_CALLBACK: (params: OIDCCallbackParams) => AzureIdentityTokenCallback(params, credential),
