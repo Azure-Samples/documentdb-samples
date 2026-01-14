@@ -22,6 +22,15 @@ param location string
 @description('Id of the principal to assign database and application roles.')
 param deploymentUserPrincipalId string = ''
 
+@description('Username for DocumentDB admin user')
+param documentDbAdminUsername string
+
+@secure()
+@description('Password for DocumentDB admin user')
+@minLength(8)
+@maxLength(128)
+param documentDbAdminPassword string
+
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName }
 var prefix = '${environmentName}${resourceToken}'
@@ -113,74 +122,99 @@ module openAi 'br/public:avm/res/cognitive-services/account:0.7.1' = {
 
 var databaseName = 'Hotels'
 
-module documentDbAccount 'br/public:avm/res/document-db/database-account:0.8.1' = {
-  name: 'documentdb-account'
+// Deploy Azure DocumentDB MongoDB Cluster (vCore)
+module documentDbCluster './documentdb.bicep' = {
+  name: 'documentdb-cluster'
   scope: resourceGroup
   params: {
-    name: 'documentdb-nosql-${prefix}'
+    clusterName: 'docdb-${resourceToken}'
     location: location
-    locations: [
-      {
-        failoverPriority: 0
-        locationName: location
-        isZoneRedundant: false
-      }
-    ]
-    tags: tags
-    disableKeyBasedMetadataWriteAccess: true
-    disableLocalAuth: true
-    networkRestrictions: {
-      publicNetworkAccess: 'Enabled'
-      ipRules: []
-      virtualNetworkRules: []
-    }
-    capabilitiesToAdd: [
-      'EnableServerless'
-    ]
-    sqlRoleDefinitions: [
-      {
-        name: 'nosql-data-plane-contributor'
-        dataAction: [
-          'Microsoft.DocumentDB/databaseAccounts/readMetadata'
-          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*'
-          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*'
-        ]
-      }
-    ]
-    sqlRoleAssignmentsPrincipalIds: union(
-      [
-        managedIdentity.outputs.principalId
-      ],
-      !empty(deploymentUserPrincipalId) ? [deploymentUserPrincipalId] : []
-    )
-    mongodbDatabases: [
-      {
-        name: databaseName
-        tags: tags
-        collections: [
-          {
-            name: 'hotels_diskann'
-            paths: [
-              '/HotelId'
-            ]
-          }
-          {
-            name: 'hotels_ivf'
-            paths: [
-              '/HotelId'
-            ]
-          }
-          {
-            name: 'hotels_hnsw'
-            paths: [
-              '/HotelId'
-            ]
-          }
-        ]
-      }
-    ]
+    adminUsername: documentDbAdminUsername
+    adminPassword: documentDbAdminPassword
   }
 }
+
+// // Deploy Azure Cosmos DB for MongoDB (Request Unit model with serverless)
+// // This provides MongoDB API compatibility with vector search capabilities
+// module documentDbAccount 'br/public:avm/res/document-db/database-account:0.11.3' = {
+//   name: 'documentdb-account'
+//   scope: resourceGroup
+//   params: {
+//     name: 'documentdb-nosql-${prefix}'
+//     location: location
+//     locations: [
+//       {
+//         failoverPriority: 0
+//         locationName: location
+//         isZoneRedundant: false
+//       }
+//     ]
+//     tags: tags
+//     disableKeyBasedMetadataWriteAccess: true
+//     disableLocalAuth: false
+//     networkRestrictions: {
+//       publicNetworkAccess: 'Enabled'
+//       ipRules: []
+//       virtualNetworkRules: []
+//     }
+//     capabilitiesToAdd: [
+//       'EnableServerless'
+//     ]
+//     mongodbDatabases: [
+//       {
+//         name: databaseName
+//         collections: [
+//           {
+//             name: 'hotels_diskann'
+//             indexes: [
+//               {
+//                 key: {
+//                   keys: [
+//                     '_id'
+//                   ]
+//                 }
+//               }
+//             ]
+//             shardKey: {
+//               HotelId: 'Hash'
+//             }
+//           }
+//           {
+//             name: 'hotels_ivf'
+//             indexes: [
+//               {
+//                 key: {
+//                   keys: [
+//                     '_id'
+//                   ]
+//                 }
+//               }
+//             ]
+//             shardKey: {
+//               HotelId: 'Hash'
+//             }
+//           }
+//           {
+//             name: 'hotels_hnsw'
+//             indexes: [
+//               {
+//                 key: {
+//                   keys: [
+//                     '_id'
+//                   ]
+//                 }
+//               }
+//             ]
+//             shardKey: {
+//               HotelId: 'Hash'
+//             }
+//           }
+//         ]
+//       }
+//     ]
+//   }
+// }
+
 
 // Azure Subscription and Resource Group outputs
 output AZURE_LOCATION string = location
@@ -202,9 +236,12 @@ output AZURE_OPENAI_EMBEDDING_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_EMBEDDING_API_VERSION string = embeddingModelApiVersion
 
 // DocumentDB outputs
-output AZURE_DOCUMENTDB_CLUSTER string = documentDbAccount.outputs.name
-output AZURE_DOCUMENTDB_ENDPOINT string = documentDbAccount.outputs.endpoint
-output AZURE_DOCUMENTDB_DATABASENAME string = databaseName
+//output AZURE_DOCUMENTDB_CLUSTER string = documentDbAccount.outputs.name
+//output AZURE_DOCUMENTDB_ENDPOINT string = documentDbAccount.outputs.endpoint
+//output AZURE_DOCUMENTDB_DATABASENAME string = databaseName
+output CLUSTER string = documentDbCluster.outputs.clusterName
+//output AZURE_DOCUMENTDB_ADMIN_USERNAME string = documentDbAdminUsername
+//output AZURE_DOCUMENTDB_VCORE_CLUSTER_NAME string = documentDbCluster.outputs.clusterName
 
 // Configuration for embedding creation and vector search
 output DATA_FILE_WITH_VECTORS string = dataFileWithVectors
@@ -214,3 +251,4 @@ output EMBEDDED_FIELD string = embeddedFieldName
 output EMBEDDING_DIMENSIONS string = embeddingDimensions
 output EMBEDDING_BATCH_SIZE string = embeddingBatchSize
 output LOAD_SIZE_BATCH string = loadSizeBatch
+
