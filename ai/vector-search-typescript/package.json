@@ -1,7 +1,7 @@
 {
   "name": "ts-cosmos-nodejs-vector-samples",
   "version": "1.0.0",
-  "description": "Samples for MongoDB vCore vector search with Cosmos DB",
+  "description": "Samples for MongoDB vCore vector search with DocumentDB",
   "main": "index.js",
   "type": "module",
   "scripts": {

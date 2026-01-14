@@ -137,8 +137,8 @@ LOAD_SIZE_BATCH=100
 To use passwordless authentication with Microsoft Entra ID, follow these steps:
 
 1. In your Azure DocumentDB resource, enable **Native DocumentDB** and **Microsoft Entra ID** authentication methods.
-2. Assign your Microsoft Entra ID user the following roles on the Cosmos DB resource:
-   - **Cosmos DB Account Reader Role**
+2. Assign your Microsoft Entra ID user the following roles on the DocumentDB resource:
+   - **DocumentDB Account Reader Role**
    - **DocumentDB Account Contributor**
 
 ## Usage
@@ -269,7 +269,7 @@ defer mongoClient.Disconnect(ctx)
 
 1. Ensure you're logged in with `az login`
 2. Enable **Native DocumentDB and Microsoft Entra ID authentication** methods for your Azure DocumentDB resource.
-3. Grant your identity appropriate RBAC permissions on your Azure DocumentDB instance. You need **Cosmos DB Account Reader Role** and **DocumentDB Account Contributor** roles assigned to your user.
+3. Grant your identity appropriate RBAC permissions on your Azure DocumentDB instance. You need **DocumentDB Account Reader Role** and **DocumentDB Account Contributor** roles assigned to your user.
 4. Set `MONGO_CLUSTER_NAME` instead of `MONGO_CONNECTION_STRING` in `.env`
 
 ### Method 2: Connection String Authentication
@@ -333,7 +333,7 @@ mongo-vcore-vector-search-go/
 1. **Authentication Errors**
    - Verify Azure OpenAI endpoint and key
    - Check Azure DocumentDB connection string
-   - Ensure proper RBAC permissions for passwordless authentication. You need **Cosmos DB Account Reader Role** and **DocumentDB Account Contributor** roles assigned to your user. Roles may take some time to propagate.
+   - Ensure proper RBAC permissions for passwordless authentication. You need **DocumentDB Account Reader Role** and **DocumentDB Account Contributor** roles assigned to your user. Roles may take some time to propagate.
 
 2. **Embedding Generation Fails**
    - Check Azure OpenAI model deployment name
@@ -377,7 +377,7 @@ DEBUG=true
 
 - [Azure DocumentDB Documentation](https://learn.microsoft.com/azure/documentdb/)
 - [Azure OpenAI Service Documentation](https://learn.microsoft.com/azure/ai-services/openai/)
-- [Vector Search in Cosmos DB](https://learn.microsoft.com/azure/documentdb/vector-search)
+- [Vector Search in DocumentDB](https://learn.microsoft.com/azure/documentdb/vector-search)
 - [Go MongoDB Driver Documentation](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo)
 - [Azure SDK for Go Documentation](https://pkg.go.dev/github.com/Azure/azure-sdk-for-go)
 

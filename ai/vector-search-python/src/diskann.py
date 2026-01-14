@@ -14,14 +14,14 @@ def create_diskann_vector_index(collection, vector_field: str, dimensions: int) 
     # Drop any existing vector indexes on this field first
     drop_vector_indexes(collection, vector_field)
 
-    # Use the native MongoDB command for Cosmos DB vector indexes
+    # Use the native MongoDB command for DocumentDB vector indexes
     index_command = {
         "createIndexes": collection.name,
         "indexes": [
             {
                 "name": f"diskann_index_{vector_field}",
                 "key": {
-                    vector_field: "cosmosSearch"  # Cosmos DB vector search index type
+                    vector_field: "cosmosSearch"  # DocumentDB vector search index type
                 },
                 "cosmosSearchOptions": {
                     # DiskANN algorithm configuration
@@ -57,7 +57,7 @@ def create_diskann_vector_index(collection, vector_field: str, dimensions: int) 
         if "not enabled for this cluster tier" in str(e):
             print("\nDiskANN indexes require a higher cluster tier.")
             print("Try one of these alternatives:")
-            print("  • Upgrade your Cosmos DB cluster to a higher tier")
+            print("  • Upgrade your DocumentDB cluster to a higher tier")
             print("  • Use HNSW instead: python src/hnsw.py")
             print("  • Use IVF instead: python src/ivf.py")
         raise
@@ -82,11 +82,11 @@ def perform_diskann_vector_search(collection,
         query_embedding = embedding_response.data[0].embedding
 
         # Construct the aggregation pipeline for vector search
-        # Cosmos DB for MongoDB vCore uses $search with cosmosSearch
+        # DocumentDB uses $search with cosmosSearch
         pipeline = [
             {
                 "$search": {
-                    # Use cosmosSearch for vector operations in Cosmos DB
+                    # Use cosmosSearch for vector operations in DocumentDB
                     "cosmosSearch": {
                         # The query vector to search for
                         "vector": query_embedding,

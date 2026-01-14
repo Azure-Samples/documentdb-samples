@@ -1,7 +1,7 @@
 /**
  * Module for creating embedding vectors using OpenAI API
  * Supports text embedding models for generating embeddings
- * that can be used with Cosmos DB MongoDB vCore vector search
+ * that can be used with DocumentDB vector search
  */
 import * as path from "node:path";
 import { AzureOpenAI } from "openai";

@@ -38,7 +38,7 @@ class Program
             string? command;
             while (true)
             {
-                Console.WriteLine("\n=== Cosmos DB Vector Samples Menu ===\nPlease enter your choice (0-5):\n1. Create embeddings for data\n2. Show all database indexes\n3. Run IVF vector search\n4. Run HNSW vector search\n5. Run DiskANN vector search\n0. Exit\n");
+                Console.WriteLine("\n=== DocumentDB Vector Samples Menu ===\nPlease enter your choice (0-5):\n1. Create embeddings for data\n2. Show all database indexes\n3. Run IVF vector search\n4. Run HNSW vector search\n5. Run DiskANN vector search\n0. Exit\n");
                 
                 var input = Console.ReadLine();
                 command = input switch

@@ -10,7 +10,7 @@ namespace CosmosDbVectorSamples.Services;
 
 /// <summary>
 /// Service for MongoDB operations including data insertion, index management, and vector index creation.
-/// Supports Azure Cosmos DB for MongoDB with passwordless authentication.
+/// Supports Azure DocumentDB with passwordless authentication.
 /// </summary>
 public class MongoDbService
 {
@@ -28,7 +28,7 @@ public class MongoDbService
         if (string.IsNullOrEmpty(_config.MongoDB.ClusterName))
             throw new InvalidOperationException("MongoDB connection not configured. Please provide ConnectionString or ClusterName.");
             
-        // Configure MongoDB connection for Azure Cosmos DB with OIDC authentication
+        // Configure MongoDB connection for Azure DocumentDB with OIDC authentication
         var connectionString = $"mongodb+srv://{_config.MongoDB.ClusterName}.global.mongocluster.cosmos.azure.com/?tls=true&authMechanism=MONGODB-OIDC&retrywrites=false&maxIdleTimeMS=120000";
         var settings = MongoClientSettings.FromUrl(MongoUrl.Create(connectionString));
         settings.UseTls = true;
@@ -49,7 +49,7 @@ public class MongoDbService
         _client.GetDatabase(databaseName).GetCollection<T>(collectionName);
 
     /// <summary>
-    /// Creates a vector search index for Cosmos DB MongoDB, with support for IVF, HNSW, and DiskANN algorithms
+    /// Creates a vector search index for DocumentDB, with support for IVF, HNSW, and DiskANN algorithms
     /// </summary>
     public async Task<BsonDocument> CreateVectorIndexAsync(string databaseName, string collectionName, string indexName, string embeddedField, BsonDocument cosmosSearchOptions)
     {

@@ -24,12 +24,12 @@ class AzureIdentityTokenCallback(OIDCCallback):
 
 def get_clients() -> Tuple[MongoClient, AzureOpenAI]:
 
-    # Get MongoDB connection string - required for Cosmos DB access
+    # Get MongoDB connection string - required for DocumentDB access
     mongo_connection_string = os.getenv("MONGO_CONNECTION_STRING")
     if not mongo_connection_string:
         raise ValueError("MONGO_CONNECTION_STRING environment variable is required")
 
-    # Create MongoDB client with optimized settings for Cosmos DB
+    # Create MongoDB client with optimized settings for DocumentDB
     mongo_client = MongoClient(
         mongo_connection_string,
         maxPoolSize=50,  # Allow up to 50 connections for better performance
@@ -95,7 +95,7 @@ def get_clients_passwordless() -> Tuple[MongoClient, AzureOpenAI]:
 
 def azure_identity_token_callback(credential: DefaultAzureCredential) -> str:
 
-    # Cosmos DB for MongoDB requires this specific scope
+    # DocumentDB requires this specific scope
     token_scope = "https://cosmos.azure.com/.default"
 
     # Get token from Azure AD

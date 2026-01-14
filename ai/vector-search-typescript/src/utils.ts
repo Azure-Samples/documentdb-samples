@@ -61,7 +61,7 @@ export function getClientsPasswordless(): { aiClient: AzureOpenAI | null; dbClie
         });
     }
 
-    // For Cosmos DB with DefaultAzureCredential
+    // For DocumentDB with DefaultAzureCredential
     const clusterName = process.env.MONGO_CLUSTER_NAME!;
 
     if (clusterName) {

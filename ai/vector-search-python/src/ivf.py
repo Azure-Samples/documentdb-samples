@@ -14,14 +14,14 @@ def create_ivf_vector_index(collection, vector_field: str, dimensions: int) -> N
     # Drop any existing vector indexes on this field first
     drop_vector_indexes(collection, vector_field)
 
-    # Use the native MongoDB command for Cosmos DB vector indexes
+    # Use the native MongoDB command for DocumentDB vector indexes
     index_command = {
         "createIndexes": collection.name,
         "indexes": [
             {
                 "name": f"ivf_index_{vector_field}",
                 "key": {
-                    vector_field: "cosmosSearch"  # Cosmos DB vector search index type
+                    vector_field: "cosmosSearch"  # DocumentDB vector search index type
                 },
                 "cosmosSearchOptions": {
                     # IVF algorithm configuration
@@ -75,7 +75,7 @@ def perform_ivf_vector_search(collection,
         pipeline = [
             {
                 "$search": {
-                    # Use cosmosSearch for vector operations in Cosmos DB
+                    # Use cosmosSearch for vector operations in DocumentDB
                     "cosmosSearch": {
                         # Query vector to find similar documents
                         "vector": query_embedding,

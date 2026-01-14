@@ -1,5 +1,5 @@
 """
-Display vector indexes for Cosmos DB collections.
+Display vector indexes for DocumentDB collections.
 
 This utility script shows all vector indexes in a collection, including
 their configuration details, status, and performance characteristics.

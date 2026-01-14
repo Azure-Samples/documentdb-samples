@@ -1,13 +1,13 @@
-# Cosmos DB Vector Samples (Python)
+# DocumentDB Vector Samples (Python)
 
-This project demonstrates vector search capabilities using Azure Cosmos DB for MongoDB (vCore) with Python. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF, along with utilities for embedding generation and data management.
+This project demonstrates vector search capabilities using Azure DocumentDB with Python. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF, along with utilities for embedding generation and data management.
 
 ## Overview
 
 Vector search enables semantic similarity searching by converting text into high-dimensional vector representations (embeddings) and finding the most similar vectors in the database. This project shows how to:
 
 - Generate embeddings using Azure OpenAI
-- Store vectors in Cosmos DB for MongoDB (vCore)
+- Store vectors in DocumentDB
 - Create and use different types of vector indexes
 - Perform similarity searches with various algorithms
 
@@ -18,7 +18,7 @@ Before running this project, you need:
 ### Azure Resources
 1. **Azure subscription** with appropriate permissions
 2. **Azure OpenAI resource** with embedding model deployment
-3. **Azure Cosmos DB for MongoDB (vCore) resource**
+3. **Azure DocumentDB resource**
 4. **Azure CLI** installed and configured
 
 ### Development Environment
@@ -75,9 +75,9 @@ az cognitiveservices account create \
 4. Choose **text-embedding-ada-002** model
 5. Note the deployment name for configuration
 
-#### Create Cosmos DB for MongoDB (vCore)
+#### Create DocumentDB
 
-Learn how to create a Cosmos DB for MongoDB (vCore) account in the [official documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/mongodb/vcore/quickstart-portal).
+Learn how to create an Azure DocumentDB account in the [official documentation](https://learn.microsoft.com/azure/documentdb/).
 
 ### Step 3: Configure Environment Variables
 
@@ -95,7 +95,7 @@ AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-openai-resource.openai.azure.com/
 AZURE_OPENAI_EMBEDDING_KEY=your-azure-openai-api-key
 AZURE_OPENAI_EMBEDDING_API_VERSION=2024-02-01
 
-# MongoDB/Cosmos DB Configuration
+# MongoDB/DocumentDB Configuration
 MONGO_CONNECTION_STRING=mongodb+srv://username:password@your-cluster.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000
 MONGO_CLUSTER_NAME=vectorSearch
 
@@ -126,14 +126,15 @@ az cognitiveservices account keys list \
     --query "key1" --output tsv
 ```
 
-#### Cosmos DB Connection String
+#### DocumentDB Connection String
 ```bash
-# Get Cosmos DB connection string
-az cosmosdb keys list \
-    --name myCosmosAccount \
+# Get DocumentDB connection string
+az resource show \
     --resource-group myResourceGroup \
-    --type connection-strings \
-    --query "connectionStrings[0].connectionString" --output tsv
+    --name myDocumentDBCluster \
+    --resource-type "Microsoft.DocumentDB/mongoClusters" \
+    --query "properties.connectionString" \
+    --output tsv
 ```
 
 ## Usage
@@ -206,7 +207,7 @@ This utility shows:
 ## Important Notes
 
 ### Vector Index Limitations
-**One Index Per Field**: Cosmos DB for MongoDB (vCore) allows only one vector index per field. Each script automatically handles this by:
+**One Index Per Field**: DocumentDB allows only one vector index per field. Each script automatically handles this by:
 
 1. **Dropping existing indexes**: Before creating a new vector index, the script removes any existing vector indexes on the same field
 2. **Safe switching**: You can run different vector index scripts in any order - each will clean up previous indexes first
@@ -234,7 +235,7 @@ Different vector index types require different cluster tiers:
 If you encounter "not enabled for this cluster tier" errors:
 1. Try a different index type (IVF is most widely supported)
 2. Consider upgrading your cluster tier
-3. Check the [Cosmos DB pricing page](https://azure.microsoft.com/pricing/details/cosmos-db/) for tier features
+3. Check the [DocumentDB pricing page](https://azure.microsoft.com/pricing/details/documentdb/) for tier features
 
 ## Authentication Options
 
@@ -257,7 +258,7 @@ mongo_client, openai_client = get_clients_passwordless()
 
 **Setup for passwordless authentication:**
 1. Ensure you're logged in with `az login`
-2. Grant your identity appropriate RBAC permissions on Cosmos DB
+2. Grant your identity appropriate RBAC permissions on DocumentDB
 3. Set `MONGO_CLUSTER_NAME` instead of `MONGO_CONNECTION_STRING` in `.env`
 
 ### Method 2: Connection String Authentication 
@@ -314,7 +315,7 @@ cosmos-db-vector-samples/
 
 1. **Authentication Errors**
    - Verify Azure OpenAI endpoint and key
-   - Check Cosmos DB connection string
+   - Check DocumentDB connection string
    - Ensure proper RBAC permissions for passwordless auth
 
 2. **Embedding Generation Fails**
@@ -368,14 +369,14 @@ except Exception as e:
 
 ### Cost Optimization
 - Use appropriate Azure OpenAI pricing tier
-- Consider Cosmos DB serverless vs provisioned throughput
+- Consider DocumentDB serverless vs provisioned throughput
 - Monitor API usage and optimize batch processing
 
 ## Further Resources
 
-- [Azure Cosmos DB for MongoDB (vCore) Documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/mongodb/vcore/)
+- [Azure DocumentDB Documentation](https://learn.microsoft.com/azure/documentdb/)
 - [Azure OpenAI Service Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
-- [Vector Search in Cosmos DB](https://learn.microsoft.com/en-us/azure/cosmos-db/mongodb/vcore/vector-search)
+- [Vector Search in DocumentDB](https://learn.microsoft.com/azure/documentdb/vector-search)
 - [Python MongoDB Driver Documentation](https://pymongo.readthedocs.io/)
 
 ## Support
