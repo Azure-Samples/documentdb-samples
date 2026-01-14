@@ -100,10 +100,10 @@ MONGO_CONNECTION_STRING=mongodb+srv://username:password@your-cluster.mongocluste
 MONGO_CLUSTER_NAME=vectorSearch
 
 # Data Configuration (defaults should work)
-DATA_FILE_WITHOUT_VECTORS=data/HotelsData_toCosmosDB_Vector.json
-DATA_FILE_WITH_VECTORS=data/HotelsData_with_vectors.json
+DATA_FILE_WITHOUT_VECTORS=../data/Hotels.json
+DATA_FILE_WITH_VECTORS=../data/Hotels_Vector.json
 FIELD_TO_EMBED=Description
-EMBEDDED_FIELD=DescriptionVector
+EMBEDDED_FIELD=text-embedding-3-small
 EMBEDDING_DIMENSIONS=1536
 EMBEDDING_SIZE_BATCH=16
 LOAD_SIZE_BATCH=100
@@ -149,9 +149,9 @@ python src/create_embeddings.py
 ```
 
 This script:
-- Reads hotel data from `data/HotelsData_toCosmosDB_Vector.json`
+- Reads hotel data from `../data/Hotels.json`
 - Generates embeddings for hotel descriptions using Azure OpenAI
-- Saves enhanced data with embeddings to `data/HotelsData_with_vectors.json`
+- Saves enhanced data with embeddings to `../data/Hotels_Vector.json`
 
 ### 2. DiskANN Vector Search
 Run DiskANN (Disk-based Approximate Nearest Neighbor) search:
@@ -284,7 +284,7 @@ cosmos-db-vector-samples/
 │   ├── ivf.py               # IVF vector search implementation
 │   └── show_indexes.py      # Display vector index information
 ├── data/
-│   └── HotelsData_toCosmosDB_Vector.json  # Sample hotel data
+│   └── Hotels_Vector.json  # Sample hotel data (shared with other samples)
 ├── requirements.txt         # Python dependencies
 ├── .env.example            # Environment variables template
 └── README.md              # This file
