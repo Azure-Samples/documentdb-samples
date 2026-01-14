@@ -1,5 +1,5 @@
 @description('Cluster name')
-@minLength(8)
+@minLength(3)
 @maxLength(40)
 param clusterName string = 'msdocs-${uniqueString(resourceGroup().id)}'
 
@@ -15,26 +15,83 @@ param adminUsername string
 @maxLength(128)
 param adminPassword string
 
+@description('Managed identity resource ID for role assignments')
+param managedIdentityPrincipalId string = ''
+
+@description('Resource tags.')
+param tags object = {}
+
+@description('Server version for the MongoDB cluster')
+@allowed([
+  '5.0'
+  '6.0'
+  '7.0'
+  '8.0'
+])
+param serverVersion string = '8.0'
+
+@description('Number of shards to provision')
+param shardCount int = 1
+
+@description('Storage size in GB')
+param storageSizeGb int = 32
+
+@description('Storage type for the cluster')
+@allowed([
+  'PremiumSSD'
+  'PremiumSSDv2'
+])
+param storageType string = 'PremiumSSD'
+
+@description('High availability mode')
+@allowed([
+  'Disabled'
+  'SameZone'
+  'ZoneRedundantPreferred'
+])
+param highAvailabilityMode string = 'Disabled'
+
+@description('Compute tier for the cluster')
+param computeTier string = 'M10'
+
+@description('Public network access setting')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccess string = 'Enabled'
+
 resource cluster 'Microsoft.DocumentDB/mongoClusters@2025-09-01' = {
   name: clusterName
   location: location
+  tags: tags
+  identity: managedIdentityPrincipalId != '' ? {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityPrincipalId}': {}
+    }
+  } : {
+    type: 'None'
+  }
   properties: {
     administrator: {
       userName: adminUsername
       password: adminPassword
     }
-    serverVersion: '8.0'
+    serverVersion: serverVersion
+    publicNetworkAccess: publicNetworkAccess
     sharding: {
-      shardCount: 1
+      shardCount: shardCount
     }
     storage: {
-      sizeGb: 32
+      sizeGb: storageSizeGb
+      type: storageType
     }
     highAvailability: {
-      targetMode: 'Disabled'
+      targetMode: highAvailabilityMode
     }
     compute: {
-      tier: 'M10'
+      tier: computeTier
     }
   }
 }

@@ -129,91 +129,20 @@ module documentDbCluster './documentdb.bicep' = {
   params: {
     clusterName: 'docdb-${resourceToken}'
     location: location
+    tags: tags
     adminUsername: documentDbAdminUsername
     adminPassword: documentDbAdminPassword
+    managedIdentityPrincipalId: managedIdentity.outputs.resourceId
+    serverVersion: '8.0'
+    shardCount: 1
+    storageSizeGb: 32
+    storageType: 'PremiumSSD'
+    highAvailabilityMode: 'Disabled'
+    computeTier: 'M40'
+    publicNetworkAccess: 'Enabled'
   }
 }
 
-// Deploy Azure Cosmos DB for MongoDB (Request Unit model with serverless)
-// This provides MongoDB API compatibility with vector search capabilities
-module documentDbAccount 'br/public:avm/res/document-db/database-account:0.11.3' = {
-  name: 'documentdb-account'
-  scope: resourceGroup
-  params: {
-    name: 'documentdb-nosql-${prefix}'
-    location: location
-    locations: [
-      {
-        failoverPriority: 0
-        locationName: location
-        isZoneRedundant: false
-      }
-    ]
-    tags: tags
-    disableKeyBasedMetadataWriteAccess: true
-    disableLocalAuth: false
-    networkRestrictions: {
-      publicNetworkAccess: 'Enabled'
-      ipRules: []
-      virtualNetworkRules: []
-    }
-    capabilitiesToAdd: [
-      'EnableServerless'
-    ]
-    mongodbDatabases: [
-      {
-        name: databaseName
-        collections: [
-          {
-            name: 'hotels_diskann'
-            indexes: [
-              {
-                key: {
-                  keys: [
-                    '_id'
-                  ]
-                }
-              }
-            ]
-            shardKey: {
-              HotelId: 'Hash'
-            }
-          }
-          {
-            name: 'hotels_ivf'
-            indexes: [
-              {
-                key: {
-                  keys: [
-                    '_id'
-                  ]
-                }
-              }
-            ]
-            shardKey: {
-              HotelId: 'Hash'
-            }
-          }
-          {
-            name: 'hotels_hnsw'
-            indexes: [
-              {
-                key: {
-                  keys: [
-                    '_id'
-                  ]
-                }
-              }
-            ]
-            shardKey: {
-              HotelId: 'Hash'
-            }
-          }
-        ]
-      }
-    ]
-  }
-}
 
 
 // Azure Subscription and Resource Group outputs
@@ -236,12 +165,10 @@ output AZURE_OPENAI_EMBEDDING_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_EMBEDDING_API_VERSION string = embeddingModelApiVersion
 
 // DocumentDB outputs
-output AZURE_DOCUMENTDB_CLUSTER string = documentDbAccount.outputs.name
-output AZURE_DOCUMENTDB_ENDPOINT string = documentDbAccount.outputs.endpoint
+output AZURE_DOCUMENTDB_CLUSTER string = documentDbCluster.outputs.clusterName
 output AZURE_DOCUMENTDB_DATABASENAME string = databaseName
 
 output AZURE_DOCUMENTDB_ADMIN_USERNAME string = documentDbAdminUsername
-output AZURE_DOCUMENTDB_VCORE_CLUSTER_NAME string = documentDbCluster.outputs.clusterName
 
 // Configuration for embedding creation and vector search
 output DATA_FILE_WITH_VECTORS string = dataFileWithVectors
