@@ -1,13 +1,13 @@
 # Cosmos DB Vector Samples (Python)
 
-This project demonstrates vector search capabilities using Azure Cosmos DB for MongoDB (vCore) with Python. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF, along with utilities for embedding generation and data management.
+This project demonstrates vector search capabilities using Cosmos DB with Python. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF, along with utilities for embedding generation and data management.
 
 ## Overview
 
 Vector search enables semantic similarity searching by converting text into high-dimensional vector representations (embeddings) and finding the most similar vectors in the database. This project shows how to:
 
 - Generate embeddings using Azure OpenAI
-- Store vectors in Cosmos DB for MongoDB (vCore)
+- Store vectors in Cosmos DB
 - Create and use different types of vector indexes
 - Perform similarity searches with various algorithms
 
@@ -18,7 +18,7 @@ Before running this project, you need:
 ### Azure Resources
 1. **Azure subscription** with appropriate permissions
 2. **Azure OpenAI resource** with embedding model deployment
-3. **Azure Cosmos DB for MongoDB (vCore) resource**
+3. **Cosmos DB resource**
 4. **Azure CLI** installed and configured
 
 ### Development Environment
@@ -75,9 +75,9 @@ az cognitiveservices account create \
 4. Choose **text-embedding-ada-002** model
 5. Note the deployment name for configuration
 
-#### Create Cosmos DB for MongoDB (vCore)
+#### Create Cosmos DB Resource
 
-Learn how to create a Cosmos DB for MongoDB (vCore) account in the [official documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/mongodb/vcore/quickstart-portal).
+Learn how to create a Cosmos DB account in the [official documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/mongodb/vcore/quickstart-portal).
 
 ### Step 3: Configure Environment Variables
 
@@ -206,7 +206,7 @@ This utility shows:
 ## Important Notes
 
 ### Vector Index Limitations
-**One Index Per Field**: Cosmos DB for MongoDB (vCore) allows only one vector index per field. Each script automatically handles this by:
+**One Index Per Field**: Cosmos DB allows only one vector index per field. Each script automatically handles this by:
 
 1. **Dropping existing indexes**: Before creating a new vector index, the script removes any existing vector indexes on the same field
 2. **Safe switching**: You can run different vector index scripts in any order - each will clean up previous indexes first
@@ -373,7 +373,7 @@ except Exception as e:
 
 ## Further Resources
 
-- [Azure Cosmos DB for MongoDB (vCore) Documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/mongodb/vcore/)
+- [Cosmos DB Documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/mongodb/vcore/)
 - [Azure OpenAI Service Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
 - [Vector Search in Cosmos DB](https://learn.microsoft.com/en-us/azure/cosmos-db/mongodb/vcore/vector-search)
 - [Python MongoDB Driver Documentation](https://pymongo.readthedocs.io/)

@@ -82,7 +82,7 @@ def perform_diskann_vector_search(collection,
         query_embedding = embedding_response.data[0].embedding
 
         # Construct the aggregation pipeline for vector search
-        # Cosmos DB for MongoDB vCore uses $search with cosmosSearch
+        # Cosmos DB uses $search with cosmosSearch
         pipeline = [
             {
                 "$search": {
