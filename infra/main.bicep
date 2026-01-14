@@ -53,8 +53,8 @@ var embeddingModelVersion = '1'
 var embeddingModelApiVersion = '2024-08-01-preview'
 
 // Data and embedding configuration
-var dataFileWithVectors = '../data/HotelsData_toCosmosDB_Vector.json'
-var dataFileWithoutVectors = '../data/HotelsData_toCosmosDB.JSON'
+var dataFileWithVectors = '../data/Hotels_Vector.json'
+var dataFileWithoutVectors = '../data/Hotels.json'
 var fieldToEmbed = 'Description'
 var embeddedFieldName = 'DescriptionVector'
 var embeddingDimensions = '1536'
@@ -182,6 +182,7 @@ module documentDbAccount 'br/public:avm/res/document-db/database-account:0.8.1' 
   }
 }
 
+// Azure Subscription and Resource Group outputs
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
 output AZURE_RESOURCE_GROUP string = resourceGroup.name
@@ -200,11 +201,10 @@ output AZURE_OPENAI_EMBEDDING_DEPLOYMENT string = embeddingModelName
 output AZURE_OPENAI_EMBEDDING_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_EMBEDDING_API_VERSION string = embeddingModelApiVersion
 
-output AZURE_COSMOSDB_ENDPOINT string = documentDbAccount.outputs.endpoint
-output AZURE_COSMOSDB_DATABASENAME string = databaseName
-
-// Environment variables needed by utils.ts
-output COSMOS_ENDPOINT string = documentDbAccount.outputs.endpoint
+// DocumentDB outputs
+output AZURE_DOCUMENTDB_CLUSTER string = documentDbAccount.outputs.name
+output AZURE_DOCUMENTDB_ENDPOINT string = documentDbAccount.outputs.endpoint
+output AZURE_DOCUMENTDB_DATABASENAME string = databaseName
 
 // Configuration for embedding creation and vector search
 output DATA_FILE_WITH_VECTORS string = dataFileWithVectors
