@@ -168,7 +168,7 @@ output AZURE_OPENAI_EMBEDDING_API_VERSION string = embeddingModelApiVersion
 // DocumentDB outputs
 output AZURE_DOCUMENTDB_CLUSTER string = documentDbCluster.outputs.clusterName
 output AZURE_DOCUMENTDB_DATABASENAME string = databaseName
-
+output MONGO_CLUSTER_NAME string = documentDbCluster.outputs.clusterName
 output AZURE_DOCUMENTDB_ADMIN_USERNAME string = documentDbAdminUsername
 
 // Configuration for embedding creation and vector search
