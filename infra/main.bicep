@@ -133,6 +133,7 @@ module documentDbCluster './documentdb.bicep' = {
     adminUsername: documentDbAdminUsername
     adminPassword: documentDbAdminPassword
     managedIdentityPrincipalId: managedIdentity.outputs.resourceId
+    managedIdentityObjectId: managedIdentity.outputs.principalId
     serverVersion: '8.0'
     shardCount: 1
     storageSizeGb: 32
