@@ -28,8 +28,8 @@ This .NET 8.0 sample application demonstrates vector similarity searches using A
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/alexwolfmsft/cosmos-db-vector-samples.git
-cd cosmos-db-vector-samples/mongo-vcore-vector-search-dotnet
+git clone https://github.com/documentdb-samples
+cd ai/vector-search-dotnet
 ```
 
 2. Login to Azure:
@@ -47,7 +47,7 @@ az login
   },
   "MongoDB": {
     "TenantId": "your-azure-tenant-id",
-    "ClusterName": "your-cosmos-mongodb-cluster-name"
+    "ClusterName": "your-documentdb-mongodb-cluster-name"
   }
 }
 ```

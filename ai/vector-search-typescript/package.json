@@ -1,5 +1,5 @@
 {
-  "name": "ts-cosmos-nodejs-vector-samples",
+  "name": "vector-search-typescript",
   "version": "1.0.0",
   "description": "Samples for MongoDB vCore vector search with DocumentDB",
   "main": "index.js",

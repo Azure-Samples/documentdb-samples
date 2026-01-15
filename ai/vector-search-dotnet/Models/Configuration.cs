@@ -1,4 +1,4 @@
-namespace CosmosDbVectorSamples.Models;
+namespace DocumentDBVectorSamples.Models;
 
 public class AppConfiguration
 {

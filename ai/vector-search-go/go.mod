@@ -1,6 +1,8 @@
-module cosmos-db-vector-samples
+module documentdb-vector-samples
 
 go 1.24.0
+
+toolchain go1.24.12
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.20.0

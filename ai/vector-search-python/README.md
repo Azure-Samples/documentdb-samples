@@ -33,7 +33,7 @@ Before running this project, you need:
 ```bash
 # Clone this repository
 git clone <your-repo-url>
-cd cosmos-db-vector-samples/mongo-vcore-vector-search-python
+cd ai/vector-search-python
 
 # Create virtual environment
 python -m venv venv
@@ -275,7 +275,7 @@ mongo_client, openai_client = get_clients()
 ## Project Structure
 
 ```
-cosmos-db-vector-samples/
+ai/vector-search-python/
 ├── src/
 │   ├── utils.py              # Shared utility functions
 │   ├── create_embeddings.py  # Generate embeddings with Azure OpenAI
