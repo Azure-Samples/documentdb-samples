@@ -71,7 +71,7 @@ func LoadConfig() *Config {
 		ClusterName:    getEnvOrDefault("MONGO_CLUSTER_NAME", "vectorSearch"),
 		DatabaseName:   "vectorSearchDB",
 		CollectionName: "vectorSearchCollection",
-		DataFile:       getEnvOrDefault("DATA_FILE_WITH_VECTORS", "data/HotelsData_with_vectors.json"),
+		DataFile:       getEnvOrDefault("DATA_FILE_WITH_VECTORS", "data/Hotels_Vector.json"),
 		VectorField:    getEnvOrDefault("EMBEDDED_FIELD", "DescriptionVector"),
 		ModelName:      getEnvOrDefault("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
 		Dimensions:     dimensions,

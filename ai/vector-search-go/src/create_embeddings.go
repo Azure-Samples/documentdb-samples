@@ -125,8 +125,8 @@ func LoadEmbeddingConfig() *EmbeddingConfig {
 
 	return &EmbeddingConfig{
 		ModelName:          getEnvOrDefault("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
-		DataWithoutVectors: getEnvOrDefault("DATA_FILE_WITHOUT_VECTORS", "HotelsData_toCosmosDB.json"),
-		DataWithVectors:    getEnvOrDefault("DATA_FILE_WITH_VECTORS", "data/HotelsData_toCosmosDB_Vector.json"),
+		DataWithoutVectors: getEnvOrDefault("DATA_FILE_WITHOUT_VECTORS", "Hotels.json"),
+		DataWithVectors:    getEnvOrDefault("DATA_FILE_WITH_VECTORS", "data/Hotels_Vector.json"),
 		FieldToEmbed:       getEnvOrDefault("FIELD_TO_EMBED", "Description"),
 		EmbeddedField:      getEnvOrDefault("EMBEDDED_FIELD", "DescriptionVector"),
 		BatchSize:          batchSize,
