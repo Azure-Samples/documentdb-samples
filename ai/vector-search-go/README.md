@@ -124,8 +124,8 @@ MONGO_CONNECTION_STRING=mongodb+srv://username:password@your-cluster.mongocluste
 MONGO_CLUSTER_NAME=vectorSearch
 
 # Data Configuration (defaults should work)
-DATA_FILE_WITHOUT_VECTORS=data/HotelsData_toCosmosDB.json
-DATA_FILE_WITH_VECTORS=data/HotelsData_toCosmosDB_Vector.json
+DATA_FILE_WITHOUT_VECTORS=data/Hotels.json
+DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
 FIELD_TO_EMBED=Description
 EMBEDDED_FIELD=DescriptionVector
 EMBEDDING_DIMENSIONS=1536
@@ -153,9 +153,9 @@ go run src/create_embeddings.go src/utils.go
 ```
 
 This program:
-- Reads hotel data from `data/HotelsData_toCosmosDB_Vector.json`
+- Reads hotel data from `data/Hotels_Vector.json`
 - Generates embeddings for hotel descriptions using Azure OpenAI
-- Saves enhanced data with embeddings to `data/HotelsData_with_vectors.json`
+- Saves enhanced data with embeddings to `data/Hotels_Vector.json`
 
 ### 2. DiskANN Vector Search
 Run DiskANN (Disk-based Approximate Nearest Neighbor) search:
@@ -299,8 +299,8 @@ mongo-vcore-vector-search-go/
 │   ├── ivf.go               # IVF vector search implementation
 │   └── show_indexes.go      # Display vector index information
 ├── data/
-│   ├── HotelsData_toCosmosDB_Vector.json  # Sample hotel data (original)
-│   └── HotelsData_with_vectors.json       # Generated with embeddings
+│   ├── Hotels_Vector.json  # Sample hotel data (original)
+│   └── Hotels_Vector.json       # Generated with embeddings
 ├── go.mod                   # Go module dependencies
 ├── go.sum                   # Dependency checksums
 ├── .env                     # Environment variables (create this)
