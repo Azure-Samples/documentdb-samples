@@ -1,12 +1,12 @@
 using Azure.AI.OpenAI;
 using Azure.Identity;
-using CosmosDbVectorSamples.Models;
+using DocumentDBVectorSamples.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Reflection;
 
-namespace CosmosDbVectorSamples.Services;
+namespace DocumentDBVectorSamples.Services;
 
 public class EmbeddingService
 {

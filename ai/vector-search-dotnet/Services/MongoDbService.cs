@@ -1,12 +1,12 @@
 using Azure.Identity;
-using CosmosDbVectorSamples.Models;
+using DocumentDBVectorSamples.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 
-namespace CosmosDbVectorSamples.Services;
+namespace DocumentDBVectorSamples.Services;
 
 /// <summary>
 /// Service for MongoDB operations including data insertion, index management, and vector index creation.
@@ -47,6 +47,14 @@ public class MongoDbService
     /// <summary>Gets a collection instance from the specified database</summary>
     public IMongoCollection<T> GetCollection<T>(string databaseName, string collectionName) => 
         _client.GetDatabase(databaseName).GetCollection<T>(collectionName);
+
+    /// <summary>Drops a collection from the specified database</summary>
+    public async Task DropCollectionAsync(string databaseName, string collectionName)
+    {
+        _logger.LogInformation($"Dropping collection '{collectionName}' from database '{databaseName}'");
+        await _client.GetDatabase(databaseName).DropCollectionAsync(collectionName);
+        _logger.LogInformation($"Collection '{collectionName}' dropped successfully");
+    }
 
     /// <summary>
     /// Creates a vector search index for DocumentDB, with support for IVF, HNSW, and DiskANN algorithms

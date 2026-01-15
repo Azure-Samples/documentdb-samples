@@ -34,7 +34,7 @@ Before running this project, you need:
 ```bash
 # Clone this repository
 git clone <your-repo-url>
-cd cosmos-db-vector-samples/mongo-vcore-vector-search-go
+cd ai/vector-search-go
 
 # Initialize Go modules (if needed)
 go mod tidy
@@ -127,7 +127,7 @@ MONGO_CLUSTER_NAME=vectorSearch
 DATA_FILE_WITHOUT_VECTORS=data/HotelsData_toCosmosDB.json
 DATA_FILE_WITH_VECTORS=data/HotelsData_toCosmosDB_Vector.json
 FIELD_TO_EMBED=Description
-EMBEDDED_FIELD=text_embedding_ada_002
+EMBEDDED_FIELD=text-embedding-3-small
 EMBEDDING_DIMENSIONS=1536
 EMBEDDING_SIZE_BATCH=16
 LOAD_SIZE_BATCH=100

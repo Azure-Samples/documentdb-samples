@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
-namespace CosmosDbVectorSamples.Models;
+namespace DocumentDBVectorSamples.Models;
 
 public class HotelData
 {
