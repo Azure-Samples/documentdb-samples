@@ -72,7 +72,7 @@ az cognitiveservices account create \
 1. Go to Azure OpenAI Studio (https://oai.azure.com/)
 2. Navigate to your OpenAI resource
 3. Go to **Deployments** and create a new deployment
-4. Choose **text-embedding-ada-002** model
+4. Choose **text-embedding-3-small** model
 5. Note the deployment name for configuration
 
 #### Create DocumentDB
@@ -90,7 +90,7 @@ cp .env.example .env
 
 ```env
 # Azure OpenAI Configuration
-AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-ada-002
+AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-openai-resource.openai.azure.com/
 AZURE_OPENAI_EMBEDDING_KEY=your-azure-openai-api-key
 AZURE_OPENAI_EMBEDDING_API_VERSION=2024-02-01

@@ -14,7 +14,7 @@ This .NET 8.0 sample application demonstrates vector similarity searches using A
 ### Azure Services
 
 - Azure DocumentDB account
-- Azure OpenAI Service with text-embedding-ada-002 model deployed
+- Azure OpenAI Service with text-embedding-3-small model deployed
 
 ### Development Environment
 
@@ -111,7 +111,7 @@ Update the following in `appsettings.json`:
 
 - **Authentication errors**: Run `az login` to authenticate with Azure
 - **Connection issues**: Verify DocumentDB cluster is running and accessible
-- **Embedding errors**: Ensure Azure OpenAI service is deployed with text-embedding-ada-002 model
+- **Embedding errors**: Ensure Azure OpenAI service is deployed with text-embedding-3-small model
 - **Index failures**: Check vector dimensions match (1536) and sufficient storage is available
 
 ## Additional Resources

@@ -73,7 +73,7 @@ func LoadConfig() *Config {
 		CollectionName: "vectorSearchCollection",
 		DataFile:       getEnvOrDefault("DATA_FILE_WITH_VECTORS", "data/HotelsData_with_vectors.json"),
 		VectorField:    getEnvOrDefault("EMBEDDED_FIELD", "DescriptionVector"),
-		ModelName:      getEnvOrDefault("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-ada-002"),
+		ModelName:      getEnvOrDefault("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
 		Dimensions:     dimensions,
 		BatchSize:      batchSize,
 	}

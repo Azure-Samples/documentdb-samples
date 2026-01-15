@@ -128,7 +128,7 @@ def main():
         'collection_name': 'vectorSearchCollection',
         'data_file': os.getenv('DATA_FILE_WITH_VECTORS', 'data/HotelsData_with_vectors.json'),
         'vector_field': os.getenv('EMBEDDED_FIELD', 'DescriptionVector'),
-        'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-ada-002'),
+        'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
         'dimensions': int(os.getenv('EMBEDDING_DIMENSIONS', '1536')),
         'batch_size': int(os.getenv('LOAD_SIZE_BATCH', '100'))
     }

@@ -19,7 +19,7 @@ import (
 // Args:
 //   - texts: List of text strings to generate embeddings for
 //   - azureOpenAIClient: Configured Azure OpenAI client
-//   - modelName: Name of the embedding model to use (e.g., 'text-embedding-ada-002')
+//   - modelName: Name of the embedding model to use (e.g., 'text-embedding-3-small')
 //
 // Returns:
 //   - List of embedding vectors, where each vector is a list of floats
@@ -124,7 +124,7 @@ func LoadEmbeddingConfig() *EmbeddingConfig {
 	batchSize, _ := strconv.Atoi(getEnvOrDefault("EMBEDDING_SIZE_BATCH", "16"))
 
 	return &EmbeddingConfig{
-		ModelName:          getEnvOrDefault("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-ada-002"),
+		ModelName:          getEnvOrDefault("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
 		DataWithoutVectors: getEnvOrDefault("DATA_FILE_WITHOUT_VECTORS", "HotelsData_toCosmosDB.json"),
 		DataWithVectors:    getEnvOrDefault("DATA_FILE_WITH_VECTORS", "data/HotelsData_toCosmosDB_Vector.json"),
 		FieldToEmbed:       getEnvOrDefault("FIELD_TO_EMBED", "Description"),

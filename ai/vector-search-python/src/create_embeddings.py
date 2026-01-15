@@ -26,7 +26,7 @@ def create_embeddings(texts: List[str], azure_openai_client, model_name: str) ->
     Args:
         texts: List of text strings to generate embeddings for
         azure_openai_client: Configured Azure OpenAI client
-        model_name: Name of the embedding model to use (e.g., 'text-embedding-ada-002')
+        model_name: Name of the embedding model to use (e.g., 'text-embedding-3-small')
 
     Returns:
         List of embedding vectors, where each vector is a list of floats
@@ -111,7 +111,7 @@ def main():
 
     # Load configuration from environment variables
     config = {
-        'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-ada-002'),
+        'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
         'input_file': os.getenv('DATA_FILE_WITHOUT_VECTORS', 'data/HotelsData_toCosmosDB_Vector.json'),
         'output_file': os.getenv('DATA_FILE_WITH_VECTORS', 'data/HotelsData_with_vectors.json'),
         'field_to_embed': os.getenv('FIELD_TO_EMBED', 'Description'),

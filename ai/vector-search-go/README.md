@@ -67,7 +67,7 @@ az cognitiveservices account create \
 1. Go to Azure OpenAI Studio (https://oai.azure.com/)
 2. Navigate to your OpenAI resource
 3. Go to **Model deployments** and create a new deployment
-4. Choose **text-embedding-ada-002** model
+4. Choose **text-embedding-3-small** model
 5. Note the deployment name for configuration
 
 #### Create Azure DocumentDB Resource
@@ -114,7 +114,7 @@ cp .env.example .env
 
 ```env
 # Azure OpenAI Configuration
-AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-ada-002
+AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-openai-resource.openai.azure.com/
 AZURE_OPENAI_EMBEDDING_KEY=your-azure-openai-api-key
 AZURE_OPENAI_EMBEDDING_API_VERSION=2024-02-01
@@ -127,7 +127,7 @@ MONGO_CLUSTER_NAME=vectorSearch
 DATA_FILE_WITHOUT_VECTORS=data/HotelsData_toCosmosDB.json
 DATA_FILE_WITH_VECTORS=data/HotelsData_toCosmosDB_Vector.json
 FIELD_TO_EMBED=Description
-EMBEDDED_FIELD=text-embedding-3-small
+EMBEDDED_FIELD=DescriptionVector
 EMBEDDING_DIMENSIONS=1536
 EMBEDDING_SIZE_BATCH=16
 LOAD_SIZE_BATCH=100
