@@ -1,24 +1,20 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/java
+// README at: https://github.com/devcontainers/templates/tree/main/src/universal
 {
 	"name": "Default Java",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/java:latest",
 	"features": {
-		"ghcr.io/devcontainers/features/azure-cli:1": {},
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
-		"ghcr.io/azure/azure-dev/azd:0": {}
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "none",
+			"installMaven": "true"
+		},
+		"ghcr.io/devcontainers/features/azure-cli:1": {}
 	},
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-azuretools.vscode-cosmosdb",
-				"buildwithlayer.mongodb-integration-expert-qS6DB",
-				"mongodb.mongodb-vscode",
-				"ms-azuretools.vscode-documentdb",
-				"redhat.java",
-				"vscjava.vscode-maven",
-				"vscjava.vscode-gradle"
+				"ms-azuretools.vscode-documentdb"
 			]
 		}
 	}

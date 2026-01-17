@@ -485,3 +485,8 @@ dist/
 *.user
 *.suo
 *.sln.docstates
+
+# Java
+*.class
+*.jar
+target/
