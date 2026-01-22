@@ -120,7 +120,7 @@ public class DiskAnn {
         var dataFile = System.getenv("DATA_FILE_WITH_VECTORS");
         var filePath = Path.of(dataFile);
 
-        System.out.println("Reading JSON file from " + filePath.toAbsolutePath());
+        System.out.println("Reading JSON file from " + filePath);
         var jsonContent = Files.readString(filePath);
 
         return jsonMapper.readValue(jsonContent, new TypeReference<List<Map<String, Object>>>() {});
