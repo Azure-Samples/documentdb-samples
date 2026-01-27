@@ -58,11 +58,11 @@ module managedIdentity 'br/public:avm/res/managed-identity/user-assigned-identit
 // Azure OpenAI model and configuration variables
 var chatModelName = 'gpt-4o-mini'
 var chatModelVersion = '2024-07-18'
-var chatModelApiVersion = '2024-08-01-preview'
+var chatModelApiVersion = '2025-01-01-preview'
 
 var embeddingModelName = 'text-embedding-3-small'
 var embeddingModelVersion = '1'
-var embeddingModelApiVersion = '2024-08-01-preview'
+var embeddingModelApiVersion = '2023-05-15'
 
 // Data and embedding configuration
 var dataFileWithVectors = '../data/Hotels_Vector.json'

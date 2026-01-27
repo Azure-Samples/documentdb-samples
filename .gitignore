@@ -463,8 +463,8 @@ go.work
 vendor/
 
 # TypeScript / JavaScript
-node_modules/
-dist/
+**/node_modules/
+**/dist/
 *.tsbuildinfo
 .npm
 .eslintcache
@@ -485,3 +485,5 @@ dist/
 *.user
 *.suo
 *.sln.docstates
+
+**.env*

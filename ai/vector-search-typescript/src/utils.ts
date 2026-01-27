@@ -18,13 +18,19 @@ export function getClients(): { aiClient: AzureOpenAI; dbClient: MongoClient } {
     const apiVersion = process.env.AZURE_OPENAI_EMBEDDING_API_VERSION!;
     const endpoint = process.env.AZURE_OPENAI_EMBEDDING_ENDPOINT!;
     const deployment = process.env.AZURE_OPENAI_EMBEDDING_MODEL!;
+    const mongoConnectionString = process.env.MONGO_CONNECTION_STRING!;
+
+    if (!apiKey || !apiVersion || !endpoint || !deployment || !mongoConnectionString) {
+        throw new Error('Missing required environment variables: AZURE_OPENAI_EMBEDDING_KEY, AZURE_OPENAI_EMBEDDING_API_VERSION, AZURE_OPENAI_EMBEDDING_ENDPOINT, AZURE_OPENAI_EMBEDDING_MODEL, MONGO_CONNECTION_STRING');
+    }
+
     const aiClient = new AzureOpenAI({
         apiKey,
         apiVersion,
         endpoint,
         deployment
     });
-    const dbClient = new MongoClient(process.env.MONGO_CONNECTION_STRING!, {
+    const dbClient = new MongoClient(mongoConnectionString, {
         // Performance optimizations
         maxPoolSize: 10,         // Limit concurrent connections
         minPoolSize: 1,          // Maintain at least one connection
@@ -44,13 +50,24 @@ export function getClientsPasswordless(): { aiClient: AzureOpenAI | null; dbClie
     let aiClient: AzureOpenAI | null = null;
     let dbClient: MongoClient | null = null;
 
-    // For Azure OpenAI with DefaultAzureCredential
+    // Validate all required environment variables upfront
     const apiVersion = process.env.AZURE_OPENAI_EMBEDDING_API_VERSION!;
     const endpoint = process.env.AZURE_OPENAI_EMBEDDING_ENDPOINT!;
     const deployment = process.env.AZURE_OPENAI_EMBEDDING_MODEL!;
+    const clusterName = process.env.MONGO_CLUSTER_NAME!;
 
-    if (apiVersion && endpoint && deployment) {
-        const credential = new DefaultAzureCredential();
+    if (!apiVersion || !endpoint || !deployment || !clusterName) {
+        throw new Error('Missing required environment variables: AZURE_OPENAI_EMBEDDING_API_VERSION, AZURE_OPENAI_EMBEDDING_ENDPOINT, AZURE_OPENAI_EMBEDDING_MODEL, MONGO_CLUSTER_NAME');
+    }
+
+    console.log(`Using Azure OpenAI Embedding API Version: ${apiVersion}`);
+    console.log(`Using Azure OpenAI Embedding Endpoint: ${endpoint}`);
+    console.log(`Using Azure OpenAI Embedding Deployment/Model: ${deployment}`);
+
+    const credential = new DefaultAzureCredential();
+
+    // For Azure OpenAI with DefaultAzureCredential
+    {
         const scope = "https://cognitiveservices.azure.com/.default";
         const azureADTokenProvider = getBearerTokenProvider(credential, scope);
         aiClient = new AzureOpenAI({
@@ -61,15 +78,10 @@ export function getClientsPasswordless(): { aiClient: AzureOpenAI | null; dbClie
         });
     }
 
-    // For DocumentDB with DefaultAzureCredential
-    const clusterName = process.env.MONGO_CLUSTER_NAME!;
-    const managedIdentityPrincipalId = process.env.AZURE_MANAGED_IDENTITY_PRINCIPAL_ID!;
-
-    if (clusterName && managedIdentityPrincipalId) {
-        const credential = new DefaultAzureCredential();
-
+    // For DocumentDB with DefaultAzureCredential (uses signed-in user)
+    {
         dbClient = new MongoClient(
-            `mongodb+srv://${managedIdentityPrincipalId}@${clusterName}.mongocluster.cosmos.azure.com/`, {
+            `mongodb+srv://${clusterName}.mongocluster.cosmos.azure.com/`, {
             connectTimeoutMS: 120000,
             tls: true,
             retryWrites: false,
