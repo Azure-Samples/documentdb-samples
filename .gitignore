@@ -487,3 +487,8 @@ vendor/
 *.sln.docstates
 
 **.env*
+
+# Java
+*.class
+*.jar
+target/
