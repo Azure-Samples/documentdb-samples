@@ -15,6 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const deployment = process.env.AZURE_OPENAI_EMBEDDING_MODEL!;
+console.log(`Using embedding deployment/model: ${deployment}`);
 
 const dataWithVectors = process.env.DATA_FILE_WITH_VECTORS!;
 const dataWithoutVectors = process.env.DATA_FILE_WITHOUT_VECTORS!;
