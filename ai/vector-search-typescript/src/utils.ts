@@ -61,7 +61,6 @@ export function getClientsPasswordless(): { aiClient: AzureOpenAI | null; dbClie
     }
 
     console.log(`Using Azure OpenAI Embedding API Version: ${apiVersion}`);
-    console.log(`Using Azure OpenAI Embedding Endpoint: ${endpoint}`);
     console.log(`Using Azure OpenAI Embedding Deployment/Model: ${deployment}`);
 
     const credential = new DefaultAzureCredential();
