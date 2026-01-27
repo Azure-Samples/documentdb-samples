@@ -1,8 +1,7 @@
 Using Azure OpenAI Embedding API Version: 2023-05-15
-Using Azure OpenAI Embedding Endpoint: https://openai-dfb-docdb-1kmp7ue6tbbztc.openai.azure.com/
 Using Azure OpenAI Embedding Deployment/Model: text-embedding-3-small-2
 Created collection: hotels_diskann
-Reading JSON file from C:\Users\diberry\repos\azure-samples\documentdb-samples\ai\data\Hotels_Vector.json
+Reading JSON file from \documentdb-samples\ai\data\Hotels_Vector.json
 Processing in batches of 50...
 Batch 1 complete: 50 inserted
 Created vector index: vectorIndex_diskann

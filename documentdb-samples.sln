@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ai", "ai", "{BA58FF10-E1F2-1F22-EED5-4647CFF8BF60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentDBVectorSearch", "ai\vector-search-dotnet\DocumentDBVectorSearch.csproj", "{E94C3540-59F4-B5AC-D672-867AB595F52E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E94C3540-59F4-B5AC-D672-867AB595F52E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E94C3540-59F4-B5AC-D672-867AB595F52E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E94C3540-59F4-B5AC-D672-867AB595F52E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E94C3540-59F4-B5AC-D672-867AB595F52E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E94C3540-59F4-B5AC-D672-867AB595F52E} = {BA58FF10-E1F2-1F22-EED5-4647CFF8BF60}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5E584646-1E52-44CD-8825-1C4AF6B7A67B}
+	EndGlobalSection
+EndGlobal
