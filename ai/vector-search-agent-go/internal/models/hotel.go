@@ -43,7 +43,7 @@ type HotelForVectorStore struct {
 	LastRenovationDate time.Time `json:"LastRenovationDate" bson:"LastRenovationDate"`
 	Rating             float64   `json:"Rating" bson:"Rating"`
 	Address            Address   `json:"Address" bson:"Address"`
-	ContentVector      []float32 `json:"contentVector,omitempty" bson:"contentVector,omitempty"`
+	DescriptionVector  []float32 `json:"DescriptionVector,omitempty" bson:"DescriptionVector,omitempty"`
 }
 
 // HotelSearchResult represents a hotel with similarity score

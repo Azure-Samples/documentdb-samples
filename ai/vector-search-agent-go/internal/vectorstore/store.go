@@ -25,6 +25,7 @@ type VectorStoreConfig struct {
 	DatabaseName     string
 	CollectionName   string
 	IndexName        string
+	EmbeddedField    string // Field name for vector embeddings
 	UsePasswordless  bool
 	Debug            bool
 }
@@ -42,12 +43,18 @@ func LoadConfigFromEnv() *VectorStoreConfig {
 	debug := os.Getenv("DEBUG") == "true" || os.Getenv("DEBUG") == "1"
 	usePasswordless := os.Getenv("USE_PASSWORDLESS") == "true" || os.Getenv("USE_PASSWORDLESS") == "1"
 
+	embeddedField := os.Getenv("EMBEDDED_FIELD")
+	if embeddedField == "" {
+		embeddedField = "DescriptionVector"
+	}
+
 	return &VectorStoreConfig{
 		ConnectionString: os.Getenv("AZURE_DOCUMENTDB_CONNECTION_STRING"),
 		ClusterName:      os.Getenv("MONGO_CLUSTER_NAME"),
 		DatabaseName:     os.Getenv("MONGO_DB_NAME"),
 		CollectionName:   os.Getenv("MONGO_DB_COLLECTION"),
 		IndexName:        os.Getenv("MONGO_DB_INDEX_NAME"),
+		EmbeddedField:    embeddedField,
 		UsePasswordless:  usePasswordless,
 		Debug:            debug,
 	}
@@ -311,7 +318,7 @@ func (vs *VectorStore) CreateVectorIndex(ctx context.Context) error {
 		{Key: "indexes", Value: bson.A{
 			bson.D{
 				{Key: "name", Value: vs.config.IndexName},
-				{Key: "key", Value: bson.D{{Key: "contentVector", Value: "cosmosSearch"}}},
+				{Key: "key", Value: bson.D{{Key: vs.config.EmbeddedField, Value: "cosmosSearch"}}},
 				{Key: "cosmosSearchOptions", Value: cosmosSearchOptions},
 			},
 		}},
@@ -340,7 +347,7 @@ func (vs *VectorStore) VectorSearch(ctx context.Context, queryVector []float32, 
 		{{Key: "$search", Value: bson.D{
 			{Key: "cosmosSearch", Value: bson.D{
 				{Key: "vector", Value: vectorInterface},
-				{Key: "path", Value: "contentVector"},
+				{Key: "path", Value: vs.config.EmbeddedField},
 				{Key: "k", Value: k},
 			}},
 		}}},

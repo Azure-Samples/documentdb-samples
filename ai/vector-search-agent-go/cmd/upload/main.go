@@ -67,15 +67,14 @@ func main() {
 		// Convert to vector store format
 		hotelVS := hotel.ToVectorStore()
 
-		// Generate embedding
-		pageContent := hotel.PageContent()
-		embedding, err := openaiClients.GenerateEmbedding(ctx, pageContent)
+		// Generate embedding from the Description field
+		embedding, err := openaiClients.GenerateEmbedding(ctx, hotel.Description)
 		if err != nil {
 			log.Printf("Warning: Failed to generate embedding for hotel %s: %v", hotel.HotelName, err)
 			continue
 		}
 
-		hotelVS.ContentVector = embedding
+		hotelVS.DescriptionVector = embedding
 		hotelsWithVectors = append(hotelsWithVectors, hotelVS)
 
 		if debug && (i+1)%10 == 0 {
