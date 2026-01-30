@@ -123,20 +123,20 @@ You can choose between two authentication methods: passwordless authentication u
 
 ### Option 1: Passwordless authentication (Recommended)
 
-Use Azure Identity for passwordless authentication with both Azure OpenAI and Azure DocumentDB. Set `USE_PASSWORDLESS=true` or omit `AZURE_OPENAI_API_KEY` and `AZURE_DOCUMENTDB_CONNECTION_STRING`, and provide `AZURE_OPENAI_API_INSTANCE_NAME` and `MONGO_CLUSTER_NAME` instead.
+Use Azure Identity for passwordless authentication with both Azure OpenAI and Azure DocumentDB. Set `USE_PASSWORDLESS=true` or omit `AZURE_OPENAI_API_KEY` and `AZURE_DOCUMENTDB_CONNECTION_STRING`, and provide `AZURE_OPENAI_ENDPOINT` and `AZURE_DOCUMENTDB_CLUSTER` instead.
 
 ```.env
 # Enable passwordless authentication
 USE_PASSWORDLESS=true
 
 # Azure OpenAI Configuration (passwordless)
-AZURE_OPENAI_API_INSTANCE_NAME=your-openai-instance-name
+AZURE_OPENAI_ENDPOINT=https://your-openai-instance.openai.azure.com/
 
 # Azure DocumentDB (passwordless)
-MONGO_CLUSTER_NAME=your-mongo-cluster-name
-MONGO_DB_NAME=vectorSearchDB
-MONGO_DB_COLLECTION=vectorSearchCollection
-MONGO_DB_INDEX_NAME=vectorSearchIndex
+AZURE_DOCUMENTDB_CLUSTER=your-mongo-cluster-name
+AZURE_DOCUMENTDB_DATABASENAME=Hotels
+AZURE_DOCUMENTDB_COLLECTION=hotel_data
+AZURE_DOCUMENTDB_INDEX_NAME=vectorIndex
 
 # Optional settings
 DEBUG=true
@@ -160,18 +160,17 @@ Use key-based authentication by setting `USE_PASSWORDLESS=false` and providing `
 USE_PASSWORDLESS=false
 
 # Azure OpenAI Configuration (API key)
-AZURE_OPENAI_API_INSTANCE_NAME=your-openai-instance-name
+AZURE_OPENAI_ENDPOINT=https://your-openai-instance.openai.azure.com/
 AZURE_OPENAI_API_KEY=your-azure-openai-api-key
 
 # Azure DocumentDB (connection string)
 AZURE_DOCUMENTDB_CONNECTION_STRING=mongodb+srv://username:password@cluster.mongocluster.cosmos.azure.com/
-MONGO_DB_NAME=vectorSearchDB
-MONGO_DB_COLLECTION=vectorSearchCollection
-MONGO_DB_INDEX_NAME=vectorSearchIndex
+AZURE_DOCUMENTDB_DATABASENAME=vectorSearchDB
+AZURE_DOCUMENTDB_COLLECTION=hotel_data
+AZURE_DOCUMENTDB_INDEX_NAME=vectorIndex
 ```
 
 ## Usage
-
 
 Upload the hotel data with embeddings:
 
@@ -285,8 +284,8 @@ The application supports two authentication methods for both Azure OpenAI and Az
 1. **Passwordless Authentication (Recommended)**:
    - Set `USE_PASSWORDLESS=true` in your `.env` file
    - Uses Azure Identity (`DefaultAzureCredential`) for authentication
-   - For **Azure OpenAI**: Omit `AZURE_OPENAI_API_KEY` and provide only `AZURE_OPENAI_API_INSTANCE_NAME`
-   - For **Azure DocumentDB**: Omit `AZURE_DOCUMENTDB_CONNECTION_STRING` and provide `MONGO_CLUSTER_NAME` instead
+   - For **Azure OpenAI**: Omit `AZURE_OPENAI_API_KEY` and provide only `AZURE_OPENAI_ENDPOINT`
+   - For **Azure DocumentDB**: Omit `AZURE_DOCUMENTDB_CONNECTION_STRING` and provide `AZURE_DOCUMENTDB_CLUSTER` instead
    - Supports multiple credential types: Azure CLI, Managed Identity, Service Principal, Workload Identity
    - More secure as no secrets are stored in code or config files
    - Requires appropriate RBAC roles assigned to your identity
@@ -299,7 +298,7 @@ The application supports two authentication methods for both Azure OpenAI and Az
 
 **Auto-detection**: If `USE_PASSWORDLESS` is not explicitly set, the application automatically detects which authentication method to use:
 - Uses passwordless for OpenAI if `AZURE_OPENAI_API_KEY` is not set
-- Uses passwordless for Azure DocumentDB if `AZURE_DOCUMENTDB_CONNECTION_STRING` is not set but `MONGO_CLUSTER_NAME` is set
+- Uses passwordless for Azure DocumentDB if `AZURE_DOCUMENTDB_CONNECTION_STRING` is not set but `AZURE_DOCUMENTDB_CLUSTER` is set
 
 ### Vector Index Algorithms
 
