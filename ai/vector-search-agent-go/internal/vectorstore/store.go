@@ -50,10 +50,10 @@ func LoadConfigFromEnv() *VectorStoreConfig {
 
 	return &VectorStoreConfig{
 		ConnectionString: os.Getenv("AZURE_DOCUMENTDB_CONNECTION_STRING"),
-		ClusterName:      os.Getenv("MONGO_CLUSTER_NAME"),
-		DatabaseName:     os.Getenv("MONGO_DB_NAME"),
-		CollectionName:   os.Getenv("MONGO_DB_COLLECTION"),
-		IndexName:        os.Getenv("MONGO_DB_INDEX_NAME"),
+		ClusterName:      os.Getenv("AZURE_DOCUMENTDB_CLUSTER"),
+		DatabaseName:     os.Getenv("AZURE_DOCUMENTDB_DATABASENAME"),
+		CollectionName:   os.Getenv("AZURE_DOCUMENTDB_COLLECTION"),
+		IndexName:        os.Getenv("AZURE_DOCUMENTDB_INDEX_NAME"),
 		EmbeddedField:    embeddedField,
 		UsePasswordless:  usePasswordless,
 		Debug:            debug,
@@ -74,7 +74,7 @@ func NewVectorStore(ctx context.Context, config *VectorStoreConfig) (*VectorStor
 			fmt.Println("[vectorstore] Using passwordless (OIDC) authentication")
 		}
 		if config.ClusterName == "" {
-			return nil, fmt.Errorf("MONGO_CLUSTER_NAME is required for passwordless authentication")
+			return nil, fmt.Errorf("AZURE_DOCUMENTDB_CLUSTER is required for passwordless authentication")
 		}
 		client, err = connectWithOIDC(ctx, config.ClusterName, config.Debug)
 		if err != nil {

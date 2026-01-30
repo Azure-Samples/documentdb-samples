@@ -60,6 +60,10 @@ var chatModelName = 'gpt-4o-mini'
 var chatModelVersion = '2024-07-18'
 var chatModelApiVersion = '2025-01-01-preview'
 
+var synthModelName = 'gpt-4o'
+var synthModelVersion = '2024-11-20'
+var synthModelApiVersion = '2025-01-01-preview'
+
 var embeddingModelName = 'text-embedding-3-small'
 var embeddingModelVersion = '1'
 var embeddingModelApiVersion = '2023-05-15'
@@ -72,6 +76,10 @@ var embeddedFieldName = 'DescriptionVector'
 var embeddingDimensions = '1536'
 var embeddingBatchSize = '16'
 var loadSizeBatch = '50'
+
+// DocumentDB collection configuration
+var collectionName = 'hotel_data'
+var indexName = 'vectorIndex'
 
 var openAiServiceName = 'openai-${prefix}'
 module openAi 'br/public:avm/res/cognitive-services/account:0.7.1' = {
@@ -96,6 +104,18 @@ module openAi 'br/public:avm/res/cognitive-services/account:0.7.1' = {
           format: 'OpenAI'
           name: chatModelName
           version: chatModelVersion
+        }
+        sku: {
+          name: 'GlobalStandard'
+          capacity: 50
+        }
+      }
+      {
+        name: synthModelName
+        model: {
+          format: 'OpenAI'
+          name: synthModelName
+          version: synthModelVersion
         }
         sku: {
           name: 'GlobalStandard'
@@ -165,6 +185,17 @@ output AZURE_OPENAI_CHAT_DEPLOYMENT string = chatModelName
 output AZURE_OPENAI_CHAT_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_CHAT_API_VERSION string = chatModelApiVersion
 
+// Planner agent uses the same model as chat (gpt-4o-mini)
+output AZURE_OPENAI_PLANNER_MODEL string = chatModelName
+output AZURE_OPENAI_PLANNER_DEPLOYMENT string = chatModelName
+output AZURE_OPENAI_PLANNER_ENDPOINT string = openAi.outputs.endpoint
+output AZURE_OPENAI_PLANNER_API_VERSION string = chatModelApiVersion
+
+output AZURE_OPENAI_SYNTH_MODEL string = synthModelName
+output AZURE_OPENAI_SYNTH_DEPLOYMENT string = synthModelName
+output AZURE_OPENAI_SYNTH_ENDPOINT string = openAi.outputs.endpoint
+output AZURE_OPENAI_SYNTH_API_VERSION string = synthModelApiVersion
+
 output AZURE_OPENAI_EMBEDDING_MODEL string = embeddingModelName
 output AZURE_OPENAI_EMBEDDING_DEPLOYMENT string = embeddingModelName
 output AZURE_OPENAI_EMBEDDING_ENDPOINT string = openAi.outputs.endpoint
@@ -178,6 +209,8 @@ output AZURE_MANAGED_IDENTITY_CLIENT_ID string = managedIdentity.outputs.clientI
 // DocumentDB outputs
 output AZURE_DOCUMENTDB_CLUSTER string = documentDbCluster.outputs.clusterName
 output AZURE_DOCUMENTDB_DATABASENAME string = databaseName
+output AZURE_DOCUMENTDB_COLLECTION string = collectionName
+output AZURE_DOCUMENTDB_INDEX_NAME string = indexName
 output MONGO_CLUSTER_NAME string = documentDbCluster.outputs.clusterName
 output AZURE_DOCUMENTDB_ADMIN_USERNAME string = documentDbAdminUsername
 

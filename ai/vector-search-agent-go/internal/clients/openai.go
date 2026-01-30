@@ -14,8 +14,8 @@ import (
 
 // OpenAIConfig holds configuration for Azure OpenAI clients
 type OpenAIConfig struct {
-	InstanceName string
-	APIKey       string
+	Endpoint string
+	APIKey   string
 
 	EmbeddingDeployment string
 	EmbeddingAPIVersion string
@@ -42,7 +42,7 @@ func LoadConfigFromEnv() *OpenAIConfig {
 	usePasswordless := os.Getenv("USE_PASSWORDLESS") == "true" || os.Getenv("USE_PASSWORDLESS") == "1"
 
 	return &OpenAIConfig{
-		InstanceName:        os.Getenv("AZURE_OPENAI_API_INSTANCE_NAME"),
+		Endpoint:            os.Getenv("AZURE_OPENAI_ENDPOINT"),
 		APIKey:              os.Getenv("AZURE_OPENAI_API_KEY"),
 		EmbeddingDeployment: os.Getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT"),
 		EmbeddingAPIVersion: os.Getenv("AZURE_OPENAI_EMBEDDING_API_VERSION"),
@@ -57,11 +57,9 @@ func LoadConfigFromEnv() *OpenAIConfig {
 
 // NewOpenAIClients creates all Azure OpenAI clients with passwordless authentication support
 func NewOpenAIClients(config *OpenAIConfig) (*OpenAIClients, error) {
-	if config.InstanceName == "" {
-		return nil, fmt.Errorf("AZURE_OPENAI_API_INSTANCE_NAME is required")
+	if config.Endpoint == "" {
+		return nil, fmt.Errorf("AZURE_OPENAI_ENDPOINT is required")
 	}
-
-	endpoint := fmt.Sprintf("https://%s.openai.azure.com/", config.InstanceName)
 
 	// Use the default API version if not specified
 	apiVersion := config.EmbeddingAPIVersion
@@ -85,7 +83,7 @@ func NewOpenAIClients(config *OpenAIConfig) (*OpenAIClients, error) {
 		}
 
 		client = openai.NewClient(
-			azure.WithEndpoint(endpoint, apiVersion),
+			azure.WithEndpoint(config.Endpoint, apiVersion),
 			azure.WithTokenCredential(credential),
 		)
 	} else {
@@ -97,13 +95,13 @@ func NewOpenAIClients(config *OpenAIConfig) (*OpenAIClients, error) {
 			return nil, fmt.Errorf("AZURE_OPENAI_API_KEY is required when USE_PASSWORDLESS is not enabled")
 		}
 		client = openai.NewClient(
-			azure.WithEndpoint(endpoint, apiVersion),
+			azure.WithEndpoint(config.Endpoint, apiVersion),
 			option.WithAPIKey(config.APIKey),
 		)
 	}
 
 	if config.Debug {
-		fmt.Printf("[clients] OpenAI client created for instance: %s\n", config.InstanceName)
+		fmt.Printf("[clients] OpenAI client created for endpoint: %s\n", config.Endpoint)
 		fmt.Printf("[clients] Embedding deployment: %s\n", config.EmbeddingDeployment)
 		fmt.Printf("[clients] Planner deployment: %s\n", config.PlannerDeployment)
 		fmt.Printf("[clients] Synthesizer deployment: %s\n", config.SynthDeployment)

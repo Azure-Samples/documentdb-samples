@@ -33,7 +33,7 @@ func main() {
 	// Get data file path
 	dataFile := os.Getenv("DATA_FILE_WITHOUT_VECTORS")
 	if dataFile == "" {
-		dataFile = "./data/HotelsData_toCosmosDB.JSON"
+		dataFile = "../data/Hotels.json"
 	}
 
 	fmt.Printf("Loading hotels from: %s\n", dataFile)
