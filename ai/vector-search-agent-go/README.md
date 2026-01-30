@@ -69,7 +69,7 @@ flowchart LR
 2. **Azure DocumentDB** cluster with:
    - Vector search support enabled
    - Appropriate cluster tier (M10+ for IVF, M30+ for HNSW/DiskANN)
-   - Firewall rules configured to allow your IP. For more information, see [Grant access from your IP address](https://learn.microsoft.com/azure/cosmos-db/how-to-configure-firewall#grant-access-from-your-ip-address).
+   - Firewall rules configured to allow your IP. For more information, see [Grant access from your IP address](https://learn.microsoft.com/azure/documentdb/how-to-configure-firewall#grant-access-from-your-ip-address).
 
 ### Development Tools
 
