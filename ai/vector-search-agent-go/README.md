@@ -123,7 +123,7 @@ You can choose between two authentication methods: passwordless authentication u
 
 ### Option 1: Passwordless authentication (Recommended)
 
-Use Azure Identity for passwordless authentication with both Azure OpenAI and Azure DocumentDB. Set `USE_PASSWORDLESS=true` or omit `AZURE_OPENAI_API_KEY` and `AZURE_DOCUMENTDB_CONNECTION_STRING`, and provide `AZURE_OPENAI_ENDPOINT` and `AZURE_DOCUMENTDB_CLUSTER` instead.
+Use passwordless authentication with both Azure OpenAI and Azure DocumentDB. Set `USE_PASSWORDLESS=true`, `AZURE_OPENAI_ENDPOINT`, and `AZURE_DOCUMENTDB_CLUSTER`.
 
 ```.env
 # Enable passwordless authentication
