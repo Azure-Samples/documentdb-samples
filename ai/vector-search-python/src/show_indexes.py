@@ -185,9 +185,9 @@ def main():
 
     # Load configuration from environment variables
     config = {
-        'cluster_name': os.getenv('MONGO_CLUSTER_NAME', 'vectorSearch'),
-        'default_database': 'vectorSearchDB',
-        'default_collection': 'vectorSearchCollection'
+        'cluster_name': os.getenv('AZURE_DOCUMENTDB_CLUSTER', 'vectorSearch'),
+        'default_database': os.getenv('AZURE_DOCUMENTDB_DATABASENAME', 'Hotels'),
+        'default_collection': os.getenv('AZURE_DOCUMENTDB_COLLECTION', 'hotel_data')
     }
 
     print(f"Cluster: {config['cluster_name']}")

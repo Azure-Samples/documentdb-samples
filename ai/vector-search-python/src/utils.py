@@ -25,9 +25,9 @@ class AzureIdentityTokenCallback(OIDCCallback):
 def get_clients() -> Tuple[MongoClient, AzureOpenAI]:
 
     # Get MongoDB connection string - required for DocumentDB access
-    mongo_connection_string = os.getenv("MONGO_CONNECTION_STRING")
+    mongo_connection_string = os.getenv("AZURE_DOCUMENTDB_CONNECTION_STRING")
     if not mongo_connection_string:
-        raise ValueError("MONGO_CONNECTION_STRING environment variable is required")
+        raise ValueError("AZURE_DOCUMENTDB_CONNECTION_STRING environment variable is required")
 
     # Create MongoDB client with optimized settings for DocumentDB
     mongo_client = MongoClient(
@@ -40,8 +40,8 @@ def get_clients() -> Tuple[MongoClient, AzureOpenAI]:
     )
 
     # Get Azure OpenAI configuration
-    azure_openai_endpoint = os.getenv("AZURE_OPENAI_EMBEDDING_ENDPOINT")
-    azure_openai_key = os.getenv("AZURE_OPENAI_EMBEDDING_KEY")
+    azure_openai_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+    azure_openai_key = os.getenv("AZURE_OPENAI_API_KEY")
 
     if not azure_openai_endpoint or not azure_openai_key:
         raise ValueError("Azure OpenAI endpoint and key are required")
@@ -50,7 +50,7 @@ def get_clients() -> Tuple[MongoClient, AzureOpenAI]:
     azure_openai_client = AzureOpenAI(
         azure_endpoint=azure_openai_endpoint,
         api_key=azure_openai_key,
-        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2024-02-01")
+        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2023-05-15")
     )
 
     return mongo_client, azure_openai_client
@@ -59,9 +59,9 @@ def get_clients() -> Tuple[MongoClient, AzureOpenAI]:
 def get_clients_passwordless() -> Tuple[MongoClient, AzureOpenAI]:
 
     # Get MongoDB cluster name for passwordless authentication
-    cluster_name = os.getenv("MONGO_CLUSTER_NAME")
+    cluster_name = os.getenv("AZURE_DOCUMENTDB_CLUSTER")
     if not cluster_name:
-        raise ValueError("MONGO_CLUSTER_NAME environment variable is required")
+        raise ValueError("AZURE_DOCUMENTDB_CLUSTER environment variable is required")
 
     # Create credential object for Azure authentication
     credential = DefaultAzureCredential()
@@ -79,15 +79,15 @@ def get_clients_passwordless() -> Tuple[MongoClient, AzureOpenAI]:
     )
 
     # Get Azure OpenAI endpoint
-    azure_openai_endpoint = os.getenv("AZURE_OPENAI_EMBEDDING_ENDPOINT")
+    azure_openai_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     if not azure_openai_endpoint:
-        raise ValueError("AZURE_OPENAI_EMBEDDING_ENDPOINT environment variable is required")
+        raise ValueError("AZURE_OPENAI_ENDPOINT environment variable is required")
 
     # Create Azure OpenAI client with credential-based authentication
     azure_openai_client = AzureOpenAI(
         azure_endpoint=azure_openai_endpoint,
         azure_ad_token_provider=lambda: credential.get_token("https://cognitiveservices.azure.com/.default").token,
-        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2024-02-01")
+        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2023-05-15")
     )
 
     return mongo_client, azure_openai_client
