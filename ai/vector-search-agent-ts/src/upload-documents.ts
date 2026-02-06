@@ -2,7 +2,7 @@ import { createClientsPasswordless, createClients } from './utils/clients.js';
 import { getStore } from './vector-store.js';
 
 /**
- * Upload documents to Azure Cosmos DB MongoDB Vector Store
+ * Upload documents to Azure DocumentDB MongoDB Vector Store
  */
 
 async function uploadDocuments() {
@@ -15,10 +15,27 @@ async function uploadDocuments() {
     
     console.log('\nEnvironment variables check:');
     console.log(`  DATA_FILE_WITHOUT_VECTORS: ${process.env.DATA_FILE_WITHOUT_VECTORS}`);
-    console.log(`  MONGO_DB_NAME: ${process.env.MONGO_DB_NAME}`);
-    console.log(`  MONGO_DB_COLLECTION: ${process.env.MONGO_DB_COLLECTION}`);
-    console.log(`  MONGO_CLUSTER_NAME: ${process.env.MONGO_CLUSTER_NAME}`);
+    console.log(`  AZURE_DOCUMENTDB_DATABASENAME: ${process.env.AZURE_DOCUMENTDB_DATABASENAME}`);
+    console.log(`  AZURE_DOCUMENTDB_COLLECTION: ${process.env.AZURE_DOCUMENTDB_COLLECTION}`);
+    console.log(`  AZURE_DOCUMENTDB_CLUSTER: ${process.env.AZURE_DOCUMENTDB_CLUSTER}`);
     console.log(`  AZURE_OPENAI_EMBEDDING_DEPLOYMENT: ${process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT}`);
+
+    const requiredEnvVars = [
+      'DATA_FILE_WITHOUT_VECTORS',
+      'AZURE_DOCUMENTDB_DATABASENAME',
+      'AZURE_DOCUMENTDB_COLLECTION',
+      'AZURE_DOCUMENTDB_CLUSTER',
+      'AZURE_OPENAI_EMBEDDING_DEPLOYMENT',
+    ];
+
+    const missingEnvVars = requiredEnvVars.filter((name) => {
+      const value = process.env[name];
+      return !value || value.trim().length === 0;
+    });
+
+    if (missingEnvVars.length > 0) {
+      throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+    }
     
     const clients = usePasswordless ? createClientsPasswordless() : createClients();
     const { embeddingClient, dbConfig } = clients;
@@ -29,10 +46,7 @@ async function uploadDocuments() {
     console.log(`  collectionName: ${dbConfig.collectionName}`);
 
     // Check for data file path
-    const dataFilePath = process.env.DATA_FILE_WITHOUT_VECTORS;
-    if (!dataFilePath) {
-      throw new Error('DATA_FILE_WITHOUT_VECTORS environment variable is required');
-    }
+    const dataFilePath = process.env.DATA_FILE_WITHOUT_VECTORS!;
 
     console.log(`\nReading data from: ${dataFilePath}`);
     console.log(`Database: ${dbConfig.databaseName}`);

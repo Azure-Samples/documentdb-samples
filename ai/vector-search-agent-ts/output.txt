@@ -1,5 +1,5 @@
 --- PLANNER ---
-Inserted 50 documents into Cosmos DB (Mongo API) vector store.
+Inserted 50 documents into DocumentDB (Mongo API) vector store.
 
 --- PLANNER ---
 Found 5 documents from vector store

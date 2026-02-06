@@ -1,7 +1,7 @@
 {
     "name": "ts-cosmos-nodejs-mongo-vcore-vector-agent-samples",
     "version": "1.0.0",
-    "description": "TypeScript agent samples for MongoDB vCore vector search with Cosmos DB",
+    "description": "TypeScript agent samples for MongoDB vCore vector search with DocumentDB",
     "main": "index.js",
     "type": "module",
     "scripts": {

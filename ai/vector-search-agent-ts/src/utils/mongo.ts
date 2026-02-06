@@ -17,17 +17,17 @@ async function azureIdentityTokenCallback(
 }
 
 /**
- * Delete a Cosmos DB (Mongo API) database by name using passwordless OIDC authentication.
+ * Delete a DocumentDB (Mongo API) database by name using passwordless OIDC authentication.
  *
  * Uses DefaultAzureCredential for passwordless authentication with MONGODB-OIDC.
  * Requires MONGO_CLUSTER_NAME environment variable.
  *
- * @param databaseName - The name of the database to drop. If not provided, uses MONGO_DB_NAME env var.
+ * @param databaseName - The name of the database to drop. If not provided, uses AZURE_DOCUMENTDB_DATABASENAME env var.
  */
 export async function deleteCosmosMongoDatabase(databaseName?: string): Promise<void> {
   console.log(`\n\nCLEAN UP\n\n`);
 
-  const dbName = databaseName || process.env.MONGO_DB_NAME;
+  const dbName = databaseName || process.env.AZURE_DOCUMENTDB_DATABASENAME;
   const clusterName = process.env.MONGO_CLUSTER_NAME;
   
   if (!clusterName) {
@@ -35,7 +35,7 @@ export async function deleteCosmosMongoDatabase(databaseName?: string): Promise<
   }
 
   if (!dbName) {
-    throw new Error('Database name not provided and MONGO_DB_NAME environment variable is not set.');
+    throw new Error('Database name not provided and AZURE_DOCUMENTDB_DATABASENAME environment variable is not set.');
   }
 
   const connectionString = `mongodb+srv://${clusterName}.global.mongocluster.cosmos.azure.com/`;

@@ -61,7 +61,7 @@ async function runSynthTest() {
 }
 
 async function runMongoTest() {
-  console.log('\n🗄️  Testing Azure Cosmos DB for MongoDB vCore...');
+  console.log('\n🗄️  Testing Azure DocumentDB for MongoDB vCore...');
   try {
     await testMongoConnection();
     logTest('MongoDB Connection', 'PASS');
@@ -78,7 +78,7 @@ async function runAllTests() {
   console.log('═══════════════════════════════════════════════════════');
   
   console.log('\n📋 Configuration:');
-  console.log(`   OpenAI Instance: ${process.env.AZURE_OPENAI_API_INSTANCE_NAME || 'NOT SET'}`);
+  console.log(`   OpenAI Instance: ${process.env.AZURE_OPENAI_ENDPOINT|| 'NOT SET'}`);
   console.log(`   Embedding Model: ${process.env.AZURE_OPENAI_EMBEDDING_MODEL || 'NOT SET'}`);
   console.log(`   Planner Model: ${process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT || 'NOT SET'}`);
   console.log(`   Synth Model: ${process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT || 'NOT SET'}`);

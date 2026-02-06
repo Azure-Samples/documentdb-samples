@@ -18,7 +18,7 @@ async function runPlannerAgent(
 ): Promise<string> {
   console.log('\n--- PLANNER ---');
 
-  const userMessage = `Call the "${TOOL_NAME}" tool with the desired number of neighbors: nearestNeighbors="${nearestNeighbors}" and the query: query="${userQuery}". Respond ONLY with a tool response JSON output`;
+  const userMessage = `Use the "${TOOL_NAME}" tool with nearestNeighbors=${nearestNeighbors} and query="${userQuery}". Do not answer directly; call the tool.`;
 
   const contextSchema = z.object({
     store: z.any(),

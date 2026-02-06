@@ -11,13 +11,16 @@ export async function testPlanner() {
     "https://cognitiveservices.azure.com/.default",
   );
 
+  // Extract subdomain from full endpoint URL (e.g., https://oaiy24tgvnejozgs.openai.azure.com/ -> oaiy24tgvnejozgs)
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT!;
+  const subdomain = new URL(endpoint).hostname?.split('.')[0] || endpoint;
+
   const llmWithManagedIdentity = new AzureChatOpenAI({
     azureADTokenProvider,
-    azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME!,
+    azureOpenAIApiInstanceName: subdomain,
     azureOpenAIApiDeploymentName:
       process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT!,
     azureOpenAIApiVersion: process.env.AZURE_OPENAI_PLANNER_API_VERSION!,
-    azureOpenAIBasePath: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.openai.azure.com/openai/deployments`,
   });
 
   const response = await llmWithManagedIdentity.invoke("Hi there!");

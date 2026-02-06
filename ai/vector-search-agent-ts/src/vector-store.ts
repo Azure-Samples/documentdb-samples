@@ -136,7 +136,7 @@ export async function getStore(
     }
   );
 
-  console.log(`Inserted ${documents.length} documents into Cosmos DB (Mongo API) vector store.`);
+  console.log(`Inserted ${documents.length} documents into DocumentDB (Mongo API) vector store.`);
   return store;
 }
 
@@ -177,7 +177,7 @@ export const getHotelsToMatchSearchQuery = tool(
 
 
 /**
- * Delete a Cosmos DB (Mongo API) database by name.
+ * Delete a DocumentDB (Mongo API) database by name.
  *
  * Uses the `AZURE_DOCUMENTDB_CONNECTION_STRING` environment variable to connect.
  * Example env var: `mongodb://username:password@host:port/?ssl=true&replicaSet=globaldb`
@@ -188,7 +188,7 @@ export async function deleteCosmosMongoDatabase(): Promise<void> {
 
     console.log(`\n\nCLEAN UP\n\n`);
 
-    const databaseName = process.env.MONGO_DB_NAME;
+    const databaseName = process.env.AZURE_DOCUMENTDB_DATABASENAME;
     const connectionString = process.env.AZURE_DOCUMENTDB_CONNECTION_STRING;
     if (!connectionString) {
         throw new Error('Environment variable AZURE_DOCUMENTDB_CONNECTION_STRING is not set.');

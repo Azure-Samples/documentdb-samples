@@ -1,15 +1,15 @@
 {
   "name": "ts-cosmos-nodejs-vector-samples",
   "version": "1.0.0",
-  "description": "Samples for MongoDB vCore vector search with Cosmos DB",
+  "description": "Samples for MongoDB vCore vector search with DocumentDB",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "auth": "npm run build && node --env-file ../.env dist/scripts/test-auth.js",
-    "upload": "npm run build && node --env-file ../.env dist/upload-documents.js",
-    "start": "npm run build && node --env-file ../.env dist/agent.js",
-    "cleanup": "npm run build && node --env-file ../.env dist/cleanup.js"
+    "auth": "npm run build && node --env-file .env dist/scripts/test-auth.js",
+    "upload": "npm run build && node --env-file .env dist/upload-documents.js",
+    "start": "npm run build && node --env-file .env dist/agent.js",
+    "cleanup": "npm run build && node --env-file .env dist/cleanup.js"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

@@ -11,9 +11,14 @@ export async function testEmbeddings() {
     "https://cognitiveservices.azure.com/.default",
   );
 
+  // Extract subdomain from full endpoint URL (e.g., https://oaiy24tgvnejozgs.openai.azure.com/ -> oaiy24tgvnejozgs)
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT!;
+  const subdomain = new URL(endpoint).hostname?.split('.')[0] || endpoint;
+
   if (process.env.DEBUG === "true") {
     console.log("[embed] Environment variables:");
-    console.log(`  AZURE_OPENAI_API_INSTANCE_NAME: ${process.env.AZURE_OPENAI_API_INSTANCE_NAME}`);
+    console.log(`  AZURE_OPENAI_ENDPOINT: ${process.env.AZURE_OPENAI_ENDPOINT}`);
+    console.log(`  Extracted subdomain: ${subdomain}`);
     console.log(`  AZURE_OPENAI_EMBEDDING_MODEL: ${process.env.AZURE_OPENAI_EMBEDDING_MODEL}`);
     console.log(`  AZURE_OPENAI_EMBEDDING_API_VERSION: ${process.env.AZURE_OPENAI_EMBEDDING_API_VERSION}`);
     console.log(`  AZURE_OPENAI_API_KEY: ${process.env.AZURE_OPENAI_API_KEY ? '[SET]' : '[NOT SET]'}`);
@@ -21,11 +26,10 @@ export async function testEmbeddings() {
 
   const modelWithManagedIdentity = new AzureOpenAIEmbeddings({
     azureADTokenProvider,
-    azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME!,
+    azureOpenAIApiInstanceName: subdomain,
     azureOpenAIApiEmbeddingsDeploymentName:
       process.env.AZURE_OPENAI_EMBEDDING_MODEL!,
     azureOpenAIApiVersion: process.env.AZURE_OPENAI_EMBEDDING_API_VERSION!,
-    azureOpenAIBasePath: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.openai.azure.com/openai/deployments`,
   });
 
   const vectors = await modelWithManagedIdentity.embedDocuments([

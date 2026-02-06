@@ -6,7 +6,7 @@ import { AccessToken, DefaultAzureCredential, TokenCredential, getBearerTokenPro
 This file contains utility functions to create Azure OpenAI clients for embeddings, planning, and synthesis.
 
 It supports two modes of authentication:
-1. API Key based authentication using AZURE_OPENAI_API_KEY and AZURE_OPENAI_API_INSTANCE_NAME environment variables.
+1. API Key based authentication using AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINTenvironment variables.
 2. Passwordless authentication using DefaultAzureCredential from Azure Identity library.
 */
 
@@ -16,6 +16,17 @@ const DOCUMENT_DB_SCOPE = 'https://ossrdbms-aad.database.windows.net/.default';
 
 // Azure identity credential (used for passwordless auth)
 const CREDENTIAL = new DefaultAzureCredential();
+
+function requireEnvVars(names: string[]) {
+  const missing = names.filter((name) => {
+    const value = process.env[name];
+    return !value || value.trim().length === 0;
+  });
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  }
+}
 
 // Token callback for MongoDB OIDC authentication
 async function azureIdentityTokenCallback(
@@ -39,7 +50,7 @@ if (DEBUG) {
       HAS_AZURE_CLIENT_ID: !!process.env.AZURE_CLIENT_ID,
       HAS_AZURE_TENANT_ID: !!process.env.AZURE_TENANT_ID,
       HAS_AZURE_CLIENT_SECRET: !!process.env.AZURE_CLIENT_SECRET,
-      HAS_AZURE_OPENAI_INSTANCE: !!process.env.AZURE_OPENAI_API_INSTANCE_NAME,
+      HAS_AZURE_OPENAI_INSTANCE: !!process.env.AZURE_OPENAI_ENDPOINT,
       HAS_EMBEDDING_DEPLOYMENT: !!process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
       HAS_PLANNER_DEPLOYMENT: !!process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT,
       HAS_SYNTH_DEPLOYMENT: !!process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT
@@ -47,7 +58,7 @@ if (DEBUG) {
   } else {
     console.log('[clients] Password Env present:', {
       HAS_AZURE_OPENAI_API_KEY: !!process.env.AZURE_OPENAI_API_KEY,
-      HAS_AZURE_OPENAI_INSTANCE: !!process.env.AZURE_OPENAI_API_INSTANCE_NAME,
+      HAS_AZURE_OPENAI_INSTANCE: !!process.env.AZURE_OPENAI_ENDPOINT,
       HAS_EMBEDDING_DEPLOYMENT: !!process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
       HAS_PLANNER_DEPLOYMENT: !!process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT,
       HAS_SYNTH_DEPLOYMENT: !!process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT,
@@ -59,11 +70,23 @@ if (DEBUG) {
 // Create clients with API key authentication
 export function createClients() {
   try {
-    const key = process.env.AZURE_OPENAI_API_KEY;
-    const instance = process.env.AZURE_OPENAI_API_INSTANCE_NAME;
-    if (!key || !instance) {
-      throw new Error('Missing keys: AZURE_OPENAI_API_KEY or AZURE_OPENAI_API_INSTANCE_NAME');
-    }
+    requireEnvVars([
+      'AZURE_OPENAI_API_KEY',
+      'AZURE_OPENAI_ENDPOINT',
+      'AZURE_OPENAI_EMBEDDING_DEPLOYMENT',
+      'AZURE_OPENAI_EMBEDDING_API_VERSION',
+      'AZURE_OPENAI_PLANNER_DEPLOYMENT',
+      'AZURE_OPENAI_PLANNER_API_VERSION',
+      'AZURE_OPENAI_SYNTH_DEPLOYMENT',
+      'AZURE_OPENAI_SYNTH_API_VERSION',
+      'AZURE_DOCUMENTDB_CLUSTER',
+      'AZURE_DOCUMENTDB_CONNECTION_STRING',
+      'AZURE_DOCUMENTDB_DATABASENAME',
+      'AZURE_DOCUMENTDB_COLLECTION',
+    ]);
+
+    const key = process.env.AZURE_OPENAI_API_KEY!;
+    const instance = process.env.AZURE_OPENAI_ENDPOINT!;
 
     const auth = {
       azureOpenAIApiKey: key,
@@ -94,10 +117,10 @@ export function createClients() {
     });
 
     const dbConfig = {
-      instance: process.env.AZURE_DOCUMENTDB_INSTANCE!,
+      instance: process.env.AZURE_DOCUMENTDB_CLUSTER!,
       connectionString: process.env.AZURE_DOCUMENTDB_CONNECTION_STRING!,
-      databaseName: process.env.MONGO_DB_NAME!,
-      collectionName: process.env.MONGO_DB_COLLECTION!
+      databaseName: process.env.AZURE_DOCUMENTDB_DATABASENAME!,
+      collectionName: process.env.AZURE_DOCUMENTDB_COLLECTION!
     };
 
     return { embeddingClient, plannerClient, synthClient, dbConfig };
@@ -112,21 +135,32 @@ export function createClients() {
 // Create clients with passwordless authentication
 export function createClientsPasswordless() {
   try {
-    const instance = process.env.AZURE_OPENAI_API_INSTANCE_NAME;
-    if (!instance) {
-      throw new Error('Missing passwordless: AZURE_OPENAI_API_INSTANCE_NAME for passwordless client');
-    }
+    requireEnvVars([
+      'AZURE_OPENAI_ENDPOINT',
+      'AZURE_OPENAI_EMBEDDING_MODEL',
+      'AZURE_OPENAI_EMBEDDING_API_VERSION',
+      'AZURE_OPENAI_PLANNER_DEPLOYMENT',
+      'AZURE_OPENAI_PLANNER_API_VERSION',
+      'AZURE_OPENAI_SYNTH_DEPLOYMENT',
+      'AZURE_OPENAI_SYNTH_API_VERSION',
+      'AZURE_DOCUMENTDB_CLUSTER',
+      'AZURE_DOCUMENTDB_DATABASENAME',
+      'AZURE_DOCUMENTDB_COLLECTION',
+    ]);
+
+    // Extract subdomain from full endpoint URL (e.g., https://oaiy24tgvnejozgs.openai.azure.com/ -> oaiy24tgvnejozgs)
+    const endpoint = process.env.AZURE_OPENAI_ENDPOINT!;
+    const subdomain = new URL(endpoint).hostname?.split('.')[0] || endpoint;
 
     const embeddingClient = new AzureOpenAIEmbeddings({
       azureADTokenProvider: getBearerTokenProvider(
         CREDENTIAL,
         "https://cognitiveservices.azure.com/.default",
       ),
-      azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME!,
+      azureOpenAIApiInstanceName: subdomain,
       azureOpenAIApiEmbeddingsDeploymentName:
         process.env.AZURE_OPENAI_EMBEDDING_MODEL!,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_EMBEDDING_API_VERSION!,
-      azureOpenAIBasePath: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.openai.azure.com/openai/deployments`
     });
 
     const plannerClient = new AzureChatOpenAI({
@@ -134,11 +168,10 @@ export function createClientsPasswordless() {
         CREDENTIAL,
         "https://cognitiveservices.azure.com/.default",
       ),
-      azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME!,
+      azureOpenAIApiInstanceName: subdomain,
       azureOpenAIApiDeploymentName:
         process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT!,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_PLANNER_API_VERSION!,
-      azureOpenAIBasePath: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.openai.azure.com/openai/deployments`,
     });
 
     const synthClient = new AzureChatOpenAI({
@@ -146,15 +179,14 @@ export function createClientsPasswordless() {
         CREDENTIAL,
         "https://cognitiveservices.azure.com/.default",
       ),
-      azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME!,
+      azureOpenAIApiInstanceName: subdomain,
       azureOpenAIApiDeploymentName:
         process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT!,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_SYNTH_API_VERSION!,
-      azureOpenAIBasePath: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.openai.azure.com/openai/deployments`,
     });
 
     const mongoClient = new MongoClient(
-      `mongodb+srv://${process.env.AZURE_DOCUMENTDB_INSTANCE!}.global.mongocluster.cosmos.azure.com/`,
+      `mongodb+srv://${process.env.AZURE_DOCUMENTDB_CLUSTER!}.global.mongocluster.cosmos.azure.com/`,
       {
         connectTimeoutMS: 30000,
         tls: true,
@@ -168,10 +200,10 @@ export function createClientsPasswordless() {
     );
 
     const dbConfig = {
-      instance: process.env.AZURE_DOCUMENTDB_INSTANCE!,
+      instance: process.env.AZURE_DOCUMENTDB_CLUSTER!,
       client: mongoClient,
-      databaseName: process.env.MONGO_DB_NAME!,
-      collectionName: process.env.MONGO_DB_COLLECTION!,
+      databaseName: process.env.AZURE_DOCUMENTDB_DATABASENAME!,
+      collectionName: process.env.AZURE_DOCUMENTDB_COLLECTION!,
     };
 
     return { embeddingClient, plannerClient, synthClient, dbConfig };
