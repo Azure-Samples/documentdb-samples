@@ -29,11 +29,16 @@ import java.util.Map;
  */
 public class DiskAnn {
     private static final String SAMPLE_QUERY = "quintessential lodging near running trails, eateries, retail";
-    private static final String DATABASE_NAME = "Hotels";
-    private static final String COLLECTION_NAME = "hotels_diskann";
-    private static final String VECTOR_INDEX_NAME = "vectorIndex_diskann";
+    private static final String DATABASE_NAME = getEnv("AZURE_DOCUMENTDB_DATABASENAME", "Hotels");
+    private static final String COLLECTION_NAME = getEnv("AZURE_DOCUMENTDB_COLLECTION", "hotel_data");
+    private static final String VECTOR_INDEX_NAME = getEnv("AZURE_DOCUMENTDB_INDEX_NAME", "vectorIndex");
 
     private final JsonMapper jsonMapper = JsonMapper.builder().build();
+
+    private static String getEnv(String key, String defaultValue) {
+        String value = System.getenv(key);
+        return value != null ? value : defaultValue;
+    }
 
     public static void main(String[] args) {
         new DiskAnn().run();
@@ -73,7 +78,7 @@ public class DiskAnn {
     }
 
     private MongoClient createMongoClient() {
-        var clusterName = System.getenv("MONGO_CLUSTER_NAME");
+        var clusterName = System.getenv("AZURE_DOCUMENTDB_CLUSTER");
         var managedIdentityPrincipalId = System.getenv("AZURE_MANAGED_IDENTITY_PRINCIPAL_ID");
         var azureCredential = new DefaultAzureCredentialBuilder().build();
 
@@ -107,7 +112,7 @@ public class DiskAnn {
     }
 
     private OpenAIClient createOpenAIClient() {
-        var endpoint = System.getenv("AZURE_OPENAI_EMBEDDING_ENDPOINT");
+        var endpoint = System.getenv("AZURE_OPENAI_ENDPOINT");
         var credential = new DefaultAzureCredentialBuilder().build();
 
         return new OpenAIClientBuilder()
@@ -128,7 +133,7 @@ public class DiskAnn {
 
     private void insertDataInBatches(MongoCollection<Document> collection, List<Map<String, Object>> hotelData) {
         var batchSizeStr = System.getenv("LOAD_SIZE_BATCH");
-        var batchSize = batchSizeStr != null ? Integer.parseInt(batchSizeStr) : 100;
+        var batchSize = batchSizeStr != null ? Integer.parseInt(batchSizeStr) : 50;
         var batches = partitionList(hotelData, batchSize);
 
         System.out.println("Processing in batches of " + batchSize + "...");
@@ -176,7 +181,7 @@ public class DiskAnn {
     }
 
     private List<Double> createEmbedding(OpenAIClient openAIClient, String text) {
-        var model = System.getenv("AZURE_OPENAI_EMBEDDING_MODEL");
+        var model = System.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT");
         var options = new EmbeddingsOptions(List.of(text));
 
         var response = openAIClient.getEmbeddings(model, options);
