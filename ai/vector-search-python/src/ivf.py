@@ -114,14 +114,14 @@ def main():
 
     # Load configuration from environment variables
     config = {
-        'cluster_name': os.getenv('MONGO_CLUSTER_NAME', 'vectorSearch'),
-        'database_name': 'vectorSearchDB',
-        'collection_name': 'vectorSearchCollection',
-        'data_file': os.getenv('DATA_FILE_WITH_VECTORS', 'data/Hotels_Vector.json'),
+        'cluster_name': os.getenv('AZURE_DOCUMENTDB_CLUSTER', 'vectorSearch'),
+        'database_name': os.getenv('AZURE_DOCUMENTDB_DATABASENAME', 'Hotels'),
+        'collection_name': os.getenv('AZURE_DOCUMENTDB_COLLECTION', 'hotel_data'),
+        'data_file': os.getenv('DATA_FILE_WITH_VECTORS', '../data/Hotels_Vector.json'),
         'vector_field': os.getenv('EMBEDDED_FIELD', 'DescriptionVector'),
-        'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_DEPLOYMENT', 'text-embedding-3-small'),
         'dimensions': int(os.getenv('EMBEDDING_DIMENSIONS', '1536')),
-        'batch_size': int(os.getenv('LOAD_SIZE_BATCH', '100'))
+        'batch_size': int(os.getenv('LOAD_SIZE_BATCH', '50'))
     }
 
     try:

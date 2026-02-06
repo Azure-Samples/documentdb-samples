@@ -65,15 +65,15 @@ func LoadConfig() *Config {
 	}
 
 	dimensions, _ := strconv.Atoi(getEnvOrDefault("EMBEDDING_DIMENSIONS", "1536"))
-	batchSize, _ := strconv.Atoi(getEnvOrDefault("LOAD_SIZE_BATCH", "100"))
+	batchSize, _ := strconv.Atoi(getEnvOrDefault("LOAD_SIZE_BATCH", "50"))
 
 	return &Config{
-		ClusterName:    getEnvOrDefault("MONGO_CLUSTER_NAME", "vectorSearch"),
-		DatabaseName:   "vectorSearchDB",
-		CollectionName: "vectorSearchCollection",
-		DataFile:       getEnvOrDefault("DATA_FILE_WITH_VECTORS", "data/Hotels_Vector.json"),
+		ClusterName:    getEnvOrDefault("AZURE_DOCUMENTDB_CLUSTER", "vectorSearch"),
+		DatabaseName:   getEnvOrDefault("AZURE_DOCUMENTDB_DATABASENAME", "Hotels"),
+		CollectionName: getEnvOrDefault("AZURE_DOCUMENTDB_COLLECTION", "hotel_data"),
+		DataFile:       getEnvOrDefault("DATA_FILE_WITH_VECTORS", "../data/Hotels_Vector.json"),
 		VectorField:    getEnvOrDefault("EMBEDDED_FIELD", "DescriptionVector"),
-		ModelName:      getEnvOrDefault("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+		ModelName:      getEnvOrDefault("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small"),
 		Dimensions:     dimensions,
 		BatchSize:      batchSize,
 	}
@@ -92,9 +92,9 @@ func GetClients() (*mongo.Client, openai.Client, error) {
 	ctx := context.Background()
 
 	// Get MongoDB connection string
-	mongoConnectionString := os.Getenv("MONGO_CONNECTION_STRING")
+	mongoConnectionString := os.Getenv("AZURE_DOCUMENTDB_CONNECTION_STRING")
 	if mongoConnectionString == "" {
-		return nil, openai.Client{}, fmt.Errorf("MONGO_CONNECTION_STRING environment variable is required. " +
+		return nil, openai.Client{}, fmt.Errorf("AZURE_DOCUMENTDB_CONNECTION_STRING environment variable is required. " +
 			"Set it to your DocumentDB connection string or use GetClientsPasswordless() for OIDC auth")
 	}
 
@@ -119,16 +119,22 @@ func GetClients() (*mongo.Client, openai.Client, error) {
 	}
 
 	// Get Azure OpenAI configuration
-	azureOpenAIEndpoint := os.Getenv("AZURE_OPENAI_EMBEDDING_ENDPOINT")
-	azureOpenAIKey := os.Getenv("AZURE_OPENAI_EMBEDDING_KEY")
+	azureOpenAIEndpoint := os.Getenv("AZURE_OPENAI_ENDPOINT")
+	azureOpenAIKey := os.Getenv("AZURE_OPENAI_API_KEY")
+	apiVersion := getEnvOrDefault("AZURE_OPENAI_EMBEDDING_API_VERSION", "2023-05-15")
 
-	if azureOpenAIEndpoint == "" || azureOpenAIKey == "" {
-		return nil, openai.Client{}, fmt.Errorf("Azure OpenAI endpoint and key are required")
+	if azureOpenAIEndpoint == "" {
+		return nil, openai.Client{}, fmt.Errorf("AZURE_OPENAI_ENDPOINT environment variable is required")
 	}
 
-	// Create Azure OpenAI client
+	if azureOpenAIKey == "" {
+		return nil, openai.Client{}, fmt.Errorf("AZURE_OPENAI_API_KEY environment variable is required. " +
+			"Use GetClientsPasswordless() for passwordless authentication")
+	}
+
+	// Create Azure OpenAI client using the Azure SDK
 	openAIClient := openai.NewClient(
-		option.WithBaseURL(fmt.Sprintf("%s/openai/v1", azureOpenAIEndpoint)),
+		azure.WithEndpoint(azureOpenAIEndpoint, apiVersion),
 		option.WithAPIKey(azureOpenAIKey))
 
 	return mongoClient, openAIClient, nil
@@ -139,9 +145,9 @@ func GetClientsPasswordless() (*mongo.Client, openai.Client, error) {
 	ctx := context.Background()
 
 	// Get MongoDB cluster name
-	clusterName := os.Getenv("MONGO_CLUSTER_NAME")
+	clusterName := os.Getenv("AZURE_DOCUMENTDB_CLUSTER")
 	if clusterName == "" {
-		return nil, openai.Client{}, fmt.Errorf("MONGO_CLUSTER_NAME environment variable is required")
+		return nil, openai.Client{}, fmt.Errorf("AZURE_DOCUMENTDB_CLUSTER environment variable is required")
 	}
 
 	// Create Azure credential
@@ -161,14 +167,16 @@ func GetClientsPasswordless() (*mongo.Client, openai.Client, error) {
 	fmt.Println("OIDC authentication successful!")
 
 	// Get Azure OpenAI endpoint
-	azureOpenAIEndpoint := os.Getenv("AZURE_OPENAI_EMBEDDING_ENDPOINT")
+	azureOpenAIEndpoint := os.Getenv("AZURE_OPENAI_ENDPOINT")
 	if azureOpenAIEndpoint == "" {
-		return nil, openai.Client{}, fmt.Errorf("AZURE_OPENAI_EMBEDDING_ENDPOINT environment variable is required")
+		return nil, openai.Client{}, fmt.Errorf("AZURE_OPENAI_ENDPOINT environment variable is required")
 	}
+
+	apiVersion := getEnvOrDefault("AZURE_OPENAI_EMBEDDING_API_VERSION", "2023-05-15")
 
 	// Create Azure OpenAI client with credential-based authentication
 	openAIClient := openai.NewClient(
-		option.WithBaseURL(fmt.Sprintf("%s/openai/v1", azureOpenAIEndpoint)),
+		azure.WithEndpoint(azureOpenAIEndpoint, apiVersion),
 		azure.WithTokenCredential(credential))
 
 	return mongoClient, openAIClient, nil

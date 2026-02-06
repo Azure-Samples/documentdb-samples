@@ -121,12 +121,12 @@ func LoadEmbeddingConfig() *EmbeddingConfig {
 		log.Printf("Warning: Error loading .env file: %v", err)
 	}
 
-	batchSize, _ := strconv.Atoi(getEnvOrDefault("EMBEDDING_SIZE_BATCH", "16"))
+	batchSize, _ := strconv.Atoi(getEnvOrDefault("EMBEDDING_BATCH_SIZE", "16"))
 
 	return &EmbeddingConfig{
-		ModelName:          getEnvOrDefault("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
-		DataWithoutVectors: getEnvOrDefault("DATA_FILE_WITHOUT_VECTORS", "Hotels.json"),
-		DataWithVectors:    getEnvOrDefault("DATA_FILE_WITH_VECTORS", "data/Hotels_Vector.json"),
+		ModelName:          getEnvOrDefault("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small"),
+		DataWithoutVectors: getEnvOrDefault("DATA_FILE_WITHOUT_VECTORS", "../data/Hotels.json"),
+		DataWithVectors:    getEnvOrDefault("DATA_FILE_WITH_VECTORS", "../data/Hotels_Vector.json"),
 		FieldToEmbed:       getEnvOrDefault("FIELD_TO_EMBED", "Description"),
 		EmbeddedField:      getEnvOrDefault("EMBEDDED_FIELD", "DescriptionVector"),
 		BatchSize:          batchSize,
