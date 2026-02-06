@@ -1,0 +1,4 @@
+Connecting to database: Hotels
+
+Deleting database: Hotels
+Database deleted successfully!

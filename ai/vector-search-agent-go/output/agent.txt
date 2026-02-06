@@ -1,0 +1,29 @@
+Query: quintessential lodging near running trails, eateries, retail
+Nearest Neighbors: 5
+
+--- PLANNER ---
+Tool: search_hotels_collection
+Query: quintessential lodging near running trails, eateries, and retail with good amenities and access to outdoor activities
+K: 5
+Hotel #1: Royal Cottage Resort, Score: 0.505441
+Hotel #2: Country Comfort Inn, Score: 0.502445
+Hotel #3: Winter Panorama Resort, Score: 0.465747
+Hotel #4: Nordick's Valley Motel, Score: 0.459140
+Hotel #5: Planetary Plaza & Suites, Score: 0.446738
+
+--- SYNTHESIZER ---
+Context size: 3300 characters
+
+--- FINAL ANSWER ---
+1. COMPARISON SUMMARY:
+• **Royal Cottage Resort** and **Country Comfort Inn** both have a 2.5 rating, free WiFi, free parking, and extended-stay amenities, but Royal Cottage Resort is newly renovated (2023) and includes fireplaces and fitness facilities.
+• **Winter Panorama Resort** has a much higher rating (4.5) and offers upscale amenities like a pool, restaurant, and spa services, but lacks free parking and is more suited for leisure than extended stays.
+• Location-wise, Royal Cottage Resort is in Bothell, WA, and Country Comfort Inn is in Bellevue, WA, both closer to running trails and eateries compared to Winter Panorama Resort in Wilsonville, OR.
+• Winter Panorama Resort stands out for luxury and recreation, while Royal Cottage Resort and Country Comfort Inn focus on practical extended-stay features.
+
+2. BEST OVERALL:
+Choose **Royal Cottage Resort** for its newly renovated facilities, fitness center, fireplaces, free parking, and proximity to running trails and eateries.
+
+3. ALTERNATIVE PICKS:
+• Choose **Country Comfort Inn** if you prefer a Bellevue location and are looking for a more budget-friendly option with similar extended-stay amenities.
+• Choose **Winter Panorama Resort** if you prioritize luxury, recreational activities, and a higher-rated experience over proximity to trails and eateries.
