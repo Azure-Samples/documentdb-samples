@@ -1,0 +1,13 @@
+Loading hotels from: ../data/Hotels.json
+Loaded 50 hotels
+
+Generating embeddings and preparing documents...
+Generated embeddings for 50 hotels
+
+Inserting documents into vector store...
+Successfully inserted 50 documents
+
+Creating vector index...
+Vector index created successfully
+
+Data upload complete!

@@ -1,0 +1,25 @@
+Starting document upload...
+
+Authentication mode: Passwordless (Azure AD)
+
+Environment variables check:
+  DATA_FILE_WITHOUT_VECTORS: ../data/Hotels.json
+  AZURE_DOCUMENTDB_DATABASENAME: Hotels
+  AZURE_DOCUMENTDB_COLLECTION: hotel_data
+  AZURE_DOCUMENTDB_CLUSTER: docdb-eopd77ujeia5s
+  AZURE_OPENAI_EMBEDDING_DEPLOYMENT: text-embedding-3-small
+
+dbConfig properties:
+  instance: docdb-eopd77ujeia5s
+  databaseName: Hotels
+  collectionName: hotel_data
+
+Reading data from: ../data/Hotels.json
+Database: Hotels
+Collection: hotel_data
+Vector algorithm: vector-ivf
+
+Inserted 50 documents into DocumentDB (Mongo API) vector store.
+
+✓ Upload completed in 11.83 seconds
+✓ Connection closed
