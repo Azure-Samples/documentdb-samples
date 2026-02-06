@@ -126,10 +126,14 @@ resource firewallRulesAllowAll 'Microsoft.DocumentDB/mongoClusters/firewallRules
   }
 }
 
-// Register managed identity as an administrative user on the cluster
-resource managedIdentityUser 'Microsoft.DocumentDB/mongoClusters/users@2025-09-01' = {
+// Register managed identity as an administrative user on the cluster (only if provided)
+resource managedIdentityUser 'Microsoft.DocumentDB/mongoClusters/users@2025-09-01' = if (!empty(managedIdentityObjectId)) {
   parent: cluster
   name: managedIdentityObjectId
+  dependsOn: [
+    firewallRules
+    firewallRulesAllowAll
+  ]
   properties: {
     identityProvider: {
       type: 'MicrosoftEntraID'
@@ -146,10 +150,14 @@ resource managedIdentityUser 'Microsoft.DocumentDB/mongoClusters/users@2025-09-0
   }
 }
 
-// Register current user as an administrative user on the cluster
-resource currentUserAdminUser 'Microsoft.DocumentDB/mongoClusters/users@2025-09-01' = {
+// Register current user as an administrative user on the cluster (only if provided)
+resource currentUserAdminUser 'Microsoft.DocumentDB/mongoClusters/users@2025-09-01' = if (!empty(currentUserPrincipalId)) {
   parent: cluster
   name: currentUserPrincipalId
+  dependsOn: [
+    firewallRules
+    firewallRulesAllowAll
+  ]
   properties: {
     identityProvider: {
       type: 'MicrosoftEntraID'

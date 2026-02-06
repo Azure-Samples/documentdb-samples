@@ -82,7 +82,7 @@ async function runAllTests() {
   console.log(`   Embedding Model: ${process.env.AZURE_OPENAI_EMBEDDING_MODEL || 'NOT SET'}`);
   console.log(`   Planner Model: ${process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT || 'NOT SET'}`);
   console.log(`   Synth Model: ${process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT || 'NOT SET'}`);
-  console.log(`   MongoDB Cluster: ${process.env.MONGO_CLUSTER_NAME || 'NOT SET'}`);
+  console.log(`   MongoDB Cluster: ${process.env.AZURE_DOCUMENTDB_CLUSTER || 'NOT SET'}`);
 
   // Run all tests
   await runEmbeddingsTest();

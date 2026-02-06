@@ -17,10 +17,10 @@ async function azureIdentityTokenCallback(
 }
 
 async function testMongoConnection() {
-  const clusterName = process.env.MONGO_CLUSTER_NAME;
+  const clusterName = process.env.AZURE_DOCUMENTDB_CLUSTER;
   
   if (!clusterName) {
-    throw new Error('MONGO_CLUSTER_NAME is not set in environment');
+    throw new Error('AZURE_DOCUMENTDB_CLUSTER is not set in environment');
   }
 
   console.log('Connecting to MongoDB cluster:', clusterName);
