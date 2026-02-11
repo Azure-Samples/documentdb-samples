@@ -18,7 +18,7 @@ hooks:
   postdown:
     windows:
       shell: pwsh
-      run: "rm .env"
+      run: "if (Test-Path .env) { rm .env }"
     posix:
       shell: sh
-      run: "rm .env"
+      run: "[ -f .env ] && rm .env || true"
