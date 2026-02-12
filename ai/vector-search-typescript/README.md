@@ -1,3 +1,15 @@
+<!--
+---
+page_type: sample
+name: "DocumentDB Vector Search for TypeScript"
+description: This sample demonstrates vector search capabilities using Azure DocumentDB with TypeScript/Node.js. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF, along with utilities for embedding generation and data management.
+urlFragment: vector-search-typescript
+languages:
+- typescript
+products:
+- azure
+---
+-->
 # DocumentDB Vector Samples (TypeScript)
 
 This project demonstrates vector search capabilities using Azure DocumentDB with TypeScript/Node.js. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF, along with utilities for embedding generation and data management.
