@@ -2,7 +2,7 @@
 ---
 page_type: sample
 name: "DocumentDB Vector Search for Java"
-description: "This sample demonstrates vector search capabilities using Azure DocumentDB with Java. It includes implementations of three different vector index types including DiskANN, HNSW, and IVF."
+description: "This sample demonstrates vector search capabilities using Azure DocumentDB with Java. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF."
 urlFragment: vector-search-java
 languages:
 - java
