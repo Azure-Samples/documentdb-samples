@@ -55,7 +55,7 @@ public class VectorSearchService
                 VectorIndexType.DiskANN => "diskann", 
                 _ => throw new ArgumentException($"Unknown index type: {indexType}") 
             };
-            var collectionName = $"hotels_{collectionSuffix}_fixed";
+            var collectionName = $"hotels_{collectionSuffix}";
             var indexName = $"vectorIndex_{collectionSuffix}";
             
             var collection = _mongoService.GetCollection<HotelData>(_config.VectorSearch.DatabaseName, collectionName);
