@@ -14,6 +14,7 @@ public class AzureOpenAIConfiguration
     public string EmbeddingModel { get; set; } = string.Empty;
     public string ApiVersion { get; set; } = string.Empty;
     public string Endpoint { get; set; } = string.Empty;
+    public string TenantId { get; set; } = string.Empty;
     // Note: API Key removed - using Microsoft Entra ID authentication via DefaultAzureCredential
 }
 

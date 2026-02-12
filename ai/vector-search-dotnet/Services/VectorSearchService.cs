@@ -28,7 +28,11 @@ public class VectorSearchService
         _config = config;
         
         // Initialize Azure OpenAI client with passwordless authentication
-        _openAIClient = new AzureOpenAIClient(new Uri(_config.AzureOpenAI.Endpoint), new DefaultAzureCredential());
+        var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+        {
+            TenantId = _config.AzureOpenAI.TenantId
+        });
+        _openAIClient = new AzureOpenAIClient(new Uri(_config.AzureOpenAI.Endpoint), credential);
     }
 
     /// <summary>
