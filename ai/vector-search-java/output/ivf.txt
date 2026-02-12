@@ -1,0 +1,12 @@
+Created collection: hotels_ivf
+Reading JSON file from /workspaces/documentdb-samples/ai/vector-search-java/../data/Hotels_Vector.json
+Processing in batches of 50...
+Batch 1 complete: 50 inserted
+Created vector index: vectorIndex_ivf
+
+Vector search results for: "quintessential lodging near running trails, eateries, retail"
+1. HotelName: Royal Cottage Resort, Score: 0.4991
+2. HotelName: Country Comfort Inn, Score: 0.4785
+3. HotelName: Nordick's Valley Motel, Score: 0.4635
+4. HotelName: Economy Universe Motel, Score: 0.4461
+5. HotelName: Roach Motel, Score: 0.4388

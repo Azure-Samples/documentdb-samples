@@ -3,7 +3,7 @@
 {
 	"name": "Default Java",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/java:latest",
+	"image": "maven:3-eclipse-temurin-21-alpine",
 	"features": {
 		"ghcr.io/devcontainers/features/java:1": {
 			"version": "none",
