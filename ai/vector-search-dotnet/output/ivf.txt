@@ -1,0 +1,43 @@
+=== DocumentDB Vector Samples Menu ===
+Please enter your choice (0-5):
+1. Create embeddings for data
+2. Show all database indexes
+3. Run IVF vector search
+4. Run HNSW vector search
+5. Run DiskANN vector search
+0. Exit
+
+3
+info: DocumentDBVectorSamples.Services.MongoDbService[0]
+      MongoDB client initialized with passwordless authentication
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+      Starting IVF vector search workflow
+info: DocumentDBVectorSamples.Services.MongoDbService[0]
+      Collection is empty, loading data from file
+info: DocumentDBVectorSamples.Services.MongoDbService[0]
+      Processing 50 items for insertion
+info: DocumentDBVectorSamples.Services.MongoDbService[0]
+      Successfully inserted 50 items
+info: DocumentDBVectorSamples.Services.MongoDbService[0]
+      Successfully loaded 50 documents into collection
+info: DocumentDBVectorSamples.Services.MongoDbService[0]
+      Creating vector index 'vectorIndex_ivf' on field 'DescriptionVector'
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+      Vector index 'vectorIndex_ivf' is ready for IVF search
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+      Generated query embedding with 1536 dimensions
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+      Executing IVF vector search for top 5 results
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+
+✅ Search Results (5 found using IVF):
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+        1. Royal Cottage Resort (Similarity: 0.4991)
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+        2. Country Comfort Inn (Similarity: 0.4786)
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+        3. Nordick's Valley Motel (Similarity: 0.4635)
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+        4. Economy Universe Motel (Similarity: 0.4461)
+info: DocumentDBVectorSamples.Services.VectorSearch.VectorSearchService[0]
+        5. Roach Motel (Similarity: 0.4388)
