@@ -24,10 +24,12 @@ public class EmbeddingService
         
         try
         {
-            var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            var credentialOptions = new DefaultAzureCredentialOptions();
+            if (!string.IsNullOrEmpty(_config.AzureOpenAI.TenantId))
             {
-                TenantId = _config.AzureOpenAI.TenantId
-            });
+                credentialOptions.TenantId = _config.AzureOpenAI.TenantId;
+            }
+            var credential = new DefaultAzureCredential(credentialOptions);
             _openAIClient = new AzureOpenAIClient(
                 new Uri(_config.AzureOpenAI.Endpoint),
                 credential);
