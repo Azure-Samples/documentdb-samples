@@ -1,0 +1,27 @@
+Starting HNSW vector search demonstration...
+
+Initializing clients...
+
+Loading data from ../data/Hotels_Vector.json...
+Loaded 50 documents
+
+Preparing collection 'vectorSearchCollection'...
+Cleared existing data from collection
+Starting batch insertion of 50 documents...
+Batch 1 completed: 50 documents inserted
+
+Creating HNSW vector index...
+Creating HNSW vector index on field 'DescriptionVector'...
+Dropping existing vector index: diskann_index_DescriptionVector
+Dropped 1 existing vector index(es)
+HNSW vector index created successfully
+Waiting for index to be ready...
+Performing HNSW vector search for: 'quintessential lodging near running trails, eateries, retail'
+
+Search Results (showing top 5):
+================================================================================
+HotelName: Royal Cottage Resort, Score: 0.4991
+HotelName: Country Comfort Inn, Score: 0.4785
+HotelName: Nordick's Valley Motel, Score: 0.4635
+HotelName: Economy Universe Motel, Score: 0.4461
+HotelName: Roach Motel, Score: 0.4388

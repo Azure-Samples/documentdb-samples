@@ -123,9 +123,9 @@ def main():
 
     # Load configuration from environment variables
     config = {
-        'cluster_name': os.getenv('MONGO_CLUSTER_NAME', 'vectorSearch'),
-        'database_name': 'vectorSearchDB',
-        'collection_name': 'vectorSearchCollection',
+        'cluster_name': os.getenv('MONGO_CLUSTER_NAME'),
+        'database_name': 'Hotels',
+        'collection_name': 'hotels_diskann',
         'data_file': os.getenv('DATA_FILE_WITH_VECTORS', 'data/Hotels_Vector.json'),
         'vector_field': os.getenv('EMBEDDED_FIELD', 'DescriptionVector'),
         'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
@@ -156,10 +156,6 @@ def main():
         # Insert data into collection
         print(f"\nInserting data into collection '{config['collection_name']}'...")
 
-        # Clear existing data to ensure clean state
-        collection.delete_many({})
-        print("Cleared existing data from collection")
-
         # Insert the hotel data
         stats = insert_data(
             collection,
@@ -167,20 +163,21 @@ def main():
             batch_size=config['batch_size']
         )
 
-        if stats['inserted'] == 0:
+        if stats['inserted'] == 0 and not stats.get('skipped'):
             raise ValueError("No documents were inserted successfully")
 
-        # Create DiskANN vector index
-        create_diskann_vector_index(
-            collection,
-            config['vector_field'],
-            config['dimensions']
-        )
+        # Create DiskANN vector index (skip if data was already present)
+        if not stats.get('skipped'):
+            create_diskann_vector_index(
+                collection,
+                config['vector_field'],
+                config['dimensions']
+            )
 
-        # Wait briefly for index to be ready
-        import time
-        print("Waiting for index to be ready...")
-        time.sleep(2)
+            # Wait briefly for index to be ready
+            import time
+            print("Waiting for index to be ready...")
+            time.sleep(2)
 
         # Perform sample vector search
         query = "quintessential lodging near running trails, eateries, retail"

@@ -186,7 +186,7 @@ def main():
     # Load configuration from environment variables
     config = {
         'cluster_name': os.getenv('MONGO_CLUSTER_NAME', 'vectorSearch'),
-        'default_database': 'vectorSearchDB',
+        'default_database': 'Hotels',
         'default_collection': 'vectorSearchCollection'
     }
 
