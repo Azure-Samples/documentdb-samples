@@ -317,6 +317,8 @@ mongo-vcore-vector-search-go/
 ├── go.sum                   # Dependency checksums
 ├── .env                     # Environment variables (create this)
 └── README.md               # This fileskANN**: Optimized for large datasets with disk-based storage
+```
+
 - **HNSW**: High-performance hierarchical graph structure
 - **IVF**: Clustering-based approach with configurable accuracy
 
