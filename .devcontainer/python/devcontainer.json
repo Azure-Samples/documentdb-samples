@@ -5,14 +5,10 @@
 		"ghcr.io/devcontainers/features/azure-cli:1": {},
 		"ghcr.io/azure/azure-dev/azd:0": {}
 	},
-	"remoteUser": "vscode",
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"ms-python.python",
-				"ms-azuretools.vscode-cosmosdb",
-				"buildwithlayer.mongodb-integration-expert-qS6DB",
-				"mongodb.mongodb-vscode",
 				"ms-azuretools.vscode-documentdb"
 			]
 		}
