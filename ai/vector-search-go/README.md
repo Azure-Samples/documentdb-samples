@@ -129,7 +129,7 @@ cp .env.example .env
 AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-openai-resource.openai.azure.com/
 AZURE_OPENAI_EMBEDDING_KEY=your-azure-openai-api-key
-AZURE_OPENAI_EMBEDDING_API_VERSION=2024-02-01
+AZURE_OPENAI_EMBEDDING_API_VERSION=2023-05-15
 
 # DocumentDB Configuration
 MONGO_CONNECTION_STRING=mongodb+srv://username:password@your-cluster.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000
@@ -316,13 +316,9 @@ mongo-vcore-vector-search-go/
 ├── go.mod                   # Go module dependencies
 ├── go.sum                   # Dependency checksums
 ├── .env                     # Environment variables (create this)
-└── README.md               # This file
+└── README.md               # This fileskANN**: Optimized for large datasets with disk-based storage
 ```
 
-## Key Features
-
-### Vector Index Types
-- **DiskANN**: Optimized for large datasets with disk-based storage
 - **HNSW**: High-performance hierarchical graph structure
 - **IVF**: Clustering-based approach with configurable accuracy
 
