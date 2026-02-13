@@ -9,7 +9,8 @@ Loaded 50 documents
 
 Preparing collection 'vectorSearchCollection'...
 Getting token with scope: https://ossrdbms-aad.database.windows.net/.default
-Successfully obtained tokenCleared 50 existing documents from collection
+Successfully obtained token
+Cleared 50 existing documents from collection
 Starting batch insertion of 50 documents...
 Batch 1 completed: 50 documents inserted
 Insertion completed: 50 inserted, 0 failed
