@@ -88,7 +88,13 @@ func NewVectorStore(ctx context.Context, config *VectorStoreConfig) (*VectorStor
 		if config.ConnectionString == "" {
 			return nil, fmt.Errorf("AZURE_DOCUMENTDB_CONNECTION_STRING is required when USE_PASSWORDLESS is not enabled")
 		}
-		clientOptions := options.Client().ApplyURI(config.ConnectionString)
+		clientOptions := options.Client().
+			ApplyURI(config.ConnectionString).
+			// Configure connection pool for better performance
+			SetMinPoolSize(5).
+			SetMaxPoolSize(50).
+			SetMaxConnIdleTime(5 * time.Minute).
+			SetRetryWrites(true)
 		client, err = mongo.Connect(ctx, clientOptions)
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect to MongoDB: %w", err)
@@ -152,12 +158,16 @@ func connectWithOIDC(ctx context.Context, clusterName string, debug bool) (*mong
 		}, nil
 	}
 
-	// Set up MongoDB client options with OIDC authentication
+	// Set up MongoDB client options with OIDC authentication and connection pooling
 	clientOptions := options.Client().
 		ApplyURI(mongoURI).
 		SetConnectTimeout(30 * time.Second).
 		SetServerSelectionTimeout(30 * time.Second).
 		SetRetryWrites(true).
+		// Configure connection pool for better performance
+		SetMinPoolSize(5).
+		SetMaxPoolSize(50).
+		SetMaxConnIdleTime(5 * time.Minute).
 		SetAuth(options.Credential{
 			AuthMechanism: "MONGODB-OIDC",
 			// For local development, don't set ENVIRONMENT=azure to allow custom callbacks
