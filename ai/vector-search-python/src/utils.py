@@ -1,7 +1,16 @@
 import json
 import os
 import time
+import warnings
 from typing import Dict, List, Any, Optional, Tuple
+
+# Suppress the PyMongo CosmosDB cluster detection warning
+# Must be set before importing pymongo
+warnings.filterwarnings(
+    "ignore",
+    message="You appear to be connected to a CosmosDB cluster.*",
+)
+
 from pymongo import MongoClient, InsertOne
 from pymongo.collection import Collection
 from pymongo.errors import BulkWriteError
@@ -50,7 +59,7 @@ def get_clients() -> Tuple[MongoClient, AzureOpenAI]:
     azure_openai_client = AzureOpenAI(
         azure_endpoint=azure_openai_endpoint,
         api_key=azure_openai_key,
-        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2024-02-01")
+        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2023-05-15")
     )
 
     return mongo_client, azure_openai_client
@@ -87,7 +96,7 @@ def get_clients_passwordless() -> Tuple[MongoClient, AzureOpenAI]:
     azure_openai_client = AzureOpenAI(
         azure_endpoint=azure_openai_endpoint,
         azure_ad_token_provider=lambda: credential.get_token("https://cognitiveservices.azure.com/.default").token,
-        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2024-02-01")
+        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2023-05-15")
     )
 
     return mongo_client, azure_openai_client
@@ -132,6 +141,18 @@ def insert_data(collection: Collection, data: List[Dict[str, Any]],
                 batch_size: int = 100, index_fields: Optional[List[str]] = None) -> Dict[str, int]:
 
     total_documents = len(data)
+
+    # Check if data already exists in the collection
+    existing_count = collection.count_documents({})
+    if existing_count >= total_documents:
+        print(f"Collection already has {existing_count} documents, skipping insert and index creation")
+        return {'total': total_documents, 'inserted': 0, 'failed': 0, 'skipped': True}
+
+    # Clear existing data if counts don't match to ensure clean state
+    if existing_count > 0:
+        print(f"Collection has {existing_count} documents but expected {total_documents}, clearing and re-inserting...")
+        collection.delete_many({})
+
     inserted_count = 0
     failed_count = 0
 

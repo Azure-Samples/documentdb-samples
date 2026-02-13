@@ -1,0 +1,24 @@
+Initializing MongoDB and Azure OpenAI clients...
+
+Initializing clients...
+
+Loading data from ../data/Hotels_Vector.json...
+Loaded 50 documents
+
+Inserting data into collection 'hotels_diskann'...
+Cleared existing data from collection
+Starting batch insertion of 50 documents...
+Batch 1 completed: 50 documents inserted
+Creating DiskANN vector index on field 'DescriptionVector'...
+No existing vector indexes found to drop
+DiskANN vector index created successfully
+Waiting for index to be ready...
+Performing DiskANN vector search for: 'quintessential lodging near running trails, eateries, retail'
+
+Search Results (showing top 5):
+================================================================================
+HotelName: Royal Cottage Resort, Score: 0.4991
+HotelName: Country Comfort Inn, Score: 0.4785
+HotelName: Nordick's Valley Motel, Score: 0.4635
+HotelName: Economy Universe Motel, Score: 0.4461
+HotelName: Roach Motel, Score: 0.4388

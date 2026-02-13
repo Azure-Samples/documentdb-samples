@@ -117,9 +117,9 @@ def main():
 
     # Load configuration from environment variables
     config = {
-        'cluster_name': os.getenv('MONGO_CLUSTER_NAME', 'vectorSearch'),
-        'database_name': 'vectorSearchDB',
-        'collection_name': 'vectorSearchCollection',
+        'cluster_name': os.getenv('MONGO_CLUSTER_NAME'),
+        'database_name': 'Hotels',
+        'collection_name': 'hotels_hnsw',
         'data_file': os.getenv('DATA_FILE_WITH_VECTORS', 'data/Hotels_Vector.json'),
         'vector_field': os.getenv('EMBEDDED_FIELD', 'DescriptionVector'),
         'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
@@ -150,10 +150,6 @@ def main():
         # Insert data into MongoDB collection
         print(f"\nPreparing collection '{config['collection_name']}'...")
 
-        # Clear any existing data to start fresh
-        collection.delete_many({})
-        print("Cleared existing data from collection")
-
         # Insert hotel data with embeddings
         stats = insert_data(
             collection,
@@ -161,21 +157,22 @@ def main():
             batch_size=config['batch_size']
         )
 
-        if stats['inserted'] == 0:
+        if stats['inserted'] == 0 and not stats.get('skipped'):
             raise ValueError("No documents were inserted successfully")
 
-        # Create HNSW vector index for efficient similarity search
-        print("\nCreating HNSW vector index...")
-        create_hnsw_vector_index(
-            collection,
-            config['vector_field'],
-            config['dimensions']
-        )
+        # Create HNSW vector index (skip if data was already present)
+        if not stats.get('skipped'):
+            print("\nCreating HNSW vector index...")
+            create_hnsw_vector_index(
+                collection,
+                config['vector_field'],
+                config['dimensions']
+            )
 
-        # Allow time for index to become ready
-        import time
-        print("Waiting for index to be ready...")
-        time.sleep(2)
+            # Allow time for index to become ready
+            import time
+            print("Waiting for index to be ready...")
+            time.sleep(2)
 
         # Demonstrate HNSW search with various queries
         query = "quintessential lodging near running trails, eateries, retail"

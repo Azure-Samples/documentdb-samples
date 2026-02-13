@@ -114,9 +114,9 @@ def main():
 
     # Load configuration from environment variables
     config = {
-        'cluster_name': os.getenv('MONGO_CLUSTER_NAME', 'vectorSearch'),
-        'database_name': 'vectorSearchDB',
-        'collection_name': 'vectorSearchCollection',
+        'cluster_name': os.getenv('MONGO_CLUSTER_NAME'),
+        'database_name': 'Hotels',
+        'collection_name': 'hotels_ivf',
         'data_file': os.getenv('DATA_FILE_WITH_VECTORS', 'data/Hotels_Vector.json'),
         'vector_field': os.getenv('EMBEDDED_FIELD', 'DescriptionVector'),
         'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
@@ -147,10 +147,6 @@ def main():
         # Prepare collection with fresh data
         print(f"\nPreparing collection '{config['collection_name']}'...")
 
-        # Remove any existing data for clean state
-        collection.delete_many({})
-        print("Cleared existing data from collection")
-
         # Insert hotel data with embeddings
         stats = insert_data(
             collection,
@@ -158,21 +154,22 @@ def main():
             batch_size=config['batch_size']
         )
 
-        if stats['inserted'] == 0:
+        if stats['inserted'] == 0 and not stats.get('skipped'):
             raise ValueError("No documents were inserted successfully")
 
-        # Create IVF vector index for clustering-based search
-        print("\nCreating IVF vector index...")
-        create_ivf_vector_index(
-            collection,
-            config['vector_field'],
-            config['dimensions']
-        )
+        # Create IVF vector index (skip if data was already present)
+        if not stats.get('skipped'):
+            print("\nCreating IVF vector index...")
+            create_ivf_vector_index(
+                collection,
+                config['vector_field'],
+                config['dimensions']
+            )
 
-        # Wait for index to be built and ready
-        import time
-        print("Waiting for index clustering to complete...")
-        time.sleep(3)  # IVF may need more time for clustering
+            # Wait for index to be built and ready
+            import time
+            print("Waiting for index clustering to complete...")
+            time.sleep(3)  # IVF may need more time for clustering
 
         # Demonstrate IVF search 
         query = "quintessential lodging near running trails, eateries, retail"

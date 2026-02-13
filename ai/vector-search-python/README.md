@@ -105,11 +105,11 @@ cp .env.example .env
 AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-openai-resource.openai.azure.com/
 AZURE_OPENAI_EMBEDDING_KEY=your-azure-openai-api-key
-AZURE_OPENAI_EMBEDDING_API_VERSION=2024-02-01
+AZURE_OPENAI_EMBEDDING_API_VERSION=2023-05-15
 
 # MongoDB/DocumentDB Configuration
 MONGO_CONNECTION_STRING=mongodb+srv://username:password@your-cluster.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000
-MONGO_CLUSTER_NAME=vectorSearch
+MONGO_CLUSTER_NAME=your-cluster-name
 
 # Data Configuration (defaults should work)
 DATA_FILE_WITHOUT_VECTORS=data/Hotels_Vector.json
