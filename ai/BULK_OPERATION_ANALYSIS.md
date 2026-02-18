@@ -9,10 +9,10 @@ This document provides a comprehensive analysis of MongoDB drivers and insert me
 | vector-search-python | Python | pymongo>=4.6.0 | `bulk_write()` with `InsertOne` operations | ✅ Yes | No changes needed |
 | vector-search-typescript | TypeScript | mongodb@6.18.0 | `insertMany()` with `ordered: false` | ✅ Yes | No changes needed |
 | vector-search-go | Go | mongo-driver@1.17.6 | `InsertMany()` with `SetOrdered(false)` | ✅ Yes | No changes needed |
-| vector-search-java | Java | mongodb-driver-sync@5.6.2 | `insertMany()` | ⚠️ Partially | Should add options for unordered operations |
+| vector-search-java | Java | mongodb-driver-sync@5.6.2 | `insertMany()` with `ordered(false)` | ✅ Yes | ✅ Updated in this PR |
 | vector-search-dotnet | .NET | MongoDB.Driver@3.0.0 | `InsertManyAsync()` with `IsOrdered = false` | ✅ Yes | No changes needed |
 | vector-search-agent-ts | TypeScript | @langchain/azure-cosmosdb@1.0.0 | LangChain `fromDocuments()` | ✅ Yes | No changes needed (uses MongoDB internally) |
-| vector-search-agent-go | Go | mongo-driver@1.17.6 | `InsertMany()` | ⚠️ Partially | Should add options for unordered operations |
+| vector-search-agent-go | Go | mongo-driver@1.17.6 | `InsertMany()` with `SetOrdered(false)` | ✅ Yes | ✅ Updated in this PR |
 
 ## Detailed Analysis by Sample
 
@@ -83,15 +83,12 @@ result, err := collection.InsertMany(ctx, documents, options.InsertMany().SetOrd
 collection.insertMany(documents);
 ```
 
-**Analysis:** ⚠️ **Needs Improvement**
-- Uses `insertMany()` which is correct, but missing options
-- **Issue:** Not setting `ordered(false)` option for better performance
-- **Issue:** No explicit error handling for bulk write exceptions
-- Driver version 5.6.2 supports retry logic, but not optimally configured
-
-**Recommendation:** 
-- Add `InsertManyOptions` with `ordered(false)` to improve performance
-- Add proper error handling for `MongoBulkWriteException`
+**Analysis:** ✅ **Optimal** (Updated in this PR)
+- Uses `insertMany()` which is correct
+- ✅ Now sets `ordered(false)` option for better performance (updated)
+- ✅ Added proper error handling for `MongoBulkWriteException` (updated)
+- ✅ Added tracking of inserted vs failed documents (updated)
+- Driver version 5.6.2 supports retry logic and is now optimally configured
 
 ### 5. vector-search-dotnet
 
@@ -145,13 +142,12 @@ const store = await AzureCosmosDBMongoDBVectorStore.fromDocuments(
 result, err := vs.collection.InsertMany(ctx, docs)
 ```
 
-**Analysis:** ⚠️ **Needs Improvement**
-- Uses `InsertMany()` which is correct, but missing options
-- **Issue:** Not setting `SetOrdered(false)` option for better performance
-- Driver version 1.17.6 supports retry logic, but not optimally configured
-
-**Recommendation:** 
-- Add `options.InsertMany().SetOrdered(false)` to improve performance
+**Analysis:** ✅ **Optimal** (Updated in this PR)
+- Uses `InsertMany()` which is correct
+- ✅ Now sets `SetOrdered(false)` option for better performance (updated)
+- ✅ Added proper error handling for `mongo.BulkWriteException` (updated)
+- ✅ Added tracking of partial insertions (updated)
+- Driver version 1.17.6 supports retry logic and is now optimally configured
 
 ## Best Practices for MongoDB Bulk Operations
 
@@ -202,15 +198,51 @@ result, err := vs.collection.InsertMany(ctx, docs)
 
 ## Samples Requiring Updates
 
-Based on this analysis, the following samples should be updated:
+Based on this analysis, all samples are now using optimal bulk operation methods:
 
-1. **vector-search-java** - Add unordered insert options and improved error handling
-2. **vector-search-agent-go** - Add unordered insert options
+1. ✅ **vector-search-java** - Updated in this PR with unordered insert options and improved error handling
+2. ✅ **vector-search-agent-go** - Updated in this PR with unordered insert options and improved error handling
 
-All other samples are using optimal bulk operation methods and do not require updates.
+All samples now use optimal bulk operation methods with proper retry logic, error handling, and parallel execution capabilities.
 
-## Next Steps
+## Summary
 
-1. Create a PR for **vector-search-java** to update insert method with proper options
-2. Create a PR for **vector-search-agent-go** to update insert method with proper options
-3. Update sample READMEs with bulk operation best practices guidance
+This PR provides a comprehensive analysis of MongoDB drivers and bulk insert methods across all samples in the `./ai` directory, and updates samples that were not using optimal bulk operation methods.
+
+### Changes Made
+
+1. **Created comprehensive analysis document** (`BULK_OPERATION_ANALYSIS.md`)
+   - Analyzed 7 samples across 5 programming languages
+   - Documented driver versions, insert methods, and best practices
+   - Identified which samples needed updates
+
+2. **Updated Java samples** (vector-search-java)
+   - Updated all 3 Java samples (HNSW.java, IVF.java, DiskAnn.java)
+   - Added `InsertManyOptions().ordered(false)` for parallel execution
+   - Added `MongoBulkWriteException` error handling
+   - Added tracking and logging of partial successes
+
+3. **Updated Go agent sample** (vector-search-agent-go)
+   - Updated `internal/vectorstore/store.go`
+   - Added `options.InsertMany().SetOrdered(false)` for parallel execution
+   - Added `mongo.BulkWriteException` error handling
+   - Added tracking and logging of partial insertions
+
+### Summary of Findings
+
+**Samples already using optimal methods (no changes needed):**
+- ✅ vector-search-python: Uses `bulk_write()` with `ordered=False`
+- ✅ vector-search-typescript: Uses `insertMany()` with `ordered: false`
+- ✅ vector-search-go: Uses `InsertMany()` with `SetOrdered(false)`
+- ✅ vector-search-dotnet: Uses `InsertManyAsync()` with `IsOrdered = false`
+- ✅ vector-search-agent-ts: Uses LangChain abstraction with optimal settings
+
+**Samples updated in this PR:**
+- ✅ vector-search-java: Now uses `insertMany()` with `ordered(false)` and error handling
+- ✅ vector-search-agent-go: Now uses `InsertMany()` with `SetOrdered(false)` and error handling
+
+All samples now use optimal bulk operation methods that support:
+- Unordered inserts for parallel execution
+- Automatic retry logic for transient failures
+- Proper error handling with partial success tracking
+- Connection pooling and resource management
