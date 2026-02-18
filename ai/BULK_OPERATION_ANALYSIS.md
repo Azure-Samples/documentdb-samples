@@ -35,6 +35,11 @@ result = collection.bulk_write(operations, ordered=False)
 - Includes proper error handling with `BulkWriteError`
 - Driver version 4.6.0+ includes built-in retry logic and connection pooling
 
+**Documentation References:**
+- [PyMongo bulk_write() API](https://pymongo.readthedocs.io/en/stable/api/pymongo/collection.html#pymongo.collection.Collection.bulk_write)
+- [PyMongo Bulk Write Guide](https://pymongo.readthedocs.io/en/stable/examples/bulk.html)
+- [MongoDB Bulk Write Operations](https://www.mongodb.com/docs/manual/core/bulk-write-operations/)
+
 ### 2. vector-search-typescript
 
 **Language:** TypeScript/JavaScript  
@@ -53,6 +58,11 @@ const result = await collection.insertMany(batch, { ordered: false });
 - Driver version 6.18.0 includes automatic retry logic for retryable writes
 - Properly handles errors and tracks inserted vs failed documents
 
+**Documentation References:**
+- [Node.js insertMany() Documentation](https://www.mongodb.com/docs/drivers/node/current/usage-examples/insertMany/)
+- [Node.js Driver API Reference](https://mongodb.github.io/node-mongodb-native/6.0/classes/Collection.html#insertMany)
+- [MongoDB Retryable Writes](https://www.mongodb.com/docs/manual/core/retryable-writes/)
+
 ### 3. vector-search-go
 
 **Language:** Go  
@@ -70,6 +80,11 @@ result, err := collection.InsertMany(ctx, documents, options.InsertMany().SetOrd
 - Sets `SetOrdered(false)` for better performance
 - Driver version 1.17.6 includes automatic retry logic
 - Includes proper error handling for `BulkWriteException`
+
+**Documentation References:**
+- [Go InsertMany() Documentation](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo#Collection.InsertMany)
+- [Go InsertManyOptions API](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo/options#InsertManyOptions)
+- [Go Driver Usage Examples](https://www.mongodb.com/docs/drivers/go/current/usage-examples/insertMany/)
 
 ### 4. vector-search-java
 
@@ -90,6 +105,11 @@ collection.insertMany(documents);
 - ✅ Added tracking of inserted vs failed documents (updated)
 - Driver version 5.6.2 supports retry logic and is now optimally configured
 
+**Documentation References:**
+- [Java insertMany() Documentation](https://www.mongodb.com/docs/drivers/java/sync/current/usage-examples/insertMany/)
+- [Java InsertManyOptions API](https://mongodb.github.io/mongo-java-driver/5.0/apidocs/mongodb-driver-sync/com/mongodb/client/model/InsertManyOptions.html)
+- [Java Bulk Write Operations](https://www.mongodb.com/docs/drivers/java/sync/current/usage-examples/bulkWrite/)
+
 ### 5. vector-search-dotnet
 
 **Language:** C# (.NET)  
@@ -107,6 +127,11 @@ await collection.InsertManyAsync(dataList, new InsertManyOptions { IsOrdered = f
 - Sets `IsOrdered = false` for better performance
 - Driver version 3.0.0 includes automatic retry logic
 - However, error handling could be improved to capture partial successes
+
+**Documentation References:**
+- [C# InsertManyAsync() Documentation](https://www.mongodb.com/docs/drivers/csharp/current/usage-examples/insertMany/)
+- [C# InsertManyOptions API](https://mongodb.github.io/mongo-csharp-driver/2.19.0/apidocs/html/T_MongoDB_Driver_InsertManyOptions.htm)
+- [C# Bulk Write Operations](https://www.mongodb.com/docs/drivers/csharp/current/usage-examples/bulkWrite/)
 
 ### 6. vector-search-agent-ts
 
@@ -148,6 +173,11 @@ result, err := vs.collection.InsertMany(ctx, docs)
 - ✅ Added proper error handling for `mongo.BulkWriteException` (updated)
 - ✅ Added tracking of partial insertions (updated)
 - Driver version 1.17.6 supports retry logic and is now optimally configured
+
+**Documentation References:**
+- [Go InsertMany() Documentation](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo#Collection.InsertMany)
+- [Go InsertManyOptions API](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo/options#InsertManyOptions)
+- [Go Driver Usage Examples](https://www.mongodb.com/docs/drivers/go/current/usage-examples/insertMany/)
 
 ## Best Practices for MongoDB Bulk Operations
 
@@ -246,3 +276,41 @@ All samples now use optimal bulk operation methods that support:
 - Automatic retry logic for transient failures
 - Proper error handling with partial success tracking
 - Connection pooling and resource management
+
+## Documentation References
+
+This analysis is based on official MongoDB driver documentation and best practices:
+
+### General MongoDB Documentation
+- **MongoDB Bulk Write Operations:** [https://www.mongodb.com/docs/manual/core/bulk-write-operations/](https://www.mongodb.com/docs/manual/core/bulk-write-operations/)
+- **MongoDB Retryable Writes:** [https://www.mongodb.com/docs/manual/core/retryable-writes/](https://www.mongodb.com/docs/manual/core/retryable-writes/)
+- **MongoDB Write Concern:** [https://www.mongodb.com/docs/manual/reference/write-concern/](https://www.mongodb.com/docs/manual/reference/write-concern/)
+
+### Python (PyMongo) Documentation
+- **PyMongo API Reference:** [https://pymongo.readthedocs.io/en/stable/api/pymongo/collection.html](https://pymongo.readthedocs.io/en/stable/api/pymongo/collection.html)
+- **Bulk Write Guide:** [https://pymongo.readthedocs.io/en/stable/examples/bulk.html](https://pymongo.readthedocs.io/en/stable/examples/bulk.html)
+- **Error Handling:** [https://pymongo.readthedocs.io/en/stable/api/pymongo/errors.html#pymongo.errors.BulkWriteError](https://pymongo.readthedocs.io/en/stable/api/pymongo/errors.html#pymongo.errors.BulkWriteError)
+
+### TypeScript/JavaScript (Node.js) Documentation
+- **Node.js Driver Documentation:** [https://www.mongodb.com/docs/drivers/node/current/](https://www.mongodb.com/docs/drivers/node/current/)
+- **insertMany() Usage Examples:** [https://www.mongodb.com/docs/drivers/node/current/usage-examples/insertMany/](https://www.mongodb.com/docs/drivers/node/current/usage-examples/insertMany/)
+- **API Reference:** [https://mongodb.github.io/node-mongodb-native/6.0/](https://mongodb.github.io/node-mongodb-native/6.0/)
+
+### Go Driver Documentation
+- **Go Driver Package Documentation:** [https://pkg.go.dev/go.mongodb.org/mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver)
+- **Usage Examples:** [https://www.mongodb.com/docs/drivers/go/current/usage-examples/](https://www.mongodb.com/docs/drivers/go/current/usage-examples/)
+- **Error Handling:** [https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo#BulkWriteException](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo#BulkWriteException)
+
+### Java Driver Documentation
+- **Java Sync Driver Documentation:** [https://www.mongodb.com/docs/drivers/java/sync/current/](https://www.mongodb.com/docs/drivers/java/sync/current/)
+- **API Documentation:** [https://mongodb.github.io/mongo-java-driver/5.0/](https://mongodb.github.io/mongo-java-driver/5.0/)
+- **Bulk Write Operations:** [https://www.mongodb.com/docs/drivers/java/sync/current/usage-examples/bulkWrite/](https://www.mongodb.com/docs/drivers/java/sync/current/usage-examples/bulkWrite/)
+
+### .NET (C#) Driver Documentation
+- **C# Driver Documentation:** [https://www.mongodb.com/docs/drivers/csharp/current/](https://www.mongodb.com/docs/drivers/csharp/current/)
+- **API Documentation:** [https://mongodb.github.io/mongo-csharp-driver/](https://mongodb.github.io/mongo-csharp-driver/)
+- **Usage Examples:** [https://www.mongodb.com/docs/drivers/csharp/current/usage-examples/](https://www.mongodb.com/docs/drivers/csharp/current/usage-examples/)
+
+### LangChain Integration
+- **LangChain Azure Cosmos DB:** [https://js.langchain.com/docs/integrations/vectorstores/azure_cosmosdb](https://js.langchain.com/docs/integrations/vectorstores/azure_cosmosdb)
+- **LangChain Core Documents:** [https://js.langchain.com/docs/api/core/documents](https://js.langchain.com/docs/api/core/documents)

@@ -275,9 +275,38 @@ const store = await AzureCosmosDBMongoDBVectorStore.fromDocuments(
 
 ## Additional Resources
 
+### General MongoDB Documentation
 - **Detailed Analysis:** See [BULK_OPERATION_ANALYSIS.md](./BULK_OPERATION_ANALYSIS.md) for comprehensive analysis of all samples
-- **MongoDB Documentation:** [Bulk Write Operations](https://docs.mongodb.com/manual/core/bulk-write-operations/)
+- **MongoDB Bulk Write Operations:** [https://www.mongodb.com/docs/manual/core/bulk-write-operations/](https://www.mongodb.com/docs/manual/core/bulk-write-operations/)
+- **MongoDB Retryable Writes:** [https://www.mongodb.com/docs/manual/core/retryable-writes/](https://www.mongodb.com/docs/manual/core/retryable-writes/)
 - **Vector Search:** [Azure Cosmos DB for MongoDB (vCore) Vector Search](https://learn.microsoft.com/azure/cosmos-db/mongodb/vcore/vector-search)
+
+### Driver-Specific Documentation
+
+#### Python (PyMongo)
+- **PyMongo bulk_write() Documentation:** [https://pymongo.readthedocs.io/en/stable/api/pymongo/collection.html#pymongo.collection.Collection.bulk_write](https://pymongo.readthedocs.io/en/stable/api/pymongo/collection.html#pymongo.collection.Collection.bulk_write)
+- **PyMongo insert_many() Documentation:** [https://pymongo.readthedocs.io/en/stable/api/pymongo/collection.html#pymongo.collection.Collection.insert_many](https://pymongo.readthedocs.io/en/stable/api/pymongo/collection.html#pymongo.collection.Collection.insert_many)
+- **PyMongo Bulk Write Operations Guide:** [https://pymongo.readthedocs.io/en/stable/examples/bulk.html](https://pymongo.readthedocs.io/en/stable/examples/bulk.html)
+
+#### TypeScript/JavaScript (Node.js Driver)
+- **Node.js insertMany() Documentation:** [https://www.mongodb.com/docs/drivers/node/current/usage-examples/insertMany/](https://www.mongodb.com/docs/drivers/node/current/usage-examples/insertMany/)
+- **Node.js Bulk Write Operations:** [https://www.mongodb.com/docs/drivers/node/current/usage-examples/bulkWrite/](https://www.mongodb.com/docs/drivers/node/current/usage-examples/bulkWrite/)
+- **Node.js Driver API Reference:** [https://mongodb.github.io/node-mongodb-native/6.0/classes/Collection.html#insertMany](https://mongodb.github.io/node-mongodb-native/6.0/classes/Collection.html#insertMany)
+
+#### Go (MongoDB Go Driver)
+- **Go InsertMany() Documentation:** [https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo#Collection.InsertMany](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo#Collection.InsertMany)
+- **Go InsertManyOptions Documentation:** [https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo/options#InsertManyOptions](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo/options#InsertManyOptions)
+- **Go Driver Usage Examples:** [https://www.mongodb.com/docs/drivers/go/current/usage-examples/insertMany/](https://www.mongodb.com/docs/drivers/go/current/usage-examples/insertMany/)
+
+#### Java (MongoDB Java Sync Driver)
+- **Java insertMany() Documentation:** [https://www.mongodb.com/docs/drivers/java/sync/current/usage-examples/insertMany/](https://www.mongodb.com/docs/drivers/java/sync/current/usage-examples/insertMany/)
+- **Java InsertManyOptions API:** [https://mongodb.github.io/mongo-java-driver/5.0/apidocs/mongodb-driver-sync/com/mongodb/client/model/InsertManyOptions.html](https://mongodb.github.io/mongo-java-driver/5.0/apidocs/mongodb-driver-sync/com/mongodb/client/model/InsertManyOptions.html)
+- **Java Bulk Write Operations:** [https://www.mongodb.com/docs/drivers/java/sync/current/usage-examples/bulkWrite/](https://www.mongodb.com/docs/drivers/java/sync/current/usage-examples/bulkWrite/)
+
+#### .NET (MongoDB C# Driver)
+- **C# InsertManyAsync() Documentation:** [https://www.mongodb.com/docs/drivers/csharp/current/usage-examples/insertMany/](https://www.mongodb.com/docs/drivers/csharp/current/usage-examples/insertMany/)
+- **C# InsertManyOptions API:** [https://mongodb.github.io/mongo-csharp-driver/2.19.0/apidocs/html/T_MongoDB_Driver_InsertManyOptions.htm](https://mongodb.github.io/mongo-csharp-driver/2.19.0/apidocs/html/T_MongoDB_Driver_InsertManyOptions.htm)
+- **C# Bulk Write Operations:** [https://www.mongodb.com/docs/drivers/csharp/current/usage-examples/bulkWrite/](https://www.mongodb.com/docs/drivers/csharp/current/usage-examples/bulkWrite/)
 
 ## Performance Tips
 
