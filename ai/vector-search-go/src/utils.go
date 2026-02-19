@@ -69,7 +69,7 @@ func LoadConfig() *Config {
 
 	return &Config{
 		ClusterName:    getEnvOrDefault("MONGO_CLUSTER_NAME", "vectorSearch"),
-		DatabaseName:   "vectorSearchDB",
+		DatabaseName:   "Hotels",
 		CollectionName: "vectorSearchCollection",
 		DataFile:       getEnvOrDefault("DATA_FILE_WITH_VECTORS", "../data/Hotels_Vector.json"),
 		VectorField:    getEnvOrDefault("EMBEDDED_FIELD", "DescriptionVector"),
