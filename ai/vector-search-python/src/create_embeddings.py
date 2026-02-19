@@ -112,8 +112,8 @@ def main():
     # Load configuration from environment variables
     config = {
         'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
-        'input_file': os.getenv('DATA_FILE_WITHOUT_VECTORS', 'data/Hotels_Vector.json'),
-        'output_file': os.getenv('DATA_FILE_WITH_VECTORS', 'data/Hotels_Vector.json'),
+        'input_file': os.getenv('DATA_FILE_WITHOUT_VECTORS', '../data/Hotels_Vector.json'),
+        'output_file': os.getenv('DATA_FILE_WITH_VECTORS', '../data/Hotels_Vector.json'),
         'field_to_embed': os.getenv('FIELD_TO_EMBED', 'Description'),
         'embedded_field': os.getenv('EMBEDDED_FIELD', 'DescriptionVector'),
         'batch_size': int(os.getenv('EMBEDDING_SIZE_BATCH', '16'))

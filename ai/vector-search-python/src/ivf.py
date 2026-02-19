@@ -117,7 +117,7 @@ def main():
         'cluster_name': os.getenv('MONGO_CLUSTER_NAME'),
         'database_name': 'Hotels',
         'collection_name': 'hotels_ivf',
-        'data_file': os.getenv('DATA_FILE_WITH_VECTORS', 'data/Hotels_Vector.json'),
+        'data_file': os.getenv('DATA_FILE_WITH_VECTORS', '../data/Hotels_Vector.json'),
         'vector_field': os.getenv('EMBEDDED_FIELD', 'DescriptionVector'),
         'model_name': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
         'dimensions': int(os.getenv('EMBEDDING_DIMENSIONS', '1536')),
