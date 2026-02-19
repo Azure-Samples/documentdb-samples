@@ -112,8 +112,8 @@ MONGO_CONNECTION_STRING=mongodb+srv://username:password@your-cluster.mongocluste
 MONGO_CLUSTER_NAME=your-cluster-name
 
 # Data Configuration (defaults should work)
-DATA_FILE_WITHOUT_VECTORS=data/Hotels_Vector.json
-DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
+DATA_FILE_WITHOUT_VECTORS=../data/Hotels_Vector.json
+DATA_FILE_WITH_VECTORS=../data/Hotels_Vector.json
 FIELD_TO_EMBED=Description
 EMBEDDED_FIELD=DescriptionVector
 EMBEDDING_DIMENSIONS=1536
@@ -161,9 +161,9 @@ python src/create_embeddings.py
 ```
 
 This script:
-- Reads hotel data from `data/Hotels_Vector.json`
+- Reads hotel data from `../data/Hotels_Vector.json`
 - Generates embeddings for hotel descriptions using Azure OpenAI
-- Saves enhanced data with embeddings to `data/Hotels_Vector.json`
+- Saves enhanced data with embeddings to `../data/Hotels_Vector.json`
 
 ### 2. DiskANN Vector Search
 Run DiskANN (Disk-based Approximate Nearest Neighbor) search:
@@ -287,19 +287,21 @@ mongo_client, openai_client = get_clients()
 ## Project Structure
 
 ```
-ai/vector-search-python/
-├── src/
-│   ├── utils.py              # Shared utility functions
-│   ├── create_embeddings.py  # Generate embeddings with Azure OpenAI
-│   ├── diskann.py           # DiskANN vector search implementation
-│   ├── hnsw.py              # HNSW vector search implementation
-│   ├── ivf.py               # IVF vector search implementation
-│   └── show_indexes.py      # Display vector index information
+ai/
 ├── data/
-│   └── Hotels_Vector.json  # Sample hotel data
-├── requirements.txt         # Python dependencies
-├── .env.example            # Environment variables template
-└── README.md              # This file
+│   ├── Hotels.json              # Source hotel data (without vectors)
+│   └── Hotels_Vector.json       # Hotel data with vector embeddings
+└── vector-search-python/
+    ├── src/
+    │   ├── utils.py              # Shared utility functions
+    │   ├── create_embeddings.py  # Generate embeddings with Azure OpenAI
+    │   ├── diskann.py           # DiskANN vector search implementation
+    │   ├── hnsw.py              # HNSW vector search implementation
+    │   ├── ivf.py               # IVF vector search implementation
+    │   └── show_indexes.py      # Display vector index information
+    ├── requirements.txt         # Python dependencies
+    ├── .env.example             # Environment variables template
+    └── README.md                # This file
 ```
 
 ## Key Features
