@@ -217,9 +217,25 @@ func (vs *VectorStore) InsertHotelsWithEmbeddings(ctx context.Context, hotels []
 		docs[i] = hotel
 	}
 
-	result, err := vs.collection.InsertMany(ctx, docs)
+	// Use unordered inserts for better performance and parallel execution
+	opts := options.InsertMany().SetOrdered(false)
+	result, err := vs.collection.InsertMany(ctx, docs, opts)
 	if err != nil {
-		return fmt.Errorf("failed to insert documents: %w", err)
+		// With unordered inserts, some documents may succeed despite errors
+		if bulkErr, ok := err.(mongo.BulkWriteException); ok {
+			inserted := len(docs) - len(bulkErr.WriteErrors)
+			if vs.config.Debug {
+				fmt.Printf("[vectorstore] Partial insert: %d inserted, %d failed\n", inserted, len(bulkErr.WriteErrors))
+			}
+			// Return error if all documents failed
+			if inserted == 0 {
+				return fmt.Errorf("failed to insert any documents: %w", err)
+			}
+			// Log partial success
+			fmt.Printf("[vectorstore] Warning: partial insert completed with %d errors\n", len(bulkErr.WriteErrors))
+		} else {
+			return fmt.Errorf("failed to insert documents: %w", err)
+		}
 	}
 
 	if vs.config.Debug {
