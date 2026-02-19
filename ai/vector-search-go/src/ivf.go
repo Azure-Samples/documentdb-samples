@@ -150,7 +150,7 @@ func main() {
 
 	// Connect to database and collection
 	database := mongoClient.Database(config.DatabaseName)
-	collection := database.Collection(config.CollectionName)
+	collection := database.Collection("hotels_ivf")
 
 	// Load hotel data with embeddings
 	fmt.Printf("\nLoading data from %s...\n", config.DataFile)
