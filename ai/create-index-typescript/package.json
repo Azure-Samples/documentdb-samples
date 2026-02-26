@@ -1,0 +1,29 @@
+{
+  "name": "documentdb-vector-indexing",
+  "version": "1.0.0",
+  "description": "Azure DocumentDB (MongoDB) Vector Indexing for Embeddings Sample",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "azure",
+    "documentdb",
+    "mongodb",
+    "vector-search",
+    "embeddings",
+    "indexing",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^6.3.0",
+    "@azure/openai": "^1.0.0-beta.12",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
