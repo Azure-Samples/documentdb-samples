@@ -1,0 +1,32 @@
+{
+  "name": "documentdb-vector-algorithms",
+  "version": "1.0.0",
+  "description": "Azure DocumentDB (MongoDB) Vector Index Algorithms & Query Behavior Sample",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "benchmark": "node index.js"
+  },
+  "keywords": [
+    "azure",
+    "documentdb",
+    "mongodb",
+    "vector-search",
+    "algorithms",
+    "benchmark",
+    "ivf",
+    "hnsw",
+    "ann",
+    "performance"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^6.3.0",
+    "@azure/openai": "^1.0.0-beta.12",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
