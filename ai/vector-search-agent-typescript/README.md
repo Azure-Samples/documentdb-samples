@@ -15,6 +15,20 @@ Build an intelligent AI agent by using TypeScript and Azure DocumentDB. This qui
 > [!IMPORTANT]
 > This sample uses LangChain, a popular framework for building AI applications. LangChain provides abstractions for agents, tools, and prompts that simplify agent development.
 
+## What you build
+
+In this quickstart, you build a hotel recommendation agent that:
+
+- Accepts a natural language query such as "hotels near hiking trails with good ratings"
+- Uses a **planner agent** to interpret the query and invoke a vector search tool
+- Searches Azure DocumentDB for semantically similar hotels using vector embeddings
+- Uses a **synthesizer agent** to generate a comparative recommendation from the search results
+
+By the end, you have a working two-agent system that connects Azure OpenAI and Azure DocumentDB to deliver intelligent, context-aware hotel recommendations.
+
+> [!NOTE]
+> **Cost considerations:** This quickstart creates Azure OpenAI and Azure DocumentDB resources that incur costs. See [Azure OpenAI pricing](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/) and [Azure DocumentDB pricing](https://azure.microsoft.com/pricing/details/cosmos-db/) for details.
+
 ## Prerequisites
 
 You can use the Azure Developer CLI to create the required Azure resources by running the `azd` commands in the sample repository. For more information, see [Deploy Infrastructure with Azure Developer CLI](https://github.com/Azure-Samples/documentdb-samples/).
@@ -54,6 +68,9 @@ This sample uses LangChain's agent framework with the OpenAI SDK. It leverages L
 
 ## Get the sample code
 
+[![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://codespaces.new/Azure-Samples/documentdb-samples?quickstart=1)
+[![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev+Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/Azure-Samples/documentdb-samples)
+
 1. Clone or download the repository [Azure DocumentDB Samples](https://github.com/Azure-Samples/documentdb-samples/) to your local machine to follow the quickstart.
 
 1. Navigate to the project directory:
@@ -61,6 +78,29 @@ This sample uses LangChain's agent framework with the OpenAI SDK. It leverages L
     ```bash
     cd ai/vector-search-agent-ts
     ```
+
+## Deploy Azure resources with Azure Developer CLI
+
+Use the Azure Developer CLI (`azd`) to provision the required Azure OpenAI and DocumentDB resources.
+
+1. Sign in to Azure:
+
+    ```bash
+    azd auth login
+    ```
+
+1. Provision and deploy the infrastructure:
+
+    ```bash
+    azd up
+    ```
+
+1. When prompted, select your subscription and a location (for example, `swedencentral` or `eastus2`).
+
+1. After deployment completes, `azd` outputs the environment variables you need. Copy them into your `.env` file (see [Configure environment variables](#configure-environment-variables)).
+
+> [!TIP]
+> Run `azd env get-values` at any time to view the current environment values.
 
 ## Configure environment variables
 
@@ -70,9 +110,26 @@ Edit the `.env` file and replace these placeholder values:
 
 This quickstart uses a two-agent architecture (planner + synthesizer) with three model deployments (two chat models + embeddings). The environment variables are configured for each model deployment. 
 
-- `AZURE_OPENAI_PLANNER_DEPLOYMENT`: Your gpt-4o-mini deployment name
-- `AZURE_OPENAI_SYNTH_DEPLOYMENT`: Your gpt-4o deployment name
-- `AZURE_OPENAI_EMBEDDING_MODEL`: Your text-embedding-3-small deployment name (for passwordless) or `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` (for API key)
+The following table describes each environment variable:
+
+| Variable | Description |
+|---|---|
+| `USE_PASSWORDLESS` | Set to `true` for Azure Identity auth or `false` for API key auth |
+| `AZURE_OPENAI_ENDPOINT` | Your Azure OpenAI resource endpoint URL |
+| `AZURE_OPENAI_API_KEY` | Your Azure OpenAI API key (only when `USE_PASSWORDLESS=false`) |
+| `AZURE_OPENAI_PLANNER_DEPLOYMENT` | Deployment name for the planner model (for example, `gpt-4o-mini`) |
+| `AZURE_OPENAI_PLANNER_API_VERSION` | API version for the planner deployment |
+| `AZURE_OPENAI_SYNTH_DEPLOYMENT` | Deployment name for the synthesizer model (for example, `gpt-4o`) |
+| `AZURE_OPENAI_SYNTH_API_VERSION` | API version for the synthesizer deployment |
+| `AZURE_OPENAI_EMBEDDING_MODEL` | Embedding model name (passwordless) or `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` (API key) |
+| `AZURE_OPENAI_EMBEDDING_API_VERSION` | API version for the embedding deployment |
+| `AZURE_DOCUMENTDB_CLUSTER` | Your DocumentDB cluster name (passwordless) |
+| `AZURE_DOCUMENTDB_CONNECTION_STRING` | Full connection string (only when `USE_PASSWORDLESS=false`) |
+| `AZURE_DOCUMENTDB_DATABASENAME` | Database name (for example, `Hotels`) |
+| `AZURE_DOCUMENTDB_COLLECTION` | Collection name (for example, `hotel_data`) |
+| `DATA_FILE_WITHOUT_VECTORS` | Path to the hotel data JSON file |
+| `VECTOR_INDEX_ALGORITHM` | Vector index algorithm: `vector-ivf`, `vector-hnsw`, or `vector-diskann` |
+| `EMBEDDING_DIMENSIONS` | Embedding vector dimensions (for example, `1536` for text-embedding-3-small) |
 
 You can choose between two authentication methods: passwordless authentication using Azure Identity (recommended) or traditional connection string and API key.
 
@@ -113,6 +170,18 @@ EMBEDDING_DIMENSIONS=1536
   - `DocumentDB Account Contributor` and `Cosmos DB Account Reader Role` on the Azure DocumentDB resource
 
   For more information about assigning roles, see [Assign Azure roles using the Azure portal](/azure/role-based-access-control/role-assignments-portal).
+
+#### How passwordless authentication works
+
+When `USE_PASSWORDLESS=true`, the application uses `DefaultAzureCredential` from the Azure Identity SDK to obtain an OAuth token. For Azure DocumentDB connections, it uses an OIDC token callback that passes the access token directly to the MongoDB driver. This means no passwords or connection strings are stored in configuration files.
+
+The authentication flow:
+
+1. `DefaultAzureCredential` checks for available credentials (Azure CLI, managed identity, environment variables) in order.
+2. For Azure OpenAI, the token is passed to the LangChain `AzureChatOpenAI` and `AzureOpenAIEmbeddings` clients automatically.
+3. For Azure DocumentDB, a token callback function fetches an access token and provides it to the MongoDB client via the `MONGODB-OIDC` auth mechanism.
+
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/utils/clients.ts" range="1-40":::
 
 ### Option 2: Connection string and API key authentication
 
@@ -250,14 +319,36 @@ The quality of AI responses depends heavily on clear instructions. These prompts
 
 :::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/utils/prompts.ts" range="30-75":::
 
-## Prepare the data
+## Prepare and upload data
 
 The sample uses hotel data from a JSON file. The repository includes two versions:
 
 - `Hotels.json` - Hotel data without vector embeddings (used by this sample)
 - `Hotels_Vector.json` - Hotel data with pre-computed embeddings (used by other samples)
 
-The upload script automatically generates embeddings from the `Hotels.json` file using the Azure OpenAI embedding model, so you don't need to pre-compute them.
+### How the upload works
+
+The `upload-documents.ts` script performs three steps:
+
+1. **Load data** — Reads hotel records from the `Hotels.json` file.
+2. **Generate embeddings** — For each hotel, the script sends the `Description` field to the Azure OpenAI `text-embedding-3-small` model to generate a 1536-dimensional vector embedding. This converts the text description into a numeric representation that captures its semantic meaning.
+3. **Insert and index** — The script inserts documents (with their embeddings) into the Azure DocumentDB collection and creates a vector index using the configured algorithm (IVF, HNSW, or DiskANN).
+
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/upload-documents.ts":::
+
+### Vector index creation
+
+The vector index is what enables fast similarity search. When the index is created, Azure DocumentDB organizes the embedding vectors so that queries like "find hotels similar to this description" can be answered efficiently without scanning every document.
+
+The index type you choose affects performance:
+
+| Algorithm | Cluster tier | Best for |
+|---|---|---|
+| **IVF** | M10+ | Small to medium datasets, lower cost |
+| **HNSW** | M30+ | High recall, fast queries |
+| **DiskANN** | M40+ | Large-scale datasets, billion+ vectors |
+
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/vector-store.ts" range="1-50":::
 
 ## Run the sample
 
@@ -323,6 +414,28 @@ The upload script automatically generates embeddings from the `Hotels.json` file
 
     :::image type="content" source="media/quickstart-agent-typescript/documentdb-view-data.png" alt-text="Visual Studio Code DocumentDB extension showing the vector search index and hotel documents.":::
 
+## Troubleshooting
+
+### Authentication errors
+
+- **`DefaultAzureCredential` fails**: Run `az login` to sign in to the Azure CLI. Ensure your account has the required roles on both the Azure OpenAI and DocumentDB resources.
+- **OIDC token error**: Verify that RBAC is enabled on your DocumentDB cluster and that your identity has the `DocumentDB Account Contributor` role.
+
+### Connection errors
+
+- **`MongoServerError: connection refused`**: Your IP address isn't in the DocumentDB firewall rules. Add your IP in the Azure portal under **Settings > Networking > Firewall rules**. See [Grant access from your IP address](/azure/documentdb/how-to-configure-firewall#grant-access-from-your-ip-address).
+- **DNS resolution failure**: Verify the `AZURE_DOCUMENTDB_CLUSTER` value matches your cluster name exactly (without `.mongocluster.cosmos.azure.com`).
+
+### Rate limiting (HTTP 429)
+
+- **`429 Too Many Requests` from Azure OpenAI**: Your deployment doesn't have enough tokens per minute (TPM) quota. Increase quota in the Azure portal under **Azure AI Foundry > Deployments > Edit deployment**. See [Manage Azure OpenAI quotas](/azure/ai-services/openai/how-to/quota).
+- **Embedding upload fails partway**: The upload script sends batches of embedding requests. Reduce the batch size by setting `EMBEDDING_BATCH_SIZE=8` in your `.env` file, or increase TPM quota for the embedding deployment.
+
+### Vector search returns no results
+
+- **Empty results**: Verify data was uploaded successfully by running `npm run upload` and checking the document count in the VS Code DocumentDB extension.
+- **Index not created**: Ensure `VECTOR_INDEX_ALGORITHM` is set to a valid value (`vector-ivf`, `vector-hnsw`, or `vector-diskann`) and that your cluster tier supports that algorithm.
+
 ## Clean up resources
 
 Use the cleanup command to delete the test database when you're done. Run the following command:
@@ -330,4 +443,19 @@ Use the cleanup command to delete the test database when you're done. Run the fo
 ```bash
 npm run cleanup
 ```
+
+If you used `azd up` to provision resources, you can remove all Azure resources with:
+
+```bash
+azd down
+```
+
 Delete the resource group, DocumentDB account, and Azure OpenAI resource when you don't need them to avoid extra costs.
+
+## Related content
+
+- [Vector search overview in Azure DocumentDB](/azure/documentdb/vector-search)
+- [Quickstart: AI Agent with vector search using Go](/azure/documentdb/quickstart-agent-go)
+- [Azure DocumentDB documentation](/azure/documentdb/)
+- [LangChain.js Azure DocumentDB integration](https://js.langchain.com/docs/integrations/vectorstores/azure_cosmosdb_mongodb/)
+- [Azure OpenAI Service documentation](/azure/ai-services/openai/)
