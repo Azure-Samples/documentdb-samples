@@ -16,11 +16,11 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@langchain/azure-cosmosdb": "^1.0.0",
+    "@langchain/azure-cosmosdb": "^1.2.0",
     "@langchain/core": "^1.0.6",
     "@langchain/openai": "^1.1.2",
     "langchain": "^1.0.6",
-    "mongo": "^0.1.0",
+    "mongodb": "^7.1.0",
     "zod": "^4.1.12"
   }
 }

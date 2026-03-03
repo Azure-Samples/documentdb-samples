@@ -234,7 +234,7 @@ LangChain's `tool` function creates a tool from a regular TypeScript function. T
 
 When the AI calls the tool, the function body runs. It generates an embedding by converting the text query into a numeric vector using Azure OpenAI's embedding model. Then it searches the database by sending the vector to Azure DocumentDB, which finds hotels with similar vectors meaning similar descriptions. Finally, it formats results by converting the database records into readable text that the synthesizer agent can understand.
 
-The implementation leverages LangChain's `AzureCosmosDBMongoDBVectorStore` for seamless integration with Azure DocumentDB.
+The implementation leverages LangChain's `AzureDocumentDBVectorStore` for seamless integration with Azure DocumentDB.
 
 #### Why use this pattern?
 
