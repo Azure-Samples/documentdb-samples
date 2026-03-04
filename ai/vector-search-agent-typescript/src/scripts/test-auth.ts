@@ -40,7 +40,7 @@ async function runPlannerTest() {
   console.log('\n🤖 Testing Azure OpenAI Chat (Planner)...');
   try {
     await testPlanner();
-    logTest('Planner LLM', 'PASS', `Model: ${process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT}`);
+    logTest('Planner LLM', 'PASS', `Model: ${process.env.AZURE_OPENAI_PLANNER_MODEL}`);
     return true;
   } catch (error: any) {
     logTest('Planner LLM', 'FAIL', error?.message || String(error));
@@ -52,7 +52,7 @@ async function runSynthTest() {
   console.log('\n💬 Testing Azure OpenAI Chat (Synthesizer)...');
   try {
     await testSynth();
-    logTest('Synthesizer LLM', 'PASS', `Model: ${process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT}`);
+    logTest('Synthesizer LLM', 'PASS', `Model: ${process.env.AZURE_OPENAI_SYNTH_MODEL}`);
     return true;
   } catch (error: any) {
     logTest('Synthesizer LLM', 'FAIL', error?.message || String(error));
@@ -80,8 +80,8 @@ async function runAllTests() {
   console.log('\n📋 Configuration:');
   console.log(`   OpenAI Instance: ${process.env.AZURE_OPENAI_ENDPOINT|| 'NOT SET'}`);
   console.log(`   Embedding Model: ${process.env.AZURE_OPENAI_EMBEDDING_MODEL || 'NOT SET'}`);
-  console.log(`   Planner Model: ${process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT || 'NOT SET'}`);
-  console.log(`   Synth Model: ${process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT || 'NOT SET'}`);
+  console.log(`   Planner Model: ${process.env.AZURE_OPENAI_PLANNER_MODEL || 'NOT SET'}`);
+  console.log(`   Synth Model: ${process.env.AZURE_OPENAI_SYNTH_MODEL || 'NOT SET'}`);
   console.log(`   MongoDB Cluster: ${process.env.AZURE_DOCUMENTDB_CLUSTER || 'NOT SET'}`);
 
   // Run all tests

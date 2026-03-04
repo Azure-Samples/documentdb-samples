@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "create-env": "azd env get-values > .env",
     "auth": "npm run build && node --env-file .env dist/scripts/test-auth.js",
     "upload": "npm run build && node --env-file .env dist/upload-documents.js",
     "start": "npm run build && node --env-file .env dist/agent.js",

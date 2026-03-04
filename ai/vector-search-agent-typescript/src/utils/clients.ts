@@ -51,17 +51,17 @@ if (DEBUG) {
       HAS_AZURE_TENANT_ID: !!process.env.AZURE_TENANT_ID,
       HAS_AZURE_CLIENT_SECRET: !!process.env.AZURE_CLIENT_SECRET,
       HAS_AZURE_OPENAI_INSTANCE: !!process.env.AZURE_OPENAI_ENDPOINT,
-      HAS_EMBEDDING_DEPLOYMENT: !!process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
-      HAS_PLANNER_DEPLOYMENT: !!process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT,
-      HAS_SYNTH_DEPLOYMENT: !!process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT
+      HAS_EMBEDDING_MODEL: !!process.env.AZURE_OPENAI_EMBEDDING_MODEL,
+      HAS_PLANNER_MODEL: !!process.env.AZURE_OPENAI_PLANNER_MODEL,
+      HAS_SYNTH_MODEL: !!process.env.AZURE_OPENAI_SYNTH_MODEL
     });
   } else {
     console.log('[clients] Password Env present:', {
       HAS_AZURE_OPENAI_API_KEY: !!process.env.AZURE_OPENAI_API_KEY,
       HAS_AZURE_OPENAI_INSTANCE: !!process.env.AZURE_OPENAI_ENDPOINT,
-      HAS_EMBEDDING_DEPLOYMENT: !!process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
-      HAS_PLANNER_DEPLOYMENT: !!process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT,
-      HAS_SYNTH_DEPLOYMENT: !!process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT,
+      HAS_EMBEDDING_MODEL: !!process.env.AZURE_OPENAI_EMBEDDING_MODEL,
+      HAS_PLANNER_MODEL: !!process.env.AZURE_OPENAI_PLANNER_MODEL,
+      HAS_SYNTH_MODEL: !!process.env.AZURE_OPENAI_SYNTH_MODEL,
       HAS_CONNECTION_STRING: !!process.env.AZURE_DOCUMENTDB_CONNECTION_STRING,
     });
   }
@@ -73,11 +73,11 @@ export function createClients() {
     requireEnvVars([
       'AZURE_OPENAI_API_KEY',
       'AZURE_OPENAI_ENDPOINT',
-      'AZURE_OPENAI_EMBEDDING_DEPLOYMENT',
+      'AZURE_OPENAI_EMBEDDING_MODEL',
       'AZURE_OPENAI_EMBEDDING_API_VERSION',
-      'AZURE_OPENAI_PLANNER_DEPLOYMENT',
+      'AZURE_OPENAI_PLANNER_MODEL',
       'AZURE_OPENAI_PLANNER_API_VERSION',
-      'AZURE_OPENAI_SYNTH_DEPLOYMENT',
+      'AZURE_OPENAI_SYNTH_MODEL',
       'AZURE_OPENAI_SYNTH_API_VERSION',
       'AZURE_DOCUMENTDB_CLUSTER',
       'AZURE_DOCUMENTDB_CONNECTION_STRING',
@@ -95,24 +95,24 @@ export function createClients() {
 
     const embeddingClient = new AzureOpenAIEmbeddings({
       ...auth,
-      azureOpenAIApiEmbeddingsDeploymentName: process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
+      azureOpenAIApiEmbeddingsDeploymentName: process.env.AZURE_OPENAI_EMBEDDING_MODEL,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_EMBEDDING_API_VERSION,
       maxRetries: 1,
     });
 
     const plannerClient = new AzureChatOpenAI({
       ...auth,
-      model: process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT!,
+      model: process.env.AZURE_OPENAI_PLANNER_MODEL!,
       temperature: 0, // Deterministic for consistent query refinement
-      azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT,
+      azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_PLANNER_MODEL,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_PLANNER_API_VERSION,
     });
 
     const synthClient = new AzureChatOpenAI({
       ...auth,
-      model: process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT!,
+      model: process.env.AZURE_OPENAI_SYNTH_MODEL!,
       temperature: 0.3, // Slightly creative for natural responses
-      azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT,
+      azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_SYNTH_MODEL,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_SYNTH_API_VERSION,
     });
 
@@ -139,9 +139,9 @@ export function createClientsPasswordless() {
       'AZURE_OPENAI_ENDPOINT',
       'AZURE_OPENAI_EMBEDDING_MODEL',
       'AZURE_OPENAI_EMBEDDING_API_VERSION',
-      'AZURE_OPENAI_PLANNER_DEPLOYMENT',
+      'AZURE_OPENAI_PLANNER_MODEL',
       'AZURE_OPENAI_PLANNER_API_VERSION',
-      'AZURE_OPENAI_SYNTH_DEPLOYMENT',
+      'AZURE_OPENAI_SYNTH_MODEL',
       'AZURE_OPENAI_SYNTH_API_VERSION',
       'AZURE_DOCUMENTDB_CLUSTER',
       'AZURE_DOCUMENTDB_DATABASENAME',
@@ -170,7 +170,7 @@ export function createClientsPasswordless() {
       ),
       azureOpenAIApiInstanceName: subdomain,
       azureOpenAIApiDeploymentName:
-        process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT!,
+        process.env.AZURE_OPENAI_PLANNER_MODEL!,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_PLANNER_API_VERSION!,
     });
 
@@ -181,7 +181,7 @@ export function createClientsPasswordless() {
       ),
       azureOpenAIApiInstanceName: subdomain,
       azureOpenAIApiDeploymentName:
-        process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT!,
+        process.env.AZURE_OPENAI_SYNTH_MODEL!,
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_SYNTH_API_VERSION!,
     });
 
