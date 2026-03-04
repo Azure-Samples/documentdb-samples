@@ -54,7 +54,8 @@ You can use the Azure Developer CLI to create the required Azure resources by ru
 
 ### Development tools
 
-- [Node.js](https://nodejs.org/) 18 or later
+- [Azure Developer CLI](/azure/developer/azure-developer-cli/install-azd) for resource provisioning
+- [Node.js LTS](https://nodejs.org/)
 - [TypeScript](https://www.typescriptlang.org/) 5.0 or later
 - [Azure CLI](/cli/azure/install-azure-cli) for authentication
 
@@ -76,7 +77,7 @@ This sample uses LangChain's agent framework with the OpenAI SDK. It leverages L
 1. Navigate to the project directory:
 
     ```bash
-    cd ai/vector-search-agent-ts
+    cd ai/vector-search-agent-typescript
     ```
 
 ## Deploy Azure resources with Azure Developer CLI
@@ -181,7 +182,7 @@ The authentication flow:
 2. For Azure OpenAI, the token is passed to the LangChain `AzureChatOpenAI` and `AzureOpenAIEmbeddings` clients automatically.
 3. For Azure DocumentDB, a token callback function fetches an access token and provides it to the MongoDB client via the `MONGODB-OIDC` auth mechanism.
 
-:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/utils/clients.ts" range="1-40":::
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-typescript/src/utils/clients.ts" range="1-40":::
 
 ### Option 2: Connection string and API key authentication
 
@@ -220,7 +221,7 @@ EMBEDDING_DIMENSIONS=1536
 The project follows a standard Node.js/TypeScript project layout. Your directory structure should look like the following structure:
 
 ```
-vector-search-agent-ts/
+vector-search-agent-typescript/
 ├── src/
 │   ├── agent.ts              # Main agent application
 │   ├── upload-documents.ts   # Data upload utility
@@ -265,7 +266,7 @@ The application processes a hotel search request in two steps:
 - **Planning:** The workflow calls the planner agent, which analyzes the user's query (like "hotels near running trails") and searches the database for matching hotels.
 - **Synthesizing:** The workflow calls the synthesizer agent, which reviews the search results and writes a personalized recommendation explaining which hotels best match the request.
 
-:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/agent.ts" range="72-96":::
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-typescript/src/agent.ts" range="72-96":::
 
 ### Agents
 
@@ -277,7 +278,7 @@ The planner agent is the *decision maker* that determines how to search for hote
 
 The planner agent receives the user's natural language query and sends it to an AI model using LangChain's agent framework along with available tools it can use. The AI decides to call the vector search tool and provides search parameters. LangChain handles the tool execution automatically and returns the matching hotels. Instead of hardcoding search logic, the AI interprets what the user wants and chooses how to search, making the system flexible for different types of queries.
 
-:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/agent.ts" range="12-45":::
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-typescript/src/agent.ts" range="12-45":::
 
 #### Synthesizer agent
 
@@ -285,7 +286,7 @@ The synthesizer agent is the *writer* that creates helpful recommendations.
 
 The synthesizer agent receives the original user query along with the hotel search results. It sends everything to an AI model with instructions for writing recommendations. It returns a natural language response that compares hotels and explains the best options. This approach matters because raw search results aren't user-friendly. The synthesizer transforms database records into a conversational recommendation that explains why certain hotels match the user's needs.
 
-:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/agent.ts" range="48-69":::
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-typescript/src/agent.ts" range="48-69":::
 
 ### Agent tools
 
@@ -297,7 +298,7 @@ The tools file defines a search tool that the AI agent can use to find hotels. T
 
 LangChain's `tool` function creates a tool from a regular TypeScript function. The tool definition includes the name, description, and schema (using Zod for validation). This definition lets the AI know the tool exists and how to use it correctly.
 
-:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/vector-store.ts" range="144-176":::
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-typescript/src/vector-store.ts" range="144-176":::
 
 #### Tool execution
 
@@ -317,7 +318,7 @@ The prompts file defines the instructions and context given to the AI models for
 
 The quality of AI responses depends heavily on clear instructions. These prompts set boundaries, define the output format, and focus the AI on the user's goal of making a decision. You can customize these prompts to change how the agents behave without modifying any code.
 
-:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/utils/prompts.ts" range="30-75":::
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-typescript/src/utils/prompts.ts" range="30-75":::
 
 ## Prepare and upload data
 
@@ -334,7 +335,7 @@ The `upload-documents.ts` script performs three steps:
 2. **Generate embeddings** — For each hotel, the script sends the `Description` field to the Azure OpenAI `text-embedding-3-small` model to generate a 1536-dimensional vector embedding. This converts the text description into a numeric representation that captures its semantic meaning.
 3. **Insert and index** — The script inserts documents (with their embeddings) into the Azure DocumentDB collection and creates a vector index using the configured algorithm (IVF, HNSW, or DiskANN).
 
-:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/upload-documents.ts":::
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-typescript/src/upload-documents.ts":::
 
 ### Vector index creation
 
@@ -348,7 +349,7 @@ The index type you choose affects performance:
 | **HNSW** | M30+ | High recall, fast queries |
 | **DiskANN** | M40+ | Large-scale datasets, billion+ vectors |
 
-:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-ts/src/vector-store.ts" range="1-50":::
+:::code language="typescript" source="~/documentdb-samples/ai/vector-search-agent-typescript/src/vector-store.ts" range="1-50":::
 
 ## Run the sample
 
