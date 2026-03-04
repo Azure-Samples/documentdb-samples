@@ -13,6 +13,8 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.InsertManyOptions;
+import com.mongodb.MongoBulkWriteException;
 import org.bson.Document;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
@@ -133,15 +135,32 @@ public class HNSW {
 
         System.out.println("Processing in batches of " + batchSize + "...");
 
+        // Use unordered inserts for better performance and parallel execution
+        var insertOptions = new InsertManyOptions().ordered(false);
+        var totalInserted = 0;
+        var totalFailed = 0;
+
         for (int i = 0; i < batches.size(); i++) {
             var batch = batches.get(i);
             var documents = batch.stream()
                 .map(Document::new)
                 .toList();
 
-            collection.insertMany(documents);
-            System.out.println("Batch " + (i + 1) + " complete: " + documents.size() + " inserted");
+            try {
+                collection.insertMany(documents, insertOptions);
+                totalInserted += documents.size();
+                System.out.println("Batch " + (i + 1) + " complete: " + documents.size() + " inserted");
+            } catch (MongoBulkWriteException e) {
+                // With unordered inserts, some documents may succeed despite errors
+                var inserted = documents.size() - e.getWriteErrors().size();
+                totalInserted += inserted;
+                totalFailed += e.getWriteErrors().size();
+                System.out.println("Batch " + (i + 1) + " partial: " + inserted + " inserted, " + 
+                                   e.getWriteErrors().size() + " failed");
+            }
         }
+
+        System.out.println("Total: " + totalInserted + " inserted, " + totalFailed + " failed");
     }
 
     private void createStandardIndexes(MongoCollection<Document> collection) {
