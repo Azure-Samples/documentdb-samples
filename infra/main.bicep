@@ -58,15 +58,21 @@ module managedIdentity 'br/public:avm/res/managed-identity/user-assigned-identit
 // Azure OpenAI model and configuration variables
 var chatModelName = 'gpt-4o-mini'
 var chatModelVersion = '2024-07-18'
-var chatModelApiVersion = '2025-01-01-preview'
+var chatModelApiVersion = '2024-08-01-preview'
+var chatModelType = 'Standard'
+var chatModelCapacity = 50
 
 var synthModelName = 'gpt-4o'
 var synthModelVersion = '2024-11-20'
-var synthModelApiVersion = '2025-01-01-preview'
+var synthModelApiVersion = '2024-08-01-preview'
+var synthModelType = 'GlobalStandard'
+var synthModelCapacity = 50
 
 var embeddingModelName = 'text-embedding-3-small'
 var embeddingModelVersion = '1'
 var embeddingModelApiVersion = '2023-05-15'
+var embeddingModelType = 'Standard'
+var embeddingModelCapacity = 50
 
 // Data and embedding configuration
 var dataFileWithVectors = '../data/Hotels_Vector.json'
@@ -106,8 +112,8 @@ module openAi 'br/public:avm/res/cognitive-services/account:0.7.1' = {
           version: chatModelVersion
         }
         sku: {
-          name: 'GlobalStandard'
-          capacity: 50
+          name: chatModelType
+          capacity: chatModelCapacity
         }
       }
       {
@@ -118,8 +124,8 @@ module openAi 'br/public:avm/res/cognitive-services/account:0.7.1' = {
           version: synthModelVersion
         }
         sku: {
-          name: 'GlobalStandard'
-          capacity: 50
+          name: synthModelType
+          capacity: synthModelCapacity
         }
       }
       {
@@ -130,8 +136,8 @@ module openAi 'br/public:avm/res/cognitive-services/account:0.7.1' = {
           version: embeddingModelVersion
         }
         sku: {
-          name: 'Standard'
-          capacity: 10
+          name: embeddingModelType
+          capacity: embeddingModelCapacity
         }
       }
     ]
@@ -222,3 +228,4 @@ output EMBEDDED_FIELD string = embeddedFieldName
 output EMBEDDING_DIMENSIONS string = embeddingDimensions
 output EMBEDDING_BATCH_SIZE string = embeddingBatchSize
 output LOAD_SIZE_BATCH string = loadSizeBatch
+output USE_PASSWORDLESS string = deploymentUserPrincipalId != '' ? 'true' : 'false'

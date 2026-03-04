@@ -1,5 +1,5 @@
 import {
-  AzureCosmosDBMongoDBVectorStore
+  AzureDocumentDBVectorStore
 } from "@langchain/azure-cosmosdb";
 import { TOOL_NAME, PLANNER_SYSTEM_PROMPT, SYNTHESIZER_SYSTEM_PROMPT, createSynthesizerUserPrompt } from './utils/prompts.js';
 import { z } from 'zod';
@@ -13,7 +13,7 @@ async function runPlannerAgent(
   plannerClient: any,
   embeddingClient: any,
   userQuery: string,
-  store: AzureCosmosDBMongoDBVectorStore,
+  store: AzureDocumentDBVectorStore,
   nearestNeighbors = 5
 ): Promise<string> {
   console.log('\n--- PLANNER ---');

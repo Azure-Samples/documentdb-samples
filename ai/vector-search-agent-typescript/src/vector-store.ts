@@ -1,7 +1,7 @@
 import {
-  AzureCosmosDBMongoDBVectorStore,
-  AzureCosmosDBMongoDBSimilarityType,
-  AzureCosmosDBMongoDBConfig
+  AzureDocumentDBVectorStore,
+  AzureDocumentDBSimilarityType,
+  AzureDocumentDBConfig
 } from "@langchain/azure-cosmosdb";
 import type { AzureOpenAIEmbeddings } from "@langchain/openai";
 import { readFileSync } from 'fs';
@@ -18,10 +18,10 @@ type HotelForVectorStore = Omit<Hotel, 'Description_fr' | 'Location' | 'Rooms'>;
 // Helper function for similarity type
 function getSimilarityType(similarity: string) {
   switch (similarity.toUpperCase()) {
-    case 'COS': return AzureCosmosDBMongoDBSimilarityType.COS;
-    case 'L2': return AzureCosmosDBMongoDBSimilarityType.L2;
-    case 'IP': return AzureCosmosDBMongoDBSimilarityType.IP;
-    default: return AzureCosmosDBMongoDBSimilarityType.COS;
+    case 'COS': return AzureDocumentDBSimilarityType.COS;
+    case 'L2': return AzureDocumentDBSimilarityType.L2;
+    case 'IP': return AzureDocumentDBSimilarityType.IP;
+    default: return AzureDocumentDBSimilarityType.COS;
   }
 }
 
@@ -95,10 +95,10 @@ function formatHotelForSynthesizer(md: Partial<HotelForVectorStore>, score: numb
 // Get existing vector store without uploading documents
 export async function getExistingStore(
   embeddingClient: AzureOpenAIEmbeddings,
-  dbConfig: AzureCosmosDBMongoDBConfig
-): Promise<AzureCosmosDBMongoDBVectorStore> {
+  dbConfig: AzureDocumentDBConfig
+): Promise<AzureDocumentDBVectorStore> {
   
-  const store = new AzureCosmosDBMongoDBVectorStore(embeddingClient, {
+  const store = new AzureDocumentDBVectorStore(embeddingClient, {
     ...dbConfig,
     indexOptions: getVectorIndexOptions(),
   });
@@ -111,8 +111,8 @@ export async function getExistingStore(
 export async function getStore(
   dataFilePath: string,
   embeddingClient: AzureOpenAIEmbeddings,
-  dbConfig: AzureCosmosDBMongoDBConfig
-): Promise<AzureCosmosDBMongoDBVectorStore> {
+  dbConfig: AzureDocumentDBConfig
+): Promise<AzureDocumentDBVectorStore> {
   
   const hotelsData: HotelsData = JSON.parse(readFileSync(dataFilePath, 'utf-8'));
 
@@ -127,7 +127,7 @@ export async function getStore(
     });
   });
 
-  const store = await AzureCosmosDBMongoDBVectorStore.fromDocuments(
+  const store = await AzureDocumentDBVectorStore.fromDocuments(
     documents,
     embeddingClient,
     {
@@ -144,7 +144,7 @@ export async function getStore(
 export const getHotelsToMatchSearchQuery = tool(
   async ({ query, nearestNeighbors }, config): Promise<string> => {
     try {
-      const store = config.context.store as AzureCosmosDBMongoDBVectorStore;
+      const store = config.context.store as AzureDocumentDBVectorStore;
       const embeddingClient = config.context.embeddingClient as AzureOpenAIEmbeddings;
 
       // Create query embedding and perform search
