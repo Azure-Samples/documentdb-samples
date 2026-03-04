@@ -19,7 +19,7 @@ export async function testSynth() {
     azureADTokenProvider,
     azureOpenAIApiInstanceName: subdomain,
     azureOpenAIApiDeploymentName:
-      process.env.AZURE_OPENAI_SYNTH_DEPLOYMENT!,
+      process.env.AZURE_OPENAI_SYNTH_MODEL!,
     azureOpenAIApiVersion: process.env.AZURE_OPENAI_SYNTH_API_VERSION!,
   });
 

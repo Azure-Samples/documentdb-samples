@@ -118,12 +118,12 @@ The following table describes each environment variable:
 | `USE_PASSWORDLESS` | Set to `true` for Azure Identity auth or `false` for API key auth |
 | `AZURE_OPENAI_ENDPOINT` | Your Azure OpenAI resource endpoint URL |
 | `AZURE_OPENAI_API_KEY` | Your Azure OpenAI API key (only when `USE_PASSWORDLESS=false`) |
-| `AZURE_OPENAI_PLANNER_DEPLOYMENT` | Deployment name for the planner model (for example, `gpt-4o-mini`) |
-| `AZURE_OPENAI_PLANNER_API_VERSION` | API version for the planner deployment |
-| `AZURE_OPENAI_SYNTH_DEPLOYMENT` | Deployment name for the synthesizer model (for example, `gpt-4o`) |
-| `AZURE_OPENAI_SYNTH_API_VERSION` | API version for the synthesizer deployment |
-| `AZURE_OPENAI_EMBEDDING_MODEL` | Embedding model name (passwordless) or `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` (API key) |
-| `AZURE_OPENAI_EMBEDDING_API_VERSION` | API version for the embedding deployment |
+| `AZURE_OPENAI_PLANNER_MODEL` | Model name for the planner (for example, `gpt-4o-mini`) |
+| `AZURE_OPENAI_PLANNER_API_VERSION` | API version for the planner model |
+| `AZURE_OPENAI_SYNTH_MODEL` | Model name for the synthesizer (for example, `gpt-4o`) |
+| `AZURE_OPENAI_SYNTH_API_VERSION` | API version for the synthesizer model |
+| `AZURE_OPENAI_EMBEDDING_MODEL` | Embedding model name (for example, `text-embedding-3-small`) |
+| `AZURE_OPENAI_EMBEDDING_API_VERSION` | API version for the embedding model |
 | `AZURE_DOCUMENTDB_CLUSTER` | Your DocumentDB cluster name (passwordless) |
 | `AZURE_DOCUMENTDB_CONNECTION_STRING` | Full connection string (only when `USE_PASSWORDLESS=false`) |
 | `AZURE_DOCUMENTDB_DATABASENAME` | Database name (for example, `Hotels`) |
@@ -144,9 +144,9 @@ USE_PASSWORDLESS=true
 
 # Azure OpenAI Configuration (passwordless)
 AZURE_OPENAI_ENDPOINT=your-openai-endpoint
-AZURE_OPENAI_PLANNER_DEPLOYMENT=gpt-4o-mini
+AZURE_OPENAI_PLANNER_MODEL=gpt-4o-mini
 AZURE_OPENAI_PLANNER_API_VERSION=2024-08-01-preview
-AZURE_OPENAI_SYNTH_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_SYNTH_MODEL=gpt-4o
 AZURE_OPENAI_SYNTH_API_VERSION=2024-08-01-preview
 AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 AZURE_OPENAI_EMBEDDING_API_VERSION=2023-05-15
@@ -195,11 +195,11 @@ USE_PASSWORDLESS=false
 # Azure OpenAI Configuration (API key)
 AZURE_OPENAI_ENDPOINT=your-openai-endpoint
 AZURE_OPENAI_API_KEY=your-azure-openai-api-key
-AZURE_OPENAI_PLANNER_DEPLOYMENT=gpt-4o-mini
+AZURE_OPENAI_PLANNER_MODEL=gpt-4o-mini
 AZURE_OPENAI_PLANNER_API_VERSION=2024-08-01-preview
-AZURE_OPENAI_SYNTH_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_SYNTH_MODEL=gpt-4o
 AZURE_OPENAI_SYNTH_API_VERSION=2024-08-01-preview
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 AZURE_OPENAI_EMBEDDING_API_VERSION=2023-05-15
 
 # Azure DocumentDB (connection string)

@@ -19,7 +19,7 @@ export async function testPlanner() {
     azureADTokenProvider,
     azureOpenAIApiInstanceName: subdomain,
     azureOpenAIApiDeploymentName:
-      process.env.AZURE_OPENAI_PLANNER_DEPLOYMENT!,
+      process.env.AZURE_OPENAI_PLANNER_MODEL!,
     azureOpenAIApiVersion: process.env.AZURE_OPENAI_PLANNER_API_VERSION!,
   });
 

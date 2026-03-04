@@ -18,14 +18,14 @@ async function uploadDocuments() {
     console.log(`  AZURE_DOCUMENTDB_DATABASENAME: ${process.env.AZURE_DOCUMENTDB_DATABASENAME}`);
     console.log(`  AZURE_DOCUMENTDB_COLLECTION: ${process.env.AZURE_DOCUMENTDB_COLLECTION}`);
     console.log(`  AZURE_DOCUMENTDB_CLUSTER: ${process.env.AZURE_DOCUMENTDB_CLUSTER}`);
-    console.log(`  AZURE_OPENAI_EMBEDDING_DEPLOYMENT: ${process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT}`);
+    console.log(`  AZURE_OPENAI_EMBEDDING_MODEL: ${process.env.AZURE_OPENAI_EMBEDDING_MODEL}`);
 
     const requiredEnvVars = [
       'DATA_FILE_WITHOUT_VECTORS',
       'AZURE_DOCUMENTDB_DATABASENAME',
       'AZURE_DOCUMENTDB_COLLECTION',
       'AZURE_DOCUMENTDB_CLUSTER',
-      'AZURE_OPENAI_EMBEDDING_DEPLOYMENT',
+      'AZURE_OPENAI_EMBEDDING_MODEL',
     ];
 
     const missingEnvVars = requiredEnvVars.filter((name) => {
