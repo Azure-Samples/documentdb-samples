@@ -187,23 +187,19 @@ output AZURE_OPENAI_SERVICE string = openAi.outputs.name
 output AZURE_OPENAI_ENDPOINT string = openAi.outputs.endpoint
 
 output AZURE_OPENAI_CHAT_MODEL string = chatModelName
-output AZURE_OPENAI_CHAT_DEPLOYMENT string = chatModelName
 output AZURE_OPENAI_CHAT_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_CHAT_API_VERSION string = chatModelApiVersion
 
 // Planner agent uses the same model as chat (gpt-4o-mini)
 output AZURE_OPENAI_PLANNER_MODEL string = chatModelName
-output AZURE_OPENAI_PLANNER_DEPLOYMENT string = chatModelName
 output AZURE_OPENAI_PLANNER_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_PLANNER_API_VERSION string = chatModelApiVersion
 
 output AZURE_OPENAI_SYNTH_MODEL string = synthModelName
-output AZURE_OPENAI_SYNTH_DEPLOYMENT string = synthModelName
 output AZURE_OPENAI_SYNTH_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_SYNTH_API_VERSION string = synthModelApiVersion
 
 output AZURE_OPENAI_EMBEDDING_MODEL string = embeddingModelName
-output AZURE_OPENAI_EMBEDDING_DEPLOYMENT string = embeddingModelName
 output AZURE_OPENAI_EMBEDDING_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_EMBEDDING_API_VERSION string = embeddingModelApiVersion
 
