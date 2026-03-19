@@ -1,0 +1,27 @@
+{
+  "name": "select-algorithm-typescript",
+  "version": "1.0.0",
+  "description": "Compare DiskANN, HNSW, and IVF vector index algorithms with DocumentDB",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node --env-file ../../.env dist/select-algorithm.js",
+    "start:diskann": "tsc && node --env-file ../../.env dist/other/diskann-only.js",
+    "start:hnsw": "tsc && node --env-file ../../.env dist/other/hnsw-only.js",
+    "start:ivf": "tsc && node --env-file ../../.env dist/other/ivf-only.js",
+    "start:show-indexes": "tsc && node --env-file ../../.env dist/other/show-indexes.js"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.11.1",
+    "mongodb": "^6.18.0",
+    "openai": "^5.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
