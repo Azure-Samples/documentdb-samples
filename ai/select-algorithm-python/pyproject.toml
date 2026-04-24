@@ -1,0 +1,8 @@
+[project]
+name = "documentdb-select-algorithm"
+version = "1.0.0"
+requires-python = ">=3.10"
+description = "Compare DocumentDB vector index algorithms"
+license = { text = "MIT" }
+authors = [{ name = "Microsoft Corporation" }]
+readme = "README.md"
