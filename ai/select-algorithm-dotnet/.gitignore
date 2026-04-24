@@ -1,0 +1,11 @@
+# Build output
+bin/
+obj/
+
+# User settings
+*.user
+*.suo
+
+# Environment
+.env
+appsettings.Development.json
