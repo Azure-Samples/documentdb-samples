@@ -118,9 +118,18 @@ public class Utils {
         var options = new EmbeddingsOptions(List.of(text));
 
         var response = openAIClient.getEmbeddings(model, options);
-        return response.getData().get(0).getEmbedding().stream()
+        var embedding = response.getData().get(0).getEmbedding().stream()
                 .map(Float::doubleValue)
                 .toList();
+
+        var expectedDimensions = Integer.parseInt(getEnv("EMBEDDING_DIMENSIONS", "1536"));
+        if (embedding.size() != expectedDimensions) {
+            throw new IllegalStateException(String.format(
+                "Embedding dimension mismatch: expected %d, got %d. Verify EMBEDDING_DIMENSIONS matches your model.",
+                expectedDimensions, embedding.size()));
+        }
+
+        return embedding;
     }
 
     public static Document createVectorIndexOptions(String algorithm, String similarity) {

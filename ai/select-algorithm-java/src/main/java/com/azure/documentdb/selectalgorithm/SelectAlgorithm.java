@@ -23,7 +23,25 @@ public class SelectAlgorithm {
         System.exit(0);
     }
 
+    private void validateEnvironment() {
+        List<String> missing = new ArrayList<>();
+        String[] required = {"MONGO_CLUSTER_NAME", "AZURE_MANAGED_IDENTITY_PRINCIPAL_ID",
+                             "AZURE_OPENAI_EMBEDDING_ENDPOINT", "DATA_FILE_WITH_VECTORS"};
+        for (String var : required) {
+            String value = Utils.getEnv(var);
+            if (value == null || value.isBlank()) {
+                missing.add(var);
+            }
+        }
+        if (!missing.isEmpty()) {
+            throw new IllegalStateException(
+                "Missing required environment variables: " + String.join(", ", missing) +
+                "\nSee .env.example for required values. Copy to .env and fill in your Azure resource details.");
+        }
+    }
+
     public void run() {
+        validateEnvironment();
         try (var mongoClient = Utils.createMongoClient()) {
             var openAIClient = Utils.createOpenAIClient();
 
