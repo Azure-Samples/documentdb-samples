@@ -66,7 +66,7 @@ func CreateHNSWVectorIndex(ctx context.Context, collection *mongo.Collection, ve
 			fmt.Println("  • Use IVF instead: go run src/ivf.go")
 			fmt.Println("  • Use DiskANN instead: go run src/diskann.go")
 		}
-		return fmt.Errorf("error creating HNSW vector index: %v", err)
+		return fmt.Errorf("error creating HNSW vector index: %w", err)
 	}
 
 	fmt.Println("HNSW vector index created successfully")
@@ -80,7 +80,7 @@ func PerformHNSWVectorSearch(ctx context.Context, collection *mongo.Collection, 
 	// Convert query text to embedding vector
 	queryEmbedding, err := GenerateEmbedding(ctx, openAIClient, queryText, modelName)
 	if err != nil {
-		return nil, fmt.Errorf("error generating embedding: %v", err)
+		return nil, fmt.Errorf("error generating embedding: %w", err)
 	}
 
 	// Build aggregation pipeline for HNSW vector search
@@ -114,7 +114,7 @@ func PerformHNSWVectorSearch(ctx context.Context, collection *mongo.Collection, 
 	// Execute the search pipeline
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, fmt.Errorf("error performing HNSW vector search: %v", err)
+		return nil, fmt.Errorf("error performing HNSW vector search: %w", err)
 	}
 	defer cursor.Close(ctx)
 
@@ -129,7 +129,7 @@ func PerformHNSWVectorSearch(ctx context.Context, collection *mongo.Collection, 
 	}
 
 	if err := cursor.Err(); err != nil {
-		return nil, fmt.Errorf("cursor error: %v", err)
+		return nil, fmt.Errorf("cursor error: %w", err)
 	}
 
 	return results, nil
@@ -139,15 +139,16 @@ func PerformHNSWVectorSearch(ctx context.Context, collection *mongo.Collection, 
 func main() {
 	fmt.Println("Starting HNSW vector search demonstration...")
 
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
 
 	// Load configuration from environment variables
 	config := LoadConfig()
 
 	fmt.Println("\nInitializing MongoDB and Azure OpenAI clients...")
-	mongoClient, azureOpenAIClient, err := GetClientsPasswordless()
+	mongoClient, azureOpenAIClient, err := GetClientsPasswordless(ctx)
 	if err != nil {
-		log.Fatalf("Failed to initialize clients: %v", err)
+		log.Fatalf("Failed to initialize clients: %w", err)
 	}
 	defer mongoClient.Disconnect(ctx)
 
@@ -159,7 +160,7 @@ func main() {
 	fmt.Printf("\nLoading data from %s...\n", config.DataFile)
 	data, err := ReadFileReturnJSON(config.DataFile)
 	if err != nil {
-		log.Fatalf("Failed to load data: %v", err)
+		log.Fatalf("Failed to load data: %w", err)
 	}
 	fmt.Printf("Loaded %d documents\n", len(data))
 
@@ -181,7 +182,7 @@ func main() {
 	// Clear any existing data to start fresh
 	deleteResult, err := collection.DeleteMany(ctx, bson.M{})
 	if err != nil {
-		log.Fatalf("Failed to clear existing data: %v", err)
+		log.Fatalf("Failed to clear existing data: %w", err)
 	}
 	if deleteResult.DeletedCount > 0 {
 		fmt.Printf("Cleared %d existing documents from collection\n", deleteResult.DeletedCount)
@@ -190,7 +191,7 @@ func main() {
 	// Insert hotel data with embeddings
 	stats, err := InsertData(ctx, collection, documentsWithEmbeddings, config.BatchSize, nil)
 	if err != nil {
-		log.Fatalf("Failed to insert data: %v", err)
+		log.Fatalf("Failed to insert data: %w", err)
 	}
 
 	if stats.Inserted == 0 {
@@ -203,7 +204,7 @@ func main() {
 	fmt.Println("\nCreating HNSW vector index...")
 	err = CreateHNSWVectorIndex(ctx, collection, config.VectorField, config.Dimensions)
 	if err != nil {
-		log.Fatalf("Failed to create HNSW vector index: %v", err)
+		log.Fatalf("Failed to create HNSW vector index: %w", err)
 	}
 
 	// Allow time for index to become ready
@@ -224,7 +225,7 @@ func main() {
 		16, // efSearch (not used directly in DocumentDB but kept for API consistency)
 	)
 	if err != nil {
-		log.Fatalf("Failed to perform HNSW vector search: %v", err)
+		log.Fatalf("Failed to perform HNSW vector search: %w", err)
 	}
 
 	// Display the search results

@@ -63,7 +63,7 @@ func CreateIVFVectorIndex(ctx context.Context, collection *mongo.Collection, vec
 			fmt.Println("  • Use HNSW instead: go run src/hnsw.go")
 			fmt.Println("  • Use DiskANN instead: go run src/diskann.go")
 		}
-		return fmt.Errorf("error creating IVF vector index: %v", err)
+		return fmt.Errorf("error creating IVF vector index: %w", err)
 	}
 
 	fmt.Println("IVF vector index created successfully")
@@ -77,7 +77,7 @@ func PerformIVFVectorSearch(ctx context.Context, collection *mongo.Collection, o
 	// Generate embedding vector for the search query
 	queryEmbedding, err := GenerateEmbedding(ctx, openaAIClient, queryText, modelName)
 	if err != nil {
-		return nil, fmt.Errorf("error generating embedding: %v", err)
+		return nil, fmt.Errorf("error generating embedding: %w", err)
 	}
 
 	// Construct aggregation pipeline for IVF vector search
@@ -111,7 +111,7 @@ func PerformIVFVectorSearch(ctx context.Context, collection *mongo.Collection, o
 	// Execute the aggregation pipeline
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, fmt.Errorf("error performing IVF vector search: %v", err)
+		return nil, fmt.Errorf("error performing IVF vector search: %w", err)
 	}
 	defer cursor.Close(ctx)
 
@@ -126,7 +126,7 @@ func PerformIVFVectorSearch(ctx context.Context, collection *mongo.Collection, o
 	}
 
 	if err := cursor.Err(); err != nil {
-		return nil, fmt.Errorf("cursor error: %v", err)
+		return nil, fmt.Errorf("cursor error: %w", err)
 	}
 
 	return results, nil
@@ -136,15 +136,16 @@ func PerformIVFVectorSearch(ctx context.Context, collection *mongo.Collection, o
 func main() {
 	fmt.Println("Starting IVF vector search demonstration...")
 
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
 
 	// Load configuration from environment variables
 	config := LoadConfig()
 
 	fmt.Println("\nInitializing MongoDB and Azure OpenAI clients...")
-	mongoClient, azureOpenAIClient, err := GetClientsPasswordless()
+	mongoClient, azureOpenAIClient, err := GetClientsPasswordless(ctx)
 	if err != nil {
-		log.Fatalf("Failed to initialize clients: %v", err)
+		log.Fatalf("Failed to initialize clients: %w", err)
 	}
 	defer mongoClient.Disconnect(ctx)
 
@@ -156,7 +157,7 @@ func main() {
 	fmt.Printf("\nLoading data from %s...\n", config.DataFile)
 	data, err := ReadFileReturnJSON(config.DataFile)
 	if err != nil {
-		log.Fatalf("Failed to load data: %v", err)
+		log.Fatalf("Failed to load data: %w", err)
 	}
 	fmt.Printf("Loaded %d documents\n", len(data))
 
@@ -178,7 +179,7 @@ func main() {
 	// Remove any existing data for clean state
 	deleteResult, err := collection.DeleteMany(ctx, bson.M{})
 	if err != nil {
-		log.Fatalf("Failed to clear existing data: %v", err)
+		log.Fatalf("Failed to clear existing data: %w", err)
 	}
 	if deleteResult.DeletedCount > 0 {
 		fmt.Printf("Cleared %d existing documents from collection\n", deleteResult.DeletedCount)
@@ -187,7 +188,7 @@ func main() {
 	// Insert hotel data with embeddings
 	stats, err := InsertData(ctx, collection, documentsWithEmbeddings, config.BatchSize, nil)
 	if err != nil {
-		log.Fatalf("Failed to insert data: %v", err)
+		log.Fatalf("Failed to insert data: %w", err)
 	}
 
 	if stats.Inserted == 0 {
@@ -200,7 +201,7 @@ func main() {
 	fmt.Println("\nCreating IVF vector index...")
 	err = CreateIVFVectorIndex(ctx, collection, config.VectorField, config.Dimensions)
 	if err != nil {
-		log.Fatalf("Failed to create IVF vector index: %v", err)
+		log.Fatalf("Failed to create IVF vector index: %w", err)
 	}
 
 	// Wait for index to be built and ready
@@ -221,7 +222,7 @@ func main() {
 		1, // numProbes (not used in DocumentDB but kept for API consistency)
 	)
 	if err != nil {
-		log.Fatalf("Failed to perform IVF vector search: %v", err)
+		log.Fatalf("Failed to perform IVF vector search: %w", err)
 	}
 
 	// Display the search results

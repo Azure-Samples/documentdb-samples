@@ -67,7 +67,7 @@ func CreateDiskANNVectorIndex(ctx context.Context, collection *mongo.Collection,
 			fmt.Println("  • Use HNSW instead: go run src/hnsw.go")
 			fmt.Println("  • Use IVF instead: go run src/ivf.go")
 		}
-		return fmt.Errorf("error creating DiskANN vector index: %v", err)
+		return fmt.Errorf("error creating DiskANN vector index: %w", err)
 	}
 
 	fmt.Println("DiskANN vector index created successfully")
@@ -81,7 +81,7 @@ func PerformDiskANNVectorSearch(ctx context.Context, collection *mongo.Collectio
 	// Generate embedding for the query text
 	queryEmbedding, err := GenerateEmbedding(ctx, openAIClient, queryText, modelName)
 	if err != nil {
-		return nil, fmt.Errorf("error generating embedding: %v", err)
+		return nil, fmt.Errorf("error generating embedding: %w", err)
 	}
 
 	// Construct the aggregation pipeline for vector search
@@ -115,7 +115,7 @@ func PerformDiskANNVectorSearch(ctx context.Context, collection *mongo.Collectio
 	// Execute the aggregation pipeline
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, fmt.Errorf("error performing DiskANN vector search: %v", err)
+		return nil, fmt.Errorf("error performing DiskANN vector search: %w", err)
 	}
 	defer cursor.Close(ctx)
 
@@ -130,7 +130,7 @@ func PerformDiskANNVectorSearch(ctx context.Context, collection *mongo.Collectio
 	}
 
 	if err := cursor.Err(); err != nil {
-		return nil, fmt.Errorf("cursor error: %v", err)
+		return nil, fmt.Errorf("cursor error: %w", err)
 	}
 
 	return results, nil
@@ -138,15 +138,16 @@ func PerformDiskANNVectorSearch(ctx context.Context, collection *mongo.Collectio
 
 // main function demonstrates DiskANN vector search functionality
 func main() {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
 
 	// Load configuration from environment variables
 	config := LoadConfig()
 
 	fmt.Println("\nInitializing MongoDB and Azure OpenAI clients...")
-	mongoClient, azureOpenAIClient, err := GetClientsPasswordless()
+	mongoClient, azureOpenAIClient, err := GetClientsPasswordless(ctx)
 	if err != nil {
-		log.Fatalf("Failed to initialize clients: %v", err)
+		log.Fatalf("Failed to initialize clients: %w", err)
 	}
 	defer mongoClient.Disconnect(ctx)
 
@@ -158,7 +159,7 @@ func main() {
 	fmt.Printf("\nLoading data from %s...\n", config.DataFile)
 	data, err := ReadFileReturnJSON(config.DataFile)
 	if err != nil {
-		log.Fatalf("Failed to load data: %v", err)
+		log.Fatalf("Failed to load data: %w", err)
 	}
 	fmt.Printf("Loaded %d documents\n", len(data))
 
@@ -180,7 +181,7 @@ func main() {
 	// Clear existing data to ensure clean state
 	deleteResult, err := collection.DeleteMany(ctx, bson.M{})
 	if err != nil {
-		log.Fatalf("Failed to clear existing data: %v", err)
+		log.Fatalf("Failed to clear existing data: %w", err)
 	}
 	if deleteResult.DeletedCount > 0 {
 		fmt.Printf("Cleared %d existing documents from collection\n", deleteResult.DeletedCount)
@@ -189,7 +190,7 @@ func main() {
 	// Insert the hotel data
 	stats, err := InsertData(ctx, collection, documentsWithEmbeddings, config.BatchSize, nil)
 	if err != nil {
-		log.Fatalf("Failed to insert data: %v", err)
+		log.Fatalf("Failed to insert data: %w", err)
 	}
 
 	if stats.Inserted == 0 {
@@ -201,7 +202,7 @@ func main() {
 	// Create DiskANN vector index
 	err = CreateDiskANNVectorIndex(ctx, collection, config.VectorField, config.Dimensions)
 	if err != nil {
-		log.Fatalf("Failed to create DiskANN vector index: %v", err)
+		log.Fatalf("Failed to create DiskANN vector index: %w", err)
 	}
 
 	// Wait briefly for index to be ready
@@ -221,7 +222,7 @@ func main() {
 		5,
 	)
 	if err != nil {
-		log.Fatalf("Failed to perform vector search: %v", err)
+		log.Fatalf("Failed to perform vector search: %w", err)
 	}
 
 	// Display results

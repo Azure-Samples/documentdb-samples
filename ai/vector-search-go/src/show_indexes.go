@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -138,7 +139,7 @@ func showCollectionIndexes(ctx context.Context, collection *mongo.Collection, co
 
 	var indexes []IndexInfo
 	if err := cursor.All(ctx, &indexes); err != nil {
-		return fmt.Errorf("error decoding indexes: %v", err)
+		return fmt.Errorf("error decoding indexes: %w", err)
 	}
 
 	if len(indexes) == 0 {
@@ -172,7 +173,7 @@ func showDatabaseCollectionsAndIndexes(ctx context.Context, database *mongo.Data
 	// Get list of all collections in the database
 	collectionNames, err := database.ListCollectionNames(ctx, bson.M{})
 	if err != nil {
-		return fmt.Errorf("error accessing database '%s': %v", databaseName, err)
+		return fmt.Errorf("error accessing database '%s': %w", databaseName, err)
 	}
 
 	if len(collectionNames) == 0 {
@@ -208,7 +209,8 @@ func showDatabaseCollectionsAndIndexes(ctx context.Context, database *mongo.Data
 
 // main function displays vector indexes and collection information
 func main() {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
 
 	fmt.Println("Vector Index Information Display")
 	fmt.Printf("%s\n", strings.Repeat("=", 50))
@@ -221,9 +223,9 @@ func main() {
 
 	// Initialize MongoDB client
 	fmt.Println("\nConnecting to MongoDB...")
-	mongoClient, _, err := GetClientsPasswordless()
+	mongoClient, _, err := GetClientsPasswordless(ctx)
 	if err != nil {
-		log.Fatalf("Failed to initialize MongoDB client: %v", err)
+		log.Fatalf("Failed to initialize MongoDB client: %w", err)
 	}
 	defer mongoClient.Disconnect(ctx)
 

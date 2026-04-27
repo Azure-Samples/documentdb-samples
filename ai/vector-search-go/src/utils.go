@@ -61,7 +61,7 @@ func LoadConfig() *Config {
 	// services instead of .env files. For development/demo purposes only.
 	err := godotenv.Load()
 	if err != nil {
-		log.Printf("Warning: Error loading .env file: %v", err)
+		log.Printf("Warning: Error loading .env file: %w", err)
 	}
 
 	dimensions, _ := strconv.Atoi(getEnvOrDefault("EMBEDDING_DIMENSIONS", "1536"))
@@ -88,8 +88,7 @@ func getEnvOrDefault(key, defaultValue string) string {
 }
 
 // GetClients creates MongoDB and Azure OpenAI clients with connection string authentication
-func GetClients() (*mongo.Client, openai.Client, error) {
-	ctx := context.Background()
+func GetClients(ctx context.Context) (*mongo.Client, openai.Client, error) {
 
 	// Get MongoDB connection string
 	mongoConnectionString := os.Getenv("MONGO_CONNECTION_STRING")
@@ -109,13 +108,13 @@ func GetClients() (*mongo.Client, openai.Client, error) {
 
 	mongoClient, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		return nil, openai.Client{}, fmt.Errorf("failed to connect to MongoDB: %v", err)
+		return nil, openai.Client{}, fmt.Errorf("failed to connect to MongoDB: %w", err)
 	}
 
 	// Test the connection
 	err = mongoClient.Ping(ctx, nil)
 	if err != nil {
-		return nil, openai.Client{}, fmt.Errorf("failed to ping MongoDB: %v", err)
+		return nil, openai.Client{}, fmt.Errorf("failed to ping MongoDB: %w", err)
 	}
 
 	// Get Azure OpenAI configuration
@@ -135,8 +134,7 @@ func GetClients() (*mongo.Client, openai.Client, error) {
 }
 
 // GetClientsPasswordless creates MongoDB and Azure OpenAI clients with passwordless authentication
-func GetClientsPasswordless() (*mongo.Client, openai.Client, error) {
-	ctx := context.Background()
+func GetClientsPasswordless(ctx context.Context) (*mongo.Client, openai.Client, error) {
 
 	// Get MongoDB cluster name
 	clusterName := os.Getenv("MONGO_CLUSTER_NAME")
@@ -147,7 +145,7 @@ func GetClientsPasswordless() (*mongo.Client, openai.Client, error) {
 	// Create Azure credential
 	credential, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
-		return nil, openai.Client{}, fmt.Errorf("failed to create Azure credential: %v", err)
+		return nil, openai.Client{}, fmt.Errorf("failed to create Azure credential: %w", err)
 	}
 
 	// Attempt OIDC authentication
@@ -156,7 +154,7 @@ func GetClientsPasswordless() (*mongo.Client, openai.Client, error) {
 	fmt.Println("Attempting OIDC authentication...")
 	mongoClient, err := connectWithOIDC(ctx, mongoURI, credential)
 	if err != nil {
-		return nil, openai.Client{}, fmt.Errorf("OIDC authentication failed: %v", err)
+		return nil, openai.Client{}, fmt.Errorf("OIDC authentication failed: %w", err)
 	}
 	fmt.Println("OIDC authentication successful!")
 
@@ -184,7 +182,7 @@ func connectWithOIDC(ctx context.Context, mongoURI string, credential *azidentit
 			Scopes: []string{scope},
 		})
 		if err != nil {
-			return nil, fmt.Errorf("failed to get token with scope %s: %v", scope, err)
+			return nil, fmt.Errorf("failed to get token with scope %s: %w", scope, err)
 		}
 
 		fmt.Printf("Successfully obtained token")
@@ -238,13 +236,13 @@ func connectWithConnectionString(ctx context.Context, connectionString string) (
 func ReadFileReturnJSON(filePath string) ([]map[string]interface{}, error) {
 	file, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("error reading file '%s': %v", filePath, err)
+		return nil, fmt.Errorf("error reading file '%s': %w", filePath, err)
 	}
 
 	var data []map[string]interface{}
 	err = json.Unmarshal(file, &data)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing JSON in file '%s': %v", filePath, err)
+		return nil, fmt.Errorf("error parsing JSON in file '%s': %w", filePath, err)
 	}
 
 	return data, nil
@@ -254,12 +252,12 @@ func ReadFileReturnJSON(filePath string) ([]map[string]interface{}, error) {
 func WriteFileJSON(data []map[string]interface{}, filePath string) error {
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return fmt.Errorf("error marshalling data to JSON: %v", err)
+		return fmt.Errorf("error marshalling data to JSON: %w", err)
 	}
 
 	err = os.WriteFile(filePath, jsonData, 0644)
 	if err != nil {
-		return fmt.Errorf("error writing to file '%s': %v", filePath, err)
+		return fmt.Errorf("error writing to file '%s': %w", filePath, err)
 	}
 
 	fmt.Printf("Data successfully written to '%s'\n", filePath)
@@ -346,7 +344,7 @@ func DropVectorIndexes(ctx context.Context, collection *mongo.Collection, vector
 	// Get all indexes for the collection
 	cursor, err := collection.Indexes().List(ctx)
 	if err != nil {
-		return fmt.Errorf("could not list indexes: %v", err)
+		return fmt.Errorf("could not list indexes: %w", err)
 	}
 	defer cursor.Close(ctx)
 
@@ -432,7 +430,7 @@ func GenerateEmbedding(ctx context.Context, client openai.Client, text, modelNam
 		Model: modelName,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate embedding: %v", err)
+		return nil, fmt.Errorf("failed to generate embedding: %w", err)
 	}
 
 	if len(resp.Data) == 0 {

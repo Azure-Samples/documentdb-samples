@@ -41,7 +41,7 @@ func CreateEmbeddings(ctx context.Context, texts []string, openAIClient openai.C
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("error generating embeddings: %v", err)
+		return nil, fmt.Errorf("error generating embeddings: %w", err)
 	}
 
 	// Extract embedding vectors from the API response
@@ -87,7 +87,7 @@ func ProcessEmbeddingBatch(ctx context.Context, dataBatch []map[string]interface
 	if len(textsToEmbed) > 0 {
 		embeddings, err := CreateEmbeddings(ctx, textsToEmbed, openAIClient, modelName)
 		if err != nil {
-			return fmt.Errorf("failed to create embeddings: %v", err)
+			return fmt.Errorf("failed to create embeddings: %w", err)
 		}
 
 		// Add embeddings back to the original documents
@@ -118,7 +118,7 @@ func LoadEmbeddingConfig() *EmbeddingConfig {
 	// Load environment variables from .env file
 	err := godotenv.Load()
 	if err != nil {
-		log.Printf("Warning: Error loading .env file: %v", err)
+		log.Printf("Warning: Error loading .env file: %w", err)
 	}
 
 	batchSize, _ := strconv.Atoi(getEnvOrDefault("EMBEDDING_SIZE_BATCH", "16"))
@@ -141,7 +141,8 @@ func LoadEmbeddingConfig() *EmbeddingConfig {
 // 3. Processes data in batches to generate embeddings
 // 4. Saves the enhanced data with embeddings
 func main() {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
 
 	fmt.Println("Starting embedding creation process...")
 
@@ -158,9 +159,9 @@ func main() {
 
 	// Initialize clients for MongoDB and Azure OpenAI
 	fmt.Println("\nInitializing Azure OpenAI client...")
-	mongoClient, azureOpenAIClient, err := GetClientsPasswordless()
+	mongoClient, azureOpenAIClient, err := GetClientsPasswordless(ctx)
 	if err != nil {
-		log.Fatalf("Failed to initialize clients: %v", err)
+		log.Fatalf("Failed to initialize clients: %w", err)
 	}
 	defer func() {
 		if mongoClient != nil {
@@ -172,7 +173,7 @@ func main() {
 	fmt.Printf("\nReading input data from %s...\n", config.DataWithoutVectors)
 	data, err := ReadFileReturnJSON(config.DataWithoutVectors)
 	if err != nil {
-		log.Fatalf("Failed to read input file: %v", err)
+		log.Fatalf("Failed to read input file: %w", err)
 	}
 	fmt.Printf("Loaded %d documents\n", len(data))
 
@@ -215,7 +216,7 @@ func main() {
 	fmt.Printf("\nSaving enhanced data to %s...\n", config.DataWithVectors)
 	err = WriteFileJSON(data, config.DataWithVectors)
 	if err != nil {
-		log.Fatalf("Failed to save output file: %v", err)
+		log.Fatalf("Failed to save output file: %w", err)
 	}
 
 	fmt.Println("\nEmbedding creation completed successfully!")
