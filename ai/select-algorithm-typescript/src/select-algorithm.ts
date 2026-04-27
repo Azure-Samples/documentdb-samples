@@ -180,6 +180,12 @@ async function main() {
             input: [searchQuery],
         });
         const queryEmbedding = embeddingResponse.data[0].embedding;
+        if (queryEmbedding.length !== embeddingDimensions) {
+            throw new Error(
+                `Embedding dimension mismatch: expected ${embeddingDimensions}, got ${queryEmbedding.length}. ` +
+                `Verify AZURE_OPENAI_EMBEDDING_MODEL matches the configured EMBEDDING_DIMENSIONS.`
+            );
+        }
         console.log(`Query embedding: ${queryEmbedding.length} dimensions\n`);
 
         const config = { batchSize };
