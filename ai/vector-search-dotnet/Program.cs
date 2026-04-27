@@ -21,8 +21,17 @@ class Program
 
         var appConfig = new AppConfiguration();
         configuration.Bind(appConfig);
+
+        var requiredKeys = new[] { "MONGO_CLUSTER_NAME", "AZURE_OPENAI_EMBEDDING_ENDPOINT", "AZURE_OPENAI_EMBEDDING_MODEL" };
+        var missing = requiredKeys.Where(k => string.IsNullOrEmpty(configuration[k])).ToList();
+        if (missing.Any())
+        {
+            Console.Error.WriteLine($"Missing required configuration: {string.Join(", ", missing)}");
+            Console.Error.WriteLine("Set as environment variables or in appsettings.json. See README for details.");
+            Environment.Exit(1);
+        }
         
-        var services = new ServiceCollection()
+        var services= new ServiceCollection()
             .AddLogging(builder => builder.AddConsole())
             .AddSingleton<IConfiguration>(configuration)
             .AddSingleton(appConfig)
@@ -30,7 +39,7 @@ class Program
             .AddSingleton<EmbeddingService>()
             .AddSingleton<VectorSearchService>();
 
-        var serviceProvider = services.BuildServiceProvider();
+        await using var serviceProvider = services.BuildServiceProvider();
         var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
         try

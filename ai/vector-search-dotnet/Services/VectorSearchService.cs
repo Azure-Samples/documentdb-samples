@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace DocumentDBVectorSamples.Services.VectorSearch;
@@ -109,12 +110,16 @@ public class VectorSearchService
 
             // Execute and process the search
             _logger.LogInformation($"Executing {indexType} vector search for top {_config.VectorSearch.TopK} results");
+            var sw = Stopwatch.StartNew();
             var searchResults = (await collection.AggregateAsync<BsonDocument>(searchPipeline)).ToList()
                 .Select(result => new SearchResult 
                 { 
                     Document = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<HotelData>(result["document"].AsBsonDocument), 
                     Score = result["score"].AsDouble 
                 }).ToList();
+            sw.Stop();
+            var elapsedMs = sw.ElapsedMilliseconds;
+            _logger.LogInformation($"Vector search completed in {elapsedMs}ms");
 
             // Print the results
             if (searchResults?.Count == 0) 
