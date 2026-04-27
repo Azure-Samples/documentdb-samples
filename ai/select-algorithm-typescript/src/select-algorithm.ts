@@ -7,6 +7,21 @@ import { dirname } from "node:path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Validate required environment variables at startup
+const requiredEnvVars = [
+    'MONGO_CLUSTER_NAME',
+    'AZURE_OPENAI_EMBEDDING_ENDPOINT',
+    'AZURE_OPENAI_EMBEDDING_MODEL',
+    'DATA_FILE_WITH_VECTORS'
+];
+
+const missing = requiredEnvVars.filter(v => !process.env[v]);
+if (missing.length > 0) {
+    console.error(`Missing required environment variables: ${missing.join(', ')}`);
+    console.error('See .env.example for required values.');
+    process.exit(1);
+}
+
 type Algorithm = 'diskann' | 'hnsw' | 'ivf';
 type Similarity = 'COS' | 'L2' | 'IP';
 

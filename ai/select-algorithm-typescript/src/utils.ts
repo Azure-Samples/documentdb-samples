@@ -1,4 +1,4 @@
-import { MongoClient, OIDCResponse, OIDCCallbackParams } from 'mongodb';
+import { Collection, Document, MongoClient, OIDCResponse, OIDCCallbackParams } from 'mongodb';
 import { AzureOpenAI } from 'openai/index.js';
 import { promises as fs } from "fs";
 import { AccessToken, DefaultAzureCredential, TokenCredential, getBearerTokenProvider } from '@azure/identity';
@@ -19,16 +19,14 @@ export function getClientsPasswordless(): { aiClient: AzureOpenAI | null; dbClie
     let dbClient: MongoClient | null = null;
 
     // Validate all required environment variables upfront
-    const apiVersion = process.env.AZURE_OPENAI_EMBEDDING_API_VERSION!;
     const endpoint = process.env.AZURE_OPENAI_EMBEDDING_ENDPOINT!;
     const deployment = process.env.AZURE_OPENAI_EMBEDDING_MODEL!;
     const clusterName = process.env.MONGO_CLUSTER_NAME!;
 
-    if (!apiVersion || !endpoint || !deployment || !clusterName) {
-        throw new Error('Missing required environment variables: AZURE_OPENAI_EMBEDDING_API_VERSION, AZURE_OPENAI_EMBEDDING_ENDPOINT, AZURE_OPENAI_EMBEDDING_MODEL, MONGO_CLUSTER_NAME');
+    if (!endpoint || !deployment || !clusterName) {
+        throw new Error('Missing required environment variables: AZURE_OPENAI_EMBEDDING_ENDPOINT, AZURE_OPENAI_EMBEDDING_MODEL, MONGO_CLUSTER_NAME');
     }
 
-    console.log(`Using Azure OpenAI Embedding API Version: ${apiVersion}`);
     console.log(`Using Azure OpenAI Embedding Deployment/Model: ${deployment}`);
 
     const credential = new DefaultAzureCredential();
@@ -38,10 +36,12 @@ export function getClientsPasswordless(): { aiClient: AzureOpenAI | null; dbClie
         const scope = "https://cognitiveservices.azure.com/.default";
         const azureADTokenProvider = getBearerTokenProvider(credential, scope);
         aiClient = new AzureOpenAI({
-            apiVersion,
+            apiVersion: "2024-10-21",
             endpoint,
             deployment,
-            azureADTokenProvider
+            azureADTokenProvider,
+            timeout: 30000,
+            maxRetries: 3,
         });
     }
 
@@ -73,7 +73,7 @@ export async function readFileReturnJson(filePath: string): Promise<JsonData[]> 
     return JSON.parse(fileAsString);
 }
 
-export async function insertData(config, collection, data) {
+export async function insertData(config: { batchSize: number }, collection: Collection, data: Document[]) {
     console.log(`Processing in batches of ${config.batchSize}...`);
     const totalBatches = Math.ceil(data.length / config.batchSize);
 
@@ -109,7 +109,7 @@ export async function insertData(config, collection, data) {
     // Create standard field indexes
     const indexColumns = ["HotelId", "Category", "Description", "Description_fr"];
     for (const col of indexColumns) {
-        const indexSpec = {};
+        const indexSpec: Record<string, number> = {};
         indexSpec[col] = 1;
         await collection.createIndex(indexSpec);
     }
@@ -117,14 +117,14 @@ export async function insertData(config, collection, data) {
     return { total: data.length, inserted, failed };
 }
 
-export function printSearchResults(searchResults) {
+export function printSearchResults(searchResults: Document[]) {
     if (!searchResults || searchResults.length === 0) {
         console.log('No search results found.');
         return;
     }
 
-    searchResults.map((result, index) => {
-        const { document, score } = result as any;
+    searchResults.map((result: Document, index: number) => {
+        const { document, score } = result;
         console.log(`${index + 1}. HotelName: ${document.HotelName}, Score: ${score.toFixed(4)}`);
     });
 }
@@ -182,7 +182,7 @@ export function printComparisonTable(
             console.log('  No results.');
             continue;
         }
-        r.searchResults.forEach((item, i) => {
+        r.searchResults.forEach((item: Document, i: number) => {
             console.log(`  ${i + 1}. ${item.document.HotelName}, Score: ${item.score.toFixed(4)}`);
         });
         console.log(`  Latency: ${r.latencyMs.toFixed(0)}ms`);
