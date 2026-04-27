@@ -69,26 +69,45 @@ module managedIdentity 'br/public:avm/res/managed-identity/user-assigned-identit
   }
 }
 
-// Azure OpenAI model and configuration variables
+// Azure OpenAI model and configuration parameters
 // https://learn.microsoft.com/azure/ai-services/openai/concepts/models?tabs=python-secure%2Cglobal-standard%2Cstandard-chat-completions#models-by-deployment-type
-// To change deployment type, swap 'Standard' ↔ 'GlobalStandard' in the sku name variables below.
+// To change deployment type, swap 'Standard' ↔ 'GlobalStandard' in the sku name parameters below.
 // gpt-4o-mini Standard was deprecated 2026-03-31; use gpt-4.1-mini instead.
-var chatModelName = 'gpt-4.1-mini'
-var chatModelVersion = '2025-04-14'
+
+@description('Chat model name')
+param chatModelName string = 'gpt-4.1-mini'
+
+@description('Chat model version')
+param chatModelVersion string = '2025-04-14'
+
+@description('Chat model deployment type: Standard or GlobalStandard')
+param chatModelType string = 'Standard'
+
 var chatModelApiVersion = '2024-08-01-preview'
-var chatModelType = 'Standard'
 var chatModelCapacity = 50
 
-var synthModelName = 'gpt-4.1'
-var synthModelVersion = '2025-04-14'
+@description('Synthesis model name')
+param synthModelName string = 'gpt-4.1'
+
+@description('Synthesis model version')
+param synthModelVersion string = '2025-04-14'
+
+@description('Synthesis model deployment type: Standard or GlobalStandard')
+param synthModelType string = 'GlobalStandard'
+
 var synthModelApiVersion = '2024-08-01-preview'
-var synthModelType = 'GlobalStandard'
 var synthModelCapacity = 50
 
-var embeddingModelName = 'text-embedding-3-small'
-var embeddingModelVersion = '1'
+@description('Embedding model name')
+param embeddingModelName string = 'text-embedding-3-small'
+
+@description('Embedding model version')
+param embeddingModelVersion string = '1'
+
+@description('Embedding model deployment type: Standard or GlobalStandard')
+param embeddingModelType string = 'Standard'
+
 var embeddingModelApiVersion = '2023-05-15'
-var embeddingModelType = 'Standard'
 var embeddingModelCapacity = 50
 
 // Data and embedding configuration
