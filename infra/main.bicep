@@ -93,7 +93,7 @@ param synthModelName string = 'gpt-4.1'
 param synthModelVersion string = '2025-04-14'
 
 @description('Synthesis model deployment type: Standard or GlobalStandard')
-param synthModelType string = 'GlobalStandard'
+param synthModelType string = 'Standard'
 
 var synthModelApiVersion = '2024-08-01-preview'
 var synthModelCapacity = 50
