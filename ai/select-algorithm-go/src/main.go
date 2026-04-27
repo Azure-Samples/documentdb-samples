@@ -404,7 +404,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Invalid value for EMBEDDING_DIMENSIONS: %v", err)
 	}
-	dataFile := getEnvOrDefault("DATA_FILE_WITH_VECTORS", "../../data/Hotels_Vector.json")
+	dataFile := getEnvOrDefault("DATA_FILE_WITH_VECTORS", "../data/Hotels_Vector.json")
 	deployment := os.Getenv("AZURE_OPENAI_EMBEDDING_MODEL")
 	if deployment == "" {
 		log.Fatal("AZURE_OPENAI_EMBEDDING_MODEL environment variable is required")
@@ -454,6 +454,9 @@ func main() {
 	queryEmbedding, err := generateEmbedding(ctx, azureOpenAIClient, searchQuery, deployment)
 	if err != nil {
 		log.Fatalf("Failed to generate embedding: %v", err)
+	}
+	if len(queryEmbedding) != embeddingDimensions {
+		log.Fatalf("Embedding dimension mismatch: expected %d, got %d. Verify EMBEDDING_DIMENSIONS matches your model.", embeddingDimensions, len(queryEmbedding))
 	}
 	fmt.Printf("Query embedding: %d dimensions\n\n", len(queryEmbedding))
 
