@@ -11,7 +11,7 @@ warnings.filterwarnings(
 from pymongo import MongoClient, InsertOne
 from pymongo.collection import Collection
 from pymongo.errors import BulkWriteError
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from pymongo.auth_oidc import OIDCCallback, OIDCCallbackContext, OIDCCallbackResult
 from openai import AzureOpenAI
 from dotenv import load_dotenv
@@ -20,7 +20,7 @@ load_dotenv()
 
 
 class AzureIdentityTokenCallback(OIDCCallback):
-    def __init__(self, credential):
+    def __init__(self, credential: DefaultAzureCredential) -> None:
         self.credential = credential
 
     def fetch(self, context: OIDCCallbackContext) -> OIDCCallbackResult:
@@ -29,7 +29,7 @@ class AzureIdentityTokenCallback(OIDCCallback):
         return OIDCCallbackResult(access_token=token)
 
 
-def get_clients_passwordless() -> tuple[MongoClient, AzureOpenAI]:
+def get_clients_passwordless() -> tuple[MongoClient, AzureOpenAI, DefaultAzureCredential]:
     cluster_name = os.getenv("MONGO_CLUSTER_NAME")
     if not cluster_name:
         raise ValueError(
@@ -58,9 +58,11 @@ def get_clients_passwordless() -> tuple[MongoClient, AzureOpenAI]:
             "Create a .env file based on .env.example or set it in your environment."
         )
 
+    token_provider = get_bearer_token_provider(credential, "https://cognitiveservices.azure.com/.default")
+
     azure_openai_client = AzureOpenAI(
         azure_endpoint=azure_openai_endpoint,
-        azure_ad_token_provider=lambda: credential.get_token("https://cognitiveservices.azure.com/.default").token,
+        azure_ad_token_provider=token_provider,
         # See Azure OpenAI API version lifecycle:
         # https://learn.microsoft.com/azure/ai-services/openai/api-version-deprecation
         api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2024-10-21"),
@@ -68,7 +70,7 @@ def get_clients_passwordless() -> tuple[MongoClient, AzureOpenAI]:
         max_retries=3,
     )
 
-    return mongo_client, azure_openai_client
+    return mongo_client, azure_openai_client, credential
 
 
 def read_file_return_json(file_path: str) -> list[dict[str, Any]]:

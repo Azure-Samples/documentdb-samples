@@ -15,7 +15,7 @@ Similarity = Literal['COS', 'L2', 'IP']
 ALGORITHMS: list[Algorithm] = ['diskann', 'hnsw', 'ivf']
 SIMILARITIES: list[Similarity] = ['COS', 'L2', 'IP']
 
-ALGORITHM_LABELS = {
+ALGORITHM_LABELS: dict[str, str] = {
     'diskann': 'DiskANN',
     'hnsw': 'HNSW',
     'ivf': 'IVF'
@@ -141,7 +141,7 @@ def main() -> None:
         print(f'   Search query: "{search_query}"\n')
 
         print("\nInitializing MongoDB and Azure OpenAI clients...")
-        mongo_client, azure_openai_client = get_clients_passwordless()
+        mongo_client, azure_openai_client, credential = get_clients_passwordless()
 
         database = mongo_client[db_name]
 
@@ -229,10 +229,14 @@ def main() -> None:
         raise
 
     finally:
-        print('\nClosing database connection...')
+        print('\nClosing connections...')
+        if 'azure_openai_client' in locals():
+            azure_openai_client.close()
+        if 'credential' in locals():
+            credential.close()
         if 'mongo_client' in locals():
             mongo_client.close()
-        print('Database connection closed')
+        print('Connections closed')
 
 
 if __name__ == "__main__":
