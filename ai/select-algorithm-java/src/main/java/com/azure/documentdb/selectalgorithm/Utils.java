@@ -5,6 +5,7 @@ import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.ai.openai.models.EmbeddingsOptions;
 import com.azure.core.http.policy.ExponentialBackoffOptions;
 import com.azure.core.http.policy.RetryOptions;
+import com.azure.identity.DefaultAzureCredential;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,13 +28,14 @@ import java.util.Map;
 public class Utils {
     private static Dotenv dotenv;
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final DefaultAzureCredential CREDENTIAL = new DefaultAzureCredentialBuilder().build();
 
     public static void loadEnv() {
         try {
             dotenv = Dotenv.configure()
                 .ignoreIfMissing()
                 .load();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.err.println("Warning: Could not load .env file, using system environment variables");
         }
     }
@@ -54,10 +56,9 @@ public class Utils {
     public static MongoClient createMongoClient() {
         var clusterName = getEnv("MONGO_CLUSTER_NAME");
         var managedIdentityPrincipalId = getEnv("AZURE_MANAGED_IDENTITY_PRINCIPAL_ID");
-        var azureCredential = new DefaultAzureCredentialBuilder().build();
 
         MongoCredential.OidcCallback callback = (MongoCredential.OidcCallbackContext context) -> {
-            var token = azureCredential.getToken(
+            var token = CREDENTIAL.getToken(
                 new com.azure.core.credential.TokenRequestContext()
                     .addScopes("https://ossrdbms-aad.database.windows.net/.default")
             ).block();
@@ -89,11 +90,10 @@ public class Utils {
 
     public static OpenAIClient createOpenAIClient() {
         var endpoint = getEnv("AZURE_OPENAI_EMBEDDING_ENDPOINT");
-        var credential = new DefaultAzureCredentialBuilder().build();
 
         return new OpenAIClientBuilder()
             .endpoint(endpoint)
-            .credential(credential)
+            .credential(CREDENTIAL)
             .retryOptions(new RetryOptions(
                 new ExponentialBackoffOptions()
                     .setMaxRetries(3)

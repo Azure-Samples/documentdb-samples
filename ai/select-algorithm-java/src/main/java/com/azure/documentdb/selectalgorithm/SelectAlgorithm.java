@@ -1,12 +1,14 @@
 package com.azure.documentdb.selectalgorithm;
 
 import com.azure.ai.openai.OpenAIClient;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,10 +18,15 @@ public class SelectAlgorithm {
     private static final String SAMPLE_QUERY = "quintessential lodging near running trails, eateries, retail";
     private static final String DATABASE_NAME = "Hotels";
 
-
     public static void main(String[] args) {
         Utils.loadEnv();
-        new SelectAlgorithm().run();
+        try {
+            new SelectAlgorithm().run();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
+        }
         System.exit(0);
     }
 
@@ -40,7 +47,7 @@ public class SelectAlgorithm {
         }
     }
 
-    public void run() {
+    public void run() throws IOException {
         validateEnvironment();
         try (var mongoClient = Utils.createMongoClient()) {
             var openAIClient = Utils.createOpenAIClient();
@@ -66,10 +73,6 @@ public class SelectAlgorithm {
             }
 
             Utils.printComparisonTable(results);
-
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -122,7 +125,7 @@ public class SelectAlgorithm {
             result.put("latency", searchResult.latencyMs);
             return result;
 
-        } catch (Exception e) {
+        } catch (MongoException | IOException e) {
             System.err.println("  Error testing " + algorithm + " with " + similarity + ": " + e.getMessage());
             var result = new HashMap<String, Object>();
             result.put("algorithm", algorithm.toUpperCase());
