@@ -56,14 +56,17 @@ module managedIdentity 'br/public:avm/res/managed-identity/user-assigned-identit
 }
 
 // Azure OpenAI model and configuration variables
-var chatModelName = 'gpt-4o-mini'
-var chatModelVersion = '2024-07-18'
+// https://learn.microsoft.com/azure/ai-services/openai/concepts/models?tabs=python-secure%2Cglobal-standard%2Cstandard-chat-completions#models-by-deployment-type
+// To change deployment type, swap 'Standard' ↔ 'GlobalStandard' in the sku name variables below.
+// gpt-4o-mini Standard was deprecated 2026-03-31; use gpt-4.1-mini instead.
+var chatModelName = 'gpt-4.1-mini'
+var chatModelVersion = '2025-04-14'
 var chatModelApiVersion = '2024-08-01-preview'
 var chatModelType = 'Standard'
 var chatModelCapacity = 50
 
-var synthModelName = 'gpt-4o'
-var synthModelVersion = '2024-11-20'
+var synthModelName = 'gpt-4.1'
+var synthModelVersion = '2025-04-14'
 var synthModelApiVersion = '2024-08-01-preview'
 var synthModelType = 'GlobalStandard'
 var synthModelCapacity = 50
@@ -88,7 +91,7 @@ var collectionName = 'hotel_data'
 var indexName = 'vectorIndex'
 
 var openAiServiceName = 'openai-${prefix}'
-module openAi 'br/public:avm/res/cognitive-services/account:0.7.1' = {
+module openAi 'br/public:avm/res/cognitive-services/account:0.10.0' = {
   name: 'openai'
   scope: resourceGroup
   params: {
@@ -191,7 +194,7 @@ output AZURE_OPENAI_CHAT_DEPLOYMENT string = chatModelName
 output AZURE_OPENAI_CHAT_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_CHAT_API_VERSION string = chatModelApiVersion
 
-// Planner agent uses the same model as chat (gpt-4o-mini)
+// Planner agent uses the same model as chat (gpt-4.1-mini)
 output AZURE_OPENAI_PLANNER_MODEL string = chatModelName
 output AZURE_OPENAI_PLANNER_DEPLOYMENT string = chatModelName
 output AZURE_OPENAI_PLANNER_ENDPOINT string = openAi.outputs.endpoint
