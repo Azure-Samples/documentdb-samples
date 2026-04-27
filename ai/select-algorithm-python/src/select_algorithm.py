@@ -161,6 +161,12 @@ def main() -> None:
             input=[search_query]
         )
         query_embedding = embedding_response.data[0].embedding
+        if len(query_embedding) != embedding_dimensions:
+            raise ValueError(
+                f"Embedding dimension mismatch: expected {embedding_dimensions}, "
+                f"got {len(query_embedding)}. Check EMBEDDING_DIMENSIONS env var "
+                f"matches your model's output dimensions."
+            )
         print(f"Query embedding: {len(query_embedding)} dimensions\n")
 
         comparison_results = []

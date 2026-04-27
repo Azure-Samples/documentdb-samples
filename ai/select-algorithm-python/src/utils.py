@@ -63,7 +63,7 @@ def get_clients_passwordless() -> tuple[MongoClient, AzureOpenAI]:
         azure_ad_token_provider=lambda: credential.get_token("https://cognitiveservices.azure.com/.default").token,
         # See Azure OpenAI API version lifecycle:
         # https://learn.microsoft.com/azure/ai-services/openai/api-version-deprecation
-        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2023-05-15"),
+        api_version=os.getenv("AZURE_OPENAI_EMBEDDING_API_VERSION", "2024-10-21"),
         timeout=30.0,
         max_retries=3,
     )
