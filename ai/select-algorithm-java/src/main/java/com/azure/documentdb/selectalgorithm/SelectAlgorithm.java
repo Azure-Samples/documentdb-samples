@@ -15,7 +15,7 @@ import java.util.Map;
 public class SelectAlgorithm {
     private static final String SAMPLE_QUERY = "quintessential lodging near running trails, eateries, retail";
     private static final String DATABASE_NAME = "Hotels";
-    private static final int NUM_QUERIES = 5;
+
 
     public static void main(String[] args) {
         Utils.loadEnv();
@@ -89,15 +89,19 @@ public class SelectAlgorithm {
             createVectorIndex(database, collectionName, vectorIndexName, algorithm, similarity);
 
             var queryEmbedding = Utils.createEmbedding(openAIClient, SAMPLE_QUERY);
-            var avgLatency = measureSearchLatency(collection, queryEmbedding, algorithm);
+            var searchResult = executeVectorSearch(collection, queryEmbedding, algorithm);
 
-            System.out.println("  Average latency: " + String.format("%.2f", avgLatency) + " ms");
+            System.out.println("  Latency: " + String.format("%.2f", searchResult.latencyMs) + " ms");
+            System.out.println("  Results: " + searchResult.results.size());
+            for (var doc : searchResult.results) {
+                System.out.println("    - " + doc.getString("HotelName") + " (score: " + String.format("%.4f", doc.getDouble("score")) + ")");
+            }
             System.out.println();
 
             var result = new HashMap<String, Object>();
             result.put("algorithm", algorithm.toUpperCase());
             result.put("similarity", similarity);
-            result.put("latency", avgLatency);
+            result.put("latency", searchResult.latencyMs);
             return result;
 
         } catch (Exception e) {
@@ -155,42 +159,46 @@ public class SelectAlgorithm {
         System.out.println("  Created vector index: " + indexName);
     }
 
-    private double measureSearchLatency(MongoCollection<Document> collection, List<Double> queryEmbedding,
-                                        String algorithm) {
+    private static class SearchResult {
+        double latencyMs;
+        List<Document> results;
+
+        SearchResult(double latencyMs, List<Document> results) {
+            this.latencyMs = latencyMs;
+            this.results = results;
+        }
+    }
+
+    private SearchResult executeVectorSearch(MongoCollection<Document> collection, List<Double> queryEmbedding,
+                                             String algorithm) {
         var embeddedField = Utils.getEnv("EMBEDDED_FIELD");
         var searchOptions = Utils.createSearchOptions(algorithm);
 
-        var totalLatency = 0.0;
+        var cosmosSearch = new Document()
+            .append("vector", queryEmbedding)
+            .append("path", embeddedField)
+            .append("k", 5);
 
-        for (int i = 0; i < NUM_QUERIES; i++) {
-            var cosmosSearch = new Document()
-                .append("vector", queryEmbedding)
-                .append("path", embeddedField)
-                .append("k", 5);
-
-            if (!searchOptions.isEmpty()) {
-                cosmosSearch.putAll(searchOptions);
-            }
-
-            var searchStage = new Document("$search", new Document()
-                .append("cosmosSearch", cosmosSearch)
-            );
-
-            var projectStage = new Document("$project", new Document()
-                .append("score", new Document("$meta", "searchScore"))
-                .append("HotelName", 1)
-            );
-
-            var pipeline = List.of(searchStage, projectStage);
-
-            var startTime = System.nanoTime();
-            var results = collection.aggregate(pipeline);
-            results.first();
-            var endTime = System.nanoTime();
-
-            totalLatency += (endTime - startTime) / 1_000_000.0;
+        if (!searchOptions.isEmpty()) {
+            cosmosSearch.putAll(searchOptions);
         }
 
-        return totalLatency / NUM_QUERIES;
+        var searchStage = new Document("$search", new Document()
+            .append("cosmosSearch", cosmosSearch)
+        );
+
+        var projectStage = new Document("$project", new Document()
+            .append("score", new Document("$meta", "searchScore"))
+            .append("HotelName", 1)
+        );
+
+        var pipeline = List.of(searchStage, projectStage);
+
+        var startTime = System.nanoTime();
+        var results = collection.aggregate(pipeline).into(new java.util.ArrayList<>());
+        var endTime = System.nanoTime();
+
+        var latencyMs = (endTime - startTime) / 1_000_000.0;
+        return new SearchResult(latencyMs, results);
     }
 }
