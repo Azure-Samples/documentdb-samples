@@ -215,9 +215,9 @@ func getClientsPasswordless() (*mongo.Client, openai.Client, error) {
 
 	clientOptions := options.Client().
 		ApplyURI(mongoURI).
-		SetConnectTimeout(30 * time.Second).
-		SetServerSelectionTimeout(30 * time.Second).
-		SetRetryWrites(true).
+		SetConnectTimeout(120 * time.Second).
+		SetServerSelectionTimeout(120 * time.Second).
+		SetRetryWrites(false).
 		SetAuth(options.Credential{
 			AuthMechanism: "MONGODB-OIDC",
 			AuthMechanismProperties: map[string]string{
