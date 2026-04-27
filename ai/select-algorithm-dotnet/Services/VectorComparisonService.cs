@@ -70,6 +70,12 @@ public class VectorComparisonService
         var embeddingClient = _aiClient.GetEmbeddingClient(embeddingModel);
         var embeddingResponse = await embeddingClient.GenerateEmbeddingAsync(searchQuery);
         var queryEmbedding = embeddingResponse.Value.ToFloats().ToArray();
+        if (queryEmbedding.Length != _embeddingDimensions)
+        {
+            throw new InvalidOperationException(
+                $"Embedding dimension mismatch: expected {_embeddingDimensions}, got {queryEmbedding.Length}. " +
+                $"Verify the model matches the configured EmbeddingDimensions in appsettings.json.");
+        }
         _logger.LogInformation("Query embedding: {Dimensions} dimensions", queryEmbedding.Length);
 
         var comparisonResults = new List<ComparisonResult>();

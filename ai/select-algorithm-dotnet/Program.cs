@@ -28,14 +28,14 @@ class Program
 
         try
         {
-            var openAiEndpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_EMBEDDING_ENDPOINT")
-                ?? throw new InvalidOperationException("AZURE_OPENAI_EMBEDDING_ENDPOINT not set");
-            var openAiModel = Environment.GetEnvironmentVariable("AZURE_OPENAI_EMBEDDING_MODEL")
-                ?? throw new InvalidOperationException("AZURE_OPENAI_EMBEDDING_MODEL not set");
-            var mongoClusterName = Environment.GetEnvironmentVariable("MONGO_CLUSTER_NAME")
-                ?? throw new InvalidOperationException("MONGO_CLUSTER_NAME not set");
-            var tenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID")
-                ?? throw new InvalidOperationException("AZURE_TENANT_ID not set");
+            var openAiEndpoint = configuration["AZURE_OPENAI_EMBEDDING_ENDPOINT"]
+                ?? throw new InvalidOperationException("AZURE_OPENAI_EMBEDDING_ENDPOINT not configured. Set as environment variable or in appsettings.json.");
+            var openAiModel = configuration["AZURE_OPENAI_EMBEDDING_MODEL"]
+                ?? throw new InvalidOperationException("AZURE_OPENAI_EMBEDDING_MODEL not configured. Set as environment variable or in appsettings.json.");
+            var mongoClusterName = configuration["MONGO_CLUSTER_NAME"]
+                ?? throw new InvalidOperationException("MONGO_CLUSTER_NAME not configured. Set as environment variable or in appsettings.json.");
+            var tenantId = configuration["AZURE_TENANT_ID"]
+                ?? throw new InvalidOperationException("AZURE_TENANT_ID not configured. Set as environment variable or in appsettings.json.");
 
             var databaseName = configuration["DatabaseName"] ?? "Hotels";
             var embeddedField = configuration["EmbeddedField"] ?? "DescriptionVector";
