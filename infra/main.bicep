@@ -59,7 +59,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   tags: tags
 }
 
-module managedIdentity 'br/public:avm/res/managed-identity/user-assigned-identity:0.4.0' = {
+module managedIdentity 'br/public:avm/res/managed-identity/user-assigned-identity:0.5.0' = {
   name: 'user-assigned-identity'
   scope: resourceGroup
   params: {
@@ -83,7 +83,7 @@ param chatModelVersion string = '2025-04-14'
 @description('Chat model deployment type: Standard or GlobalStandard')
 param chatModelType string = 'Standard'
 
-var chatModelApiVersion = '2024-08-01-preview'
+var chatModelApiVersion = '2025-04-01-preview'
 var chatModelCapacity = 50
 
 @description('Synthesis model name')
@@ -95,7 +95,7 @@ param synthModelVersion string = '2025-04-14'
 @description('Synthesis model deployment type: Standard or GlobalStandard')
 param synthModelType string = 'Standard'
 
-var synthModelApiVersion = '2024-08-01-preview'
+var synthModelApiVersion = '2025-04-01-preview'
 var synthModelCapacity = 50
 
 @description('Embedding model name')
@@ -124,7 +124,7 @@ var collectionName = 'hotel_data'
 var indexName = 'vectorIndex'
 
 var openAiServiceName = 'openai-${prefix}'
-module openAi 'br/public:avm/res/cognitive-services/account:0.10.0' = {
+module openAi 'br/public:avm/res/cognitive-services/account:0.14.0' = {
   name: 'openai'
   scope: resourceGroup
   params: {
