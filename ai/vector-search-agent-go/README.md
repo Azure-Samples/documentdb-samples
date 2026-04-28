@@ -69,6 +69,9 @@ flowchart LR
 - Stateless execution with no conversation history
 - Suitable for single-turn query/response scenarios
 
+
+> [!NOTE]
+> **Vector indexes can be created or dropped on existing collections at any time** — no special configuration is needed at resource creation.
 ## Prerequisites
 
 ### Azure Resources

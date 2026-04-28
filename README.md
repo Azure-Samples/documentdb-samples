@@ -66,6 +66,9 @@ azd env set AZURE_OPENAI_EMBEDDING_MODEL_TYPE Standard
 | `AZURE_OPENAI_EMBEDDING_MODEL_VERSION` | `1` | Embedding model version |
 | `AZURE_OPENAI_EMBEDDING_MODEL_TYPE` | `Standard` | Deployment SKU |
 
+
+> [!NOTE]
+> **Vector indexes can be created or dropped on existing collections at any time** — no special configuration is needed at resource creation.
 ### 2. Navigate to Your Sample Language
 
 Choose your preferred programming language and navigate to the sample directory:

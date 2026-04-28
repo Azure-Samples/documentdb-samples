@@ -29,6 +29,9 @@ By the end, you have a working two-agent system that connects Azure OpenAI and A
 > [!NOTE]
 > **Cost considerations:** This quickstart creates Azure OpenAI and Azure DocumentDB resources that incur costs. See [Azure OpenAI pricing](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/) and [Azure DocumentDB pricing](https://azure.microsoft.com/pricing/details/cosmos-db/) for details.
 
+
+> [!NOTE]
+> **Vector indexes can be created or dropped on existing collections at any time** — no special configuration is needed at resource creation.
 ## Prerequisites
 
 You can use the Azure Developer CLI to create the required Azure resources by running the `azd` commands in the sample repository. For more information, see [Deploy Infrastructure with Azure Developer CLI](https://github.com/Azure-Samples/documentdb-samples/).

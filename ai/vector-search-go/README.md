@@ -14,6 +14,9 @@ products:
 
 This project demonstrates vector search capabilities using Azure DocumentDB with Go. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF, along with utilities for embedding generation and data management.
 
+
+> [!NOTE]
+> **Vector indexes can be created or dropped on existing collections at any time** — no special configuration is needed at resource creation.
 ## Overview
 
 Vector search enables semantic similarity searching by converting text into high-dimensional vector representations (embeddings) and finding the most similar vectors in the database. This project shows how to:

@@ -21,6 +21,9 @@ This .NET 8.0 sample application demonstrates vector similarity searches using A
 - Seamless integration with DocumentDB and Azure OpenAI services
 - Interactive menu-driven application
 
+
+> [!NOTE]
+> **Vector indexes can be created or dropped on existing collections at any time** — no special configuration is needed at resource creation.
 ## Prerequisites
 
 ### Azure Services
