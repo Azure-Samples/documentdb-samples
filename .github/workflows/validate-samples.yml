@@ -93,7 +93,7 @@ jobs:
       
       - name: Build Go
         working-directory: ai/${{ matrix.sample }}
-        run: go build ./...
+        run: go build -o /dev/null ./...
 
   validate-python:
     name: Python
@@ -117,7 +117,7 @@ jobs:
       - name: Validate Python syntax
         working-directory: ai/vector-search-python
         run: |
-          python -m py_compile *.py
+          find . -name "*.py" -exec python -m py_compile {} +
 
   validate-java:
     name: Java
