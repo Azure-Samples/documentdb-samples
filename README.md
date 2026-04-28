@@ -16,12 +16,11 @@ Deploy the Azure DocumentDB cluster, Azure OpenAI, and other required resources:
 
 ```bash
 azd auth login
-azd env set DOCUMENTDB_ADMIN_PASSWORD '<your-secure-password>'
 azd up
 ```
 
-> [!IMPORTANT]
-> You must set `DOCUMENTDB_ADMIN_PASSWORD` before running `azd up`. The password must be 8–128 characters.
+> [!TIP]
+> Set a custom admin password before provisioning: `azd env set DOCUMENTDB_ADMIN_PASSWORD '<your-secure-password>'`. If not set, a temporary default is used.
 
 This command will:
 - Prompt you to create a new Azure environment

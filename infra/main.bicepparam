@@ -6,7 +6,7 @@ param openAiLocation = readEnvironmentVariable('AZURE_OPENAI_LOCATION', readEnvi
 param deploymentUserPrincipalId = readEnvironmentVariable('AZURE_PRINCIPAL_ID', '')
 param currentUserPrincipalId = readEnvironmentVariable('CURRENT_USER_OBJECT_ID', readEnvironmentVariable('AZURE_PRINCIPAL_ID', ''))
 param documentDbAdminUsername = readEnvironmentVariable('DOCUMENTDB_ADMIN_USERNAME', 'docdbadmin')
-param documentDbAdminPassword = readEnvironmentVariable('DOCUMENTDB_ADMIN_PASSWORD', '')
+param documentDbAdminPassword = readEnvironmentVariable('DOCUMENTDB_ADMIN_PASSWORD', 'TempP@ss123!')
 
 // OpenAI model configuration
 param chatModelName = readEnvironmentVariable('AZURE_OPENAI_CHAT_MODEL', 'gpt-4.1-mini')
