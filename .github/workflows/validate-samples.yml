@@ -1,0 +1,120 @@
+name: Validate Samples
+
+on:
+  pull_request:
+    paths:
+      - 'ai/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'ai/**'
+
+jobs:
+  validate-typescript:
+    name: TypeScript - ${{ matrix.sample }}
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    strategy:
+      matrix:
+        sample:
+          - vector-search-typescript
+          - vector-search-agent-typescript
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ai/${{ matrix.sample }}/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ai/${{ matrix.sample }}
+        run: npm ci
+      
+      - name: Build TypeScript
+        working-directory: ai/${{ matrix.sample }}
+        run: npm run build
+
+  validate-dotnet:
+    name: .NET
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Build solution
+        run: dotnet build documentdb-samples.sln
+
+  validate-go:
+    name: Go - ${{ matrix.sample }}
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    strategy:
+      matrix:
+        sample:
+          - vector-search-go
+          - vector-search-agent-go
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache-dependency-path: ai/${{ matrix.sample }}/go.sum
+      
+      - name: Build Go
+        working-directory: ai/${{ matrix.sample }}
+        run: go build ./...
+
+  validate-python:
+    name: Python
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        working-directory: ai/vector-search-python
+        run: pip install -r requirements.txt
+
+  validate-java:
+    name: Java
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+      
+      - name: Compile Java
+        working-directory: ai/vector-search-java
+        run: mvn compile -DskipTests
