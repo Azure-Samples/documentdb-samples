@@ -22,7 +22,12 @@ azd up
 This command will:
 - Prompt you to create a new Azure environment
 - Provision all infrastructure resources in your Azure subscription
-- Generate a `.env` file in the root directory with all necessary connection strings and credentials
+
+After provisioning, export all environment variables to a `.env` file:
+
+```bash
+azd env get-values > .env
+```
 
 #### Configure OpenAI Settings (Optional)
 
