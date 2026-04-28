@@ -18,18 +18,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Install Azure CLI
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-        continue-on-error: true
-      
-      - name: Setup Azure CLI (fallback)
-        if: steps.login.outcome == 'failure'
-        run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-      
       - name: Validate Bicep compilation
         run: |
           az bicep build-params --file infra/main.bicepparam
+      
+      - name: Lint Bicep
+        run: |
           az bicep lint --file infra/main.bicep
