@@ -4,18 +4,29 @@ on:
   pull_request:
     paths:
       - 'ai/**'
+      - '.github/workflows/validate-samples.yml'
   push:
     branches:
       - main
     paths:
       - 'ai/**'
+      - '.github/workflows/validate-samples.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate-typescript:
     name: TypeScript - ${{ matrix.sample }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     continue-on-error: false
     strategy:
+      fail-fast: false
       matrix:
         sample:
           - vector-search-typescript
@@ -43,6 +54,7 @@ jobs:
   validate-dotnet:
     name: .NET
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     continue-on-error: false
     
     steps:
@@ -60,8 +72,10 @@ jobs:
   validate-go:
     name: Go - ${{ matrix.sample }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     continue-on-error: false
     strategy:
+      fail-fast: false
       matrix:
         sample:
           - vector-search-go
@@ -84,6 +98,7 @@ jobs:
   validate-python:
     name: Python
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     continue-on-error: false
     
     steps:
@@ -98,10 +113,16 @@ jobs:
       - name: Install dependencies
         working-directory: ai/vector-search-python
         run: pip install -r requirements.txt
+      
+      - name: Validate Python syntax
+        working-directory: ai/vector-search-python
+        run: |
+          python -m py_compile *.py
 
   validate-java:
     name: Java
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     continue-on-error: false
     
     steps:

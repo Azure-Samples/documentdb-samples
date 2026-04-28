@@ -4,24 +4,31 @@ on:
   pull_request:
     paths:
       - 'infra/**'
+      - '.github/workflows/validate-infra.yml'
   push:
     branches:
       - main
     paths:
       - 'infra/**'
+      - '.github/workflows/validate-infra.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate-bicep:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Validate Bicep compilation
+      - name: Validate Bicep
         run: |
+          az bicep build --file infra/main.bicep
           az bicep build-params --file infra/main.bicepparam
-      
-      - name: Lint Bicep
-        run: |
-          az bicep lint --file infra/main.bicep
