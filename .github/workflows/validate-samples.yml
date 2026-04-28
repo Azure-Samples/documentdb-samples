@@ -1,0 +1,151 @@
+name: Validate Samples
+
+on:
+  pull_request:
+    paths:
+      - 'ai/**'
+      - '.github/workflows/validate-samples.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'ai/**'
+      - '.github/workflows/validate-samples.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-typescript:
+    name: TypeScript - ${{ matrix.sample }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: false
+    strategy:
+      fail-fast: false
+      matrix:
+        sample:
+          - vector-search-typescript
+          - vector-search-agent-typescript
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ai/${{ matrix.sample }}/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ai/${{ matrix.sample }}
+        run: npm ci
+      
+      - name: Build TypeScript
+        working-directory: ai/${{ matrix.sample }}
+        run: npm run build
+
+  validate-dotnet:
+    name: .NET
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Build solution
+        run: dotnet build documentdb-samples.sln
+
+  validate-go:
+    name: Go - ${{ matrix.sample }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: false
+    strategy:
+      fail-fast: false
+      matrix:
+        sample:
+          - vector-search-go
+          - vector-search-agent-go
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.24'
+          cache-dependency-path: ai/${{ matrix.sample }}/go.sum
+      
+      - name: Validate Go
+        working-directory: ai/${{ matrix.sample }}
+        run: |
+          # Check if src/ has multiple main() declarations (independent programs sharing utils)
+          if [ -d "src" ] && [ "$(grep -rl '^func main()' src/*.go 2>/dev/null | wc -l)" -gt 1 ]; then
+            cd src
+            for f in $(grep -l '^func main()' *.go); do
+              echo "Building $f + utils.go"
+              go build -o /dev/null "$f" utils.go
+            done
+          else
+            go build ./...
+          fi
+
+  validate-python:
+    name: Python
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        working-directory: ai/vector-search-python
+        run: pip install -r requirements.txt
+      
+      - name: Validate Python syntax
+        working-directory: ai/vector-search-python
+        run: |
+          find . -name "*.py" -exec python -m py_compile {} +
+
+  validate-java:
+    name: Java
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+      
+      - name: Compile Java
+        working-directory: ai/vector-search-java
+        run: mvn compile -DskipTests
