@@ -91,9 +91,19 @@ jobs:
           go-version: '1.24'
           cache-dependency-path: ai/${{ matrix.sample }}/go.sum
       
-      - name: Build Go
+      - name: Validate Go
         working-directory: ai/${{ matrix.sample }}
-        run: go build -o /dev/null ./...
+        run: |
+          # Check if src/ has multiple main() declarations (independent programs sharing utils)
+          if [ -d "src" ] && [ "$(grep -rl '^func main()' src/*.go 2>/dev/null | wc -l)" -gt 1 ]; then
+            cd src
+            for f in $(grep -l '^func main()' *.go); do
+              echo "Building $f + utils.go"
+              go build -o /dev/null "$f" utils.go
+            done
+          else
+            go build ./...
+          fi
 
   validate-python:
     name: Python
