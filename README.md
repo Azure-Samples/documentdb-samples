@@ -116,7 +116,8 @@ If `azd up` fails when creating the Azure OpenAI resource or model deployments, 
 
 - **Region availability**: The selected model isn't available in your chosen region. Try a different `AZURE_OPENAI_LOCATION` (e.g., `eastus2`, `swedencentral`).
 - **SKU/tier mismatch**: The model doesn't support the selected deployment type. Switch between `Standard` and `GlobalStandard` using `azd env set AZURE_OPENAI_CHAT_MODEL_TYPE GlobalStandard`.
-- **Quota limits**: Your subscription has reached its quota for the selected model/region/tier combination. Check your quota in the Azure portal under **Azure OpenAI → Quotas**.
+- **Quota limits**: Your subscription has reached its quota for the selected model/region/tier combination. Check your quota in the Azure portal under **Azure OpenAI → Quotas**. You can request a quota increase or try a different region with available capacity.
+- **Model retired or unavailable**: Azure OpenAI periodically retires older model versions. If deployment fails because a model version is no longer available, update to a supported version (e.g., `azd env set AZURE_OPENAI_CHAT_MODEL_VERSION <new-version>`). See [Azure OpenAI model retirements](https://learn.microsoft.com/azure/ai-services/openai/concepts/model-retirements) for lifecycle status.
 
 All OpenAI model parameters — region, model name, version, and deployment type (Standard/GlobalStandard) — are configurable via `azd env set` before running `azd up`. See [Configure OpenAI Settings](#configure-openai-settings-optional) above for the full list.
 
