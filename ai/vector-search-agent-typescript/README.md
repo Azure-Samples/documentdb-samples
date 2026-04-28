@@ -101,10 +101,14 @@ Use the Azure Developer CLI (`azd`) to provision the required Azure OpenAI and D
 
 1. When prompted, select your subscription and a location (for example, `swedencentral` or `eastus2`).
 
-1. After deployment completes, `azd` outputs the environment variables you need. Copy them into your `.env` file (see [Configure environment variables](#configure-environment-variables)).
+1. After deployment completes, generate your `.env` file from the deployed environment:
+
+    ```bash
+    azd env get-values > .env
+    ```
 
 > [!TIP]
-> Run `azd env get-values` at any time to view the current environment values.
+> Run `azd env get-values > .env` at any time to regenerate the `.env` file with current environment values.
 
 ## Configure environment variables
 

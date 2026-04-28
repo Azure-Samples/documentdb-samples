@@ -111,6 +111,25 @@ vector-search-agent-go/
 └── README.md
 ```
 
+## Deploy Azure resources
+
+1. Provision and deploy the infrastructure:
+
+    ```bash
+    azd up
+    ```
+
+1. When prompted, select your subscription and a location (for example, `swedencentral` or `eastus2`).
+
+1. After deployment completes, generate your `.env` file from the deployed environment:
+
+    ```bash
+    azd env get-values > .env
+    ```
+
+> [!TIP]
+> Run `azd env get-values` at any time to regenerate the `.env` file with current environment values.
+
 ## Installation
 
 1. Clone the repository:
