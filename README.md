@@ -108,6 +108,21 @@ Follow the language-specific instructions:
 
 Each sample demonstrates how to generate embeddings, create vector indexes, and perform semantic similarity searches with hotel data.
 
+## Troubleshooting
+
+### Azure OpenAI provisioning fails
+
+If `azd up` fails when creating the Azure OpenAI resource or model deployments, the issue is typically one of:
+
+- **Region availability**: The selected model isn't available in your chosen region. Try a different `AZURE_OPENAI_LOCATION` (e.g., `eastus2`, `swedencentral`).
+- **SKU/tier mismatch**: The model doesn't support the selected deployment type. Switch between `Standard` and `GlobalStandard` using `azd env set AZURE_OPENAI_CHAT_MODEL_TYPE GlobalStandard`.
+- **Quota limits**: Your subscription has reached its quota for the selected model/region/tier combination. Check your quota in the Azure portal under **Azure OpenAI → Quotas**.
+
+All OpenAI model parameters — region, model name, version, and deployment type (Standard/GlobalStandard) — are configurable via `azd env set` before running `azd up`. See [Configure OpenAI Settings](#configure-openai-settings-optional) above for the full list.
+
+> [!TIP]
+> Run `azd env set AZURE_OPENAI_LOCATION <region>` to deploy OpenAI to a different region than your other resources. Check [model availability by region](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability) to find supported region/model/tier combinations.
+
 ## Cleanup
 
 To delete all provisioned Azure resources:
