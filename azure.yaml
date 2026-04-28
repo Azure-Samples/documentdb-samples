@@ -2,23 +2,4 @@ name: documentdb-samples
 
 services:
 
-hooks:
-  postprovision:
-    posix: 
-      sh: bash
-      run: |
-        # Get environment values for the application
-        azd env get-values > .env
-        echo "Environment configured. Data will be loaded after deployment."
-    windows:
-      shell: pwsh
-      run: |
-        azd env get-values > .env
-        Write-Host "Environment configured. Data will be loaded after deployment."
-  postdown:
-    windows:
-      shell: pwsh
-      run: "if (Test-Path .env) { rm .env }"
-    posix:
-      shell: sh
-      run: "[ -f .env ] && rm .env || true"
+

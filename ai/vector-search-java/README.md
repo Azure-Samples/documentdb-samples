@@ -95,7 +95,16 @@ The `azd up` command will:
 - Deploy Azure DocumentDB (MongoDB vCore) cluster
 - Create a managed identity for secure access
 - Configure all necessary permissions and networking
-- Generate a `.env` file with all connection information at the repository root
+
+### Configure environment variables
+
+After deploying with `azd up`, create a `.env` file with your provisioned resource values:
+
+```bash
+azd env get-values > .env
+```
+
+This creates a `.env` file at the repository root with the connection strings and endpoints needed to run the sample.
 
 ### Compile the Project
 
@@ -109,7 +118,7 @@ mvn clean compile
 
 ### Load Environment Variables
 
-After deployment completes, load the environment variables from the generated `.env` file. The `set -a` command ensures variables are exported to child processes (like the Maven JVM):
+Load the environment variables from the `.env` file. The `set -a` command ensures variables are exported to child processes (like the Maven JVM):
 
 ```bash
 # From the ai/vector-search-java directory

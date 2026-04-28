@@ -53,7 +53,17 @@ cd ai/vector-search-dotnet
 az login
 ```
 
-3. Update `appsettings.json` with your Azure service details:
+3. Configure environment variables:
+
+The .NET sample reads configuration from `appsettings.json` and environment variables. After deploying with `azd up`, you can view your provisioned resource values:
+
+```bash
+azd env get-values
+```
+
+Use these values to update `appsettings.json` or set them as environment variables.
+
+4. Update `appsettings.json` with your Azure service details:
 
 ```json
 {
@@ -67,7 +77,7 @@ az login
 }
 ```
 
-4. Run the application:
+5. Run the application:
 
 ```bash
 dotnet restore

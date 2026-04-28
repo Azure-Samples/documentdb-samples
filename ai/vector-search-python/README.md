@@ -96,6 +96,16 @@ Learn how to create an Azure DocumentDB account in the [official documentation](
 
 ### Step 3: Configure Environment Variables
 
+If you deployed Azure resources with `azd up` (from the repository root), create a `.env` file with your provisioned resource values:
+
+```bash
+azd env get-values > .env
+```
+
+This creates a `.env` file with the connection strings and endpoints needed to run the sample.
+
+Alternatively, you can configure the environment manually:
+
 1. Copy the example environment file:
 ```bash
 cp .env.example .env
