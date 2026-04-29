@@ -32,12 +32,21 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB. Each
 
 ## Setup
 
-1. Copy environment configuration:
+1. ### Configure environment variables
+
+   After deploying with `azd up`, create a `.env` file with your provisioned resource values:
+
+   ```bash
+   azd env get-values > .env
+   ```
+
+   This creates a `.env` file at the repository root with the connection strings and endpoints needed to run the sample.
+
+   Alternatively, copy the example and fill in values manually:
+
    ```bash
    cp .env.example .env
    ```
-
-2. Update `.env` with your resource values.
 
 3. Install dependencies:
    ```bash

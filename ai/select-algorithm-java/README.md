@@ -12,13 +12,23 @@ This sample demonstrates how to create and use different vector search index alg
 
 ## Setup
 
-1. Copy the environment file and fill in your values:
+1. ### Configure environment variables
+
+   After deploying with `azd up`, create a `.env` file with your provisioned resource values:
+
+   ```bash
+   azd env get-values > .env
+   ```
+
+   This creates a `.env` file at the repository root with the connection strings and endpoints needed to run the sample.
+
+   Alternatively, copy the example and fill in values manually:
 
    ```bash
    cp .env.example .env
    ```
 
-2. Update `.env` with your Azure resource details:
+2. Update `.env` with your Azure resource details (if not using `azd`):
    - `MONGO_CLUSTER_NAME` — your DocumentDB cluster name
    - `AZURE_OPENAI_EMBEDDING_ENDPOINT` — your Azure OpenAI endpoint
    - `AZURE_OPENAI_EMBEDDING_MODEL` — deployment name (e.g., `text-embedding-3-small`)

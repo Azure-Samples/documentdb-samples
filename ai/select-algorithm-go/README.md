@@ -18,13 +18,21 @@ This sample demonstrates how to use different vector search algorithms (IVF, HNS
    cd ai/select-algorithm-go
    ```
 
-2. **Configure environment variables** by copying the example file:
+2. **Configure environment variables:**
+
+   After deploying with `azd up`, create a `.env` file with your provisioned resource values:
+
+   ```bash
+   azd env get-values > .env
+   ```
+
+   This creates a `.env` file at the repository root with the connection strings and endpoints needed to run the sample.
+
+   Alternatively, copy the example and fill in values manually:
 
    ```bash
    cp .env.example .env
    ```
-
-   Edit `.env` with your Azure resource values.
 
 3. **Install dependencies**:
 
