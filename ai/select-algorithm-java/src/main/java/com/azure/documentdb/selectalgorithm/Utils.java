@@ -52,7 +52,7 @@ public class Utils {
         MongoCredential mongoCredential = MongoCredential.createOidcCredential(null)
                 .withMechanism(MongoCredential.MONGODB_OIDC_MECHANISM)
                 .withMechanismProperty("ENVIRONMENT", "azure")
-                .withMechanismProperty("TOKEN_RESOURCE", "https://cosmos.azure.com");
+                .withMechanismProperty("TOKEN_RESOURCE", "https://ossrdbms-aad.database.windows.net");
 
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionUri))
