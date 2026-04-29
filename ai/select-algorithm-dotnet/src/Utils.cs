@@ -4,15 +4,17 @@ using MongoDB.Bson.Serialization;
 using Azure.Identity;
 using Azure.AI.OpenAI;
 using OpenAI.Embeddings;
+using SelectAlgorithm.Models;
 
 namespace SelectAlgorithm;
 
 public static class Utils
 {
-    public static IMongoClient GetMongoClientPasswordless()
+    public static IMongoClient GetMongoClientPasswordless(AppConfiguration config)
     {
-        var clusterName = Environment.GetEnvironmentVariable("MONGO_CLUSTER_NAME")
-            ?? throw new InvalidOperationException("MONGO_CLUSTER_NAME environment variable is required");
+        var clusterName = config.DocumentDB.ClusterName;
+        if (string.IsNullOrEmpty(clusterName))
+            throw new InvalidOperationException("DocumentDB:ClusterName is required in appsettings.json");
 
         var credential = new DefaultAzureCredential();
 
@@ -27,12 +29,13 @@ public static class Utils
         return new MongoClient(settings);
     }
 
-    public static EmbeddingClient GetEmbeddingClient()
+    public static EmbeddingClient GetEmbeddingClient(AppConfiguration config)
     {
-        var endpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_EMBEDDING_ENDPOINT")
-            ?? throw new InvalidOperationException("AZURE_OPENAI_EMBEDDING_ENDPOINT environment variable is required");
-        var model = Environment.GetEnvironmentVariable("AZURE_OPENAI_EMBEDDING_MODEL")
-            ?? "text-embedding-3-small";
+        var endpoint = config.AzureOpenAI.Endpoint;
+        if (string.IsNullOrEmpty(endpoint))
+            throw new InvalidOperationException("AzureOpenAI:Endpoint is required in appsettings.json");
+
+        var model = config.AzureOpenAI.EmbeddingModel;
 
         var credential = new DefaultAzureCredential();
         var azureClient = new AzureOpenAIClient(new Uri(endpoint), credential);

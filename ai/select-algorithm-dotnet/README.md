@@ -17,28 +17,50 @@ Demonstrates three vector index algorithms available in Azure DocumentDB (vCore)
 
 ## Setup
 
-1. Copy the environment file and fill in your values:
+1. Clone the repository:
 
    ```bash
-   cp .env.example .env
+   git clone https://github.com/documentdb-samples
+   cd ai/select-algorithm-dotnet
    ```
 
-2. Edit `.env` with your configuration:
+2. Login to Azure:
 
-   ```env
-   AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
-   AZURE_OPENAI_EMBEDDING_ENDPOINT=https://<your-resource>.openai.azure.com
-   MONGO_CLUSTER_NAME=<your-cluster-name>
-   AZURE_DOCUMENTDB_DATABASENAME=Hotels
-   ALGORITHM=all
-   SIMILARITY=COS
+   ```bash
+   az login
    ```
 
-3. Restore packages:
+3. Configure environment variables:
+
+   The .NET sample reads configuration from `appsettings.json` and environment variables. After deploying with `azd up`, you can view your provisioned resource values:
+
+   ```bash
+   azd env get-values
+   ```
+
+   Use these values to update `appsettings.json` or set them as environment variables.
+
+4. Update `appsettings.json` with your Azure service details:
+
+   ```json
+   {
+     "AzureOpenAI": {
+       "Endpoint": "https://your-openai-service-name.openai.azure.com/",
+       "EmbeddingModel": "text-embedding-3-small"
+     },
+     "MongoDB": {
+       "ClusterName": "your-documentdb-cluster-name",
+       "DatabaseName": "Hotels"
+     }
+   }
+   ```
+
+5. Restore packages and run:
 
    ```bash
    cd src
    dotnet restore
+   dotnet run
    ```
 
 ## Usage
@@ -50,21 +72,26 @@ cd src
 dotnet run
 ```
 
-Run a specific algorithm:
+Run a specific algorithm or similarity metric using environment variable overrides:
 
 ```bash
-# Set in .env: ALGORITHM=ivf | hnsw | diskann | all
-dotnet run
+ALGORITHM=ivf dotnet run
+ALGORITHM=hnsw SIMILARITY=L2 dotnet run
+ALGORITHM=diskann dotnet run
 ```
+
+Valid values:
+- `ALGORITHM`: `all` (default) | `ivf` | `hnsw` | `diskann`
+- `SIMILARITY`: `COS` (default) | `L2` | `IP`
 
 ## Project Structure
 
 ```
 select-algorithm-dotnet/
-├── .env.example          # Environment variable template
 ├── README.md             # This file
 └── src/
     ├── SelectAlgorithm.csproj  # Project file
+    ├── appsettings.json        # Configuration file
     ├── Program.cs              # Entry point - dispatches by ALGORITHM env
     ├── Utils.cs                # Shared helpers (connection, embedding, search)
     ├── IvfDemo.cs              # IVF index creation and search

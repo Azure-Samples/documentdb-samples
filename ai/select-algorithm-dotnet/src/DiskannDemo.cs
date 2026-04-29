@@ -43,23 +43,23 @@ public static class DiskannDemo
         Console.WriteLine("DiskANN vector index created successfully");
     }
 
-    public static void Run()
+    public static void Run(Models.AppConfiguration config)
     {
         Console.WriteLine(new string('=', 60));
         Console.WriteLine("  DiskANN Vector Index - Select Algorithm Demo");
         Console.WriteLine("  Best for: 50,000+ documents");
         Console.WriteLine(new string('=', 60));
 
-        var databaseName = Environment.GetEnvironmentVariable("AZURE_DOCUMENTDB_DATABASENAME") ?? "Hotels";
-        var dataFile = Environment.GetEnvironmentVariable("DATA_FILE_WITH_VECTORS") ?? "../../data/Hotels_Vector.json";
-        var vectorField = Environment.GetEnvironmentVariable("EMBEDDED_FIELD") ?? "DescriptionVector";
-        var model = Environment.GetEnvironmentVariable("AZURE_OPENAI_EMBEDDING_MODEL") ?? "text-embedding-3-small";
-        var dimensions = int.Parse(Environment.GetEnvironmentVariable("EMBEDDING_DIMENSIONS") ?? "1536");
-        var batchSize = int.Parse(Environment.GetEnvironmentVariable("LOAD_SIZE_BATCH") ?? "100");
-        var similarity = Environment.GetEnvironmentVariable("SIMILARITY") ?? "COS";
+        var databaseName = config.DocumentDB.DatabaseName;
+        var dataFile = config.DataFiles.WithVectors;
+        var vectorField = config.Embedding.EmbeddedField;
+        var model = config.AzureOpenAI.EmbeddingModel;
+        var dimensions = config.Embedding.Dimensions;
+        var batchSize = config.DocumentDB.LoadBatchSize;
+        var similarity = config.VectorSearch.Similarity;
 
-        var mongoClient = Utils.GetMongoClientPasswordless();
-        var embeddingClient = Utils.GetEmbeddingClient();
+        var mongoClient = Utils.GetMongoClientPasswordless(config);
+        var embeddingClient = Utils.GetEmbeddingClient(config);
 
         try
         {

@@ -1,4 +1,5 @@
-using DotNetEnv;
+using Microsoft.Extensions.Configuration;
+using SelectAlgorithm.Models;
 
 namespace SelectAlgorithm;
 
@@ -6,9 +7,16 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Load .env file from parent directory
-        Env.Load("../.env");
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddEnvironmentVariables()
+            .Build();
 
+        var appConfig = new AppConfiguration();
+        configuration.Bind(appConfig);
+
+        // ALGORITHM env var override for selecting which demo to run
         var algorithm = (Environment.GetEnvironmentVariable("ALGORITHM") ?? "all").ToLowerInvariant();
 
         Console.WriteLine();
@@ -20,18 +28,18 @@ class Program
         switch (algorithm)
         {
             case "ivf":
-                IvfDemo.Run();
+                IvfDemo.Run(appConfig);
                 break;
             case "hnsw":
-                HnswDemo.Run();
+                HnswDemo.Run(appConfig);
                 break;
             case "diskann":
-                DiskannDemo.Run();
+                DiskannDemo.Run(appConfig);
                 break;
             case "all":
-                IvfDemo.Run();
-                HnswDemo.Run();
-                DiskannDemo.Run();
+                IvfDemo.Run(appConfig);
+                HnswDemo.Run(appConfig);
+                DiskannDemo.Run(appConfig);
                 break;
             default:
                 Console.WriteLine($"Unknown algorithm: {algorithm}");
@@ -43,3 +51,4 @@ class Program
         Console.WriteLine("Done!");
     }
 }
+
