@@ -88,6 +88,50 @@ This sample uses **passwordless authentication** via `DefaultAzureCredential`:
 
 Ensure your identity has the appropriate RBAC roles assigned on both resources.
 
+## Compare All Algorithms
+
+Run all 9 combinations (3 algorithms × 3 similarity metrics) in a single invocation and print a formatted comparison table:
+
+```bash
+mvn exec:java -Pcompare
+```
+
+Or via the `ALGORITHM` environment variable:
+
+```bash
+ALGORITHM=compare mvn exec:java
+```
+
+On Windows (PowerShell):
+
+```powershell
+$env:ALGORITHM="compare"; mvn exec:java
+```
+
+### Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
+| `TOP_K` | `3` | Number of results per search |
+| `VERBOSE` | `false` | Print detailed per-index results |
+
+### What It Does
+
+1. Connects to DocumentDB and loads hotel data into a single `hotels` collection
+2. Generates one embedding for the query text (reused for all searches)
+3. Creates 9 vector indexes: `vector_{algo}_{metric}` (e.g., `vector_hnsw_cos`)
+4. Runs vector search against each index sequentially with timing
+5. Prints a comparison table with latency, result count, and top match
+
+### Index Parameters
+
+| Algorithm | Kind | Parameters |
+|-----------|------|------------|
+| IVF | `vector-ivf` | numLists=1 |
+| HNSW | `vector-hnsw` | m=16, efConstruction=64 |
+| DiskANN | `vector-diskann` | maxDegree=32, lBuild=50 |
+
 ## Project Structure
 
 ```
@@ -96,5 +140,6 @@ src/main/java/com/azure/documentdb/selectalgorithm/
 ├── Utils.java         — Shared helpers (connection, embedding, data loading)
 ├── IvfDemo.java       — IVF index creation and vector search
 ├── HnswDemo.java      — HNSW index creation and vector search
-└── DiskannDemo.java   — DiskANN index creation and vector search
+├── DiskannDemo.java   — DiskANN index creation and vector search
+└── CompareAll.java    — Unified comparison runner (all 9 combinations)
 ```

@@ -80,6 +80,30 @@ ALGORITHM=diskann go run .
 $env:ALGORITHM="ivf"; go run .
 ```
 
+## Compare All Algorithms
+
+Run all 9 combinations (3 algorithms × 3 similarity metrics) in a single invocation and print a formatted comparison table:
+
+```bash
+ALGORITHM=compare-all go run .
+```
+
+### Environment variables for compare-all
+
+| Variable     | Default                          | Description                     |
+|--------------|----------------------------------|---------------------------------|
+| `QUERY_TEXT` | `luxury hotel near the beach`    | Text to generate the query embedding |
+| `TOP_K`      | `3`                              | Number of results per search    |
+| `VERBOSE`    | `false`                          | Show per-index result details   |
+
+On Windows (PowerShell):
+
+```powershell
+$env:ALGORITHM="compare-all"; $env:VERBOSE="true"; go run .
+```
+
+The comparison uses a **single `hotels` collection** with 9 named indexes (`vector_ivf_cos`, `vector_hnsw_l2`, `vector_diskann_ip`, etc.), generates one embedding for the query text, and runs each search sequentially for fair timing.
+
 ## Algorithm comparison
 
 | Algorithm | Kind            | Key Parameters              | Best For                    |
@@ -100,7 +124,8 @@ select-algorithm-go/
     ├── utils.go          # Shared config, auth, data, and search helpers
     ├── ivf.go            # IVF index creation and search workflow
     ├── hnsw.go           # HNSW index creation and search workflow
-    └── diskann.go        # DiskANN index creation and search workflow
+    ├── diskann.go        # DiskANN index creation and search workflow
+    └── compare_all.go    # Unified 9-combination comparison runner
 ```
 
 ## Authentication

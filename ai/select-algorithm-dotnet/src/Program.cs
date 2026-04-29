@@ -36,6 +36,9 @@ class Program
             case "diskann":
                 DiskannDemo.Run(appConfig);
                 break;
+            case "compare":
+                CompareAll.Run();
+                break;
             case "all":
                 IvfDemo.Run(appConfig);
                 HnswDemo.Run(appConfig);
@@ -43,7 +46,7 @@ class Program
                 break;
             default:
                 Console.WriteLine($"Unknown algorithm: {algorithm}");
-                Console.WriteLine("Valid options: ivf, hnsw, diskann, all");
+                Console.WriteLine("Valid options: ivf, hnsw, diskann, compare, all");
                 Environment.Exit(1);
                 break;
         }
