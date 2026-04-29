@@ -9,3 +9,6 @@ azure-identity>=1.15.0
 
 # Environment variable management from .env files
 python-dotenv>=1.0.0
+
+# Formatted table output for compare_all.py
+tabulate>=0.9.0

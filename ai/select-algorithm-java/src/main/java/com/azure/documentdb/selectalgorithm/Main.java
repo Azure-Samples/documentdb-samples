@@ -15,6 +15,7 @@ public class Main {
             case "ivf" -> IvfDemo.run();
             case "hnsw" -> HnswDemo.run();
             case "diskann" -> DiskannDemo.run();
+            case "compare" -> CompareAll.run();
             case "all" -> {
                 IvfDemo.run();
                 HnswDemo.run();
@@ -22,7 +23,7 @@ public class Main {
             }
             default -> {
                 System.err.println("Unknown algorithm: " + algorithm);
-                System.err.println("Valid options: ivf, hnsw, diskann, all");
+                System.err.println("Valid options: ivf, hnsw, diskann, compare, all");
                 System.exit(1);
             }
         }

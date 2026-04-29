@@ -65,6 +65,24 @@ npm run start:hnsw
 npm run start:diskann
 ```
 
+## Compare All Algorithms
+
+Run all 9 combinations (3 algorithms × 3 similarity metrics) in a single invocation and view a formatted comparison table:
+
+```bash
+npm run start:compare-all
+```
+
+**Environment variables** (optional overrides):
+
+| Variable | Default | Description |
+|---|---|---|
+| `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
+| `TOP_K` | `3` | Number of results per combination |
+| `VERBOSE` | `false` | When `true`, shows all k results per combo |
+
+The script creates a single `hotels` collection, loads data once, creates 9 vector indexes (one per algorithm/metric pair), and runs searches sequentially for fair timing comparison.
+
 ## Algorithm comparison
 
 | Algorithm | Index type | Best for |

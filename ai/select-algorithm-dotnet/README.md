@@ -57,6 +57,43 @@ Run a specific algorithm:
 dotnet run
 ```
 
+## Compare All Algorithms
+
+Run all 9 combinations (3 algorithms × 3 similarity metrics) in a single invocation with a formatted comparison table:
+
+```bash
+# Set in .env: ALGORITHM=compare
+dotnet run
+```
+
+This mode:
+- Uses a **single collection** (`hotels`) with 9 vector indexes
+- Generates **one embedding** for the query, reused across all searches
+- Runs searches **sequentially** with `Stopwatch` timing for fair comparison
+- Prints a formatted table with latency, top result, and scores
+
+**Additional environment variables for compare mode:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
+| `TOP_K` | `3` | Number of results per search |
+| `VERBOSE` | `false` | Show detailed per-result output |
+
+**9 Index Combinations:**
+
+| Index Name | Algorithm | Metric | Parameters |
+|------------|-----------|--------|------------|
+| `vector_ivf_cos` | IVF | COS | numLists=1 |
+| `vector_hnsw_cos` | HNSW | COS | m=16, efConstruction=64 |
+| `vector_diskann_cos` | DiskANN | COS | maxDegree=32, lBuild=50 |
+| `vector_ivf_l2` | IVF | L2 | numLists=1 |
+| `vector_hnsw_l2` | HNSW | L2 | m=16, efConstruction=64 |
+| `vector_diskann_l2` | DiskANN | L2 | maxDegree=32, lBuild=50 |
+| `vector_ivf_ip` | IVF | IP | numLists=1 |
+| `vector_hnsw_ip` | HNSW | IP | m=16, efConstruction=64 |
+| `vector_diskann_ip` | DiskANN | IP | maxDegree=32, lBuild=50 |
+
 ## Project Structure
 
 ```
@@ -69,7 +106,8 @@ select-algorithm-dotnet/
     ├── Utils.cs                # Shared helpers (connection, embedding, search)
     ├── IvfDemo.cs              # IVF index creation and search
     ├── HnswDemo.cs             # HNSW index creation and search
-    └── DiskannDemo.cs          # DiskANN index creation and search
+    ├── DiskannDemo.cs          # DiskANN index creation and search
+    └── CompareAll.cs           # Unified 9-combination comparison runner
 ```
 
 ## How It Works

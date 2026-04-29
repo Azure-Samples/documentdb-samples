@@ -61,6 +61,25 @@ python hnsw.py
 python diskann.py
 ```
 
+## Compare All Algorithms
+
+Run all 9 combinations (3 algorithms × 3 similarity metrics) in a single invocation:
+
+```bash
+cd src
+python compare_all.py
+```
+
+This creates a single `hotels` collection with 9 vector indexes and runs each search sequentially for fair timing comparison. Output is a formatted table showing latency, scores, and top results for every combination.
+
+**Environment variables:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `QUERY_TEXT` | "luxury hotel near the beach" | Search query text |
+| `TOP_K` | 3 | Number of results per search |
+| `VERBOSE` | false | Print individual results per combo |
+
 ## Configuration
 
 Edit `.env` to configure:

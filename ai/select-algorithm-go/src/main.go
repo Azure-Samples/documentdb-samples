@@ -60,8 +60,13 @@ func main() {
 			log.Printf("DiskANN failed: %v", err)
 		}
 
+	case "compare-all":
+		if err := RunCompareAll(ctx, config, mongoClient, aiClient); err != nil {
+			log.Fatalf("Compare-all failed: %v", err)
+		}
+
 	default:
-		log.Fatalf("Unknown algorithm: '%s'. Use 'all', 'ivf', 'hnsw', or 'diskann'", config.Algorithm)
+		log.Fatalf("Unknown algorithm: '%s'. Use 'all', 'ivf', 'hnsw', 'diskann', or 'compare-all'", config.Algorithm)
 	}
 
 	fmt.Println("\nDone!")
