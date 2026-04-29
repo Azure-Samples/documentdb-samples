@@ -29,6 +29,9 @@ By the end, you have a working two-agent system that connects Azure OpenAI and A
 > [!NOTE]
 > **Cost considerations:** This quickstart creates Azure OpenAI and Azure DocumentDB resources that incur costs. See [Azure OpenAI pricing](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/) and [Azure DocumentDB pricing](https://azure.microsoft.com/pricing/details/cosmos-db/) for details.
 
+
+> [!NOTE]
+> **Vector indexes can be created or dropped on existing collections at any time** — no special configuration is needed at resource creation.
 ## Prerequisites
 
 You can use the Azure Developer CLI to create the required Azure resources by running the `azd` commands in the sample repository. For more information, see [Deploy Infrastructure with Azure Developer CLI](https://github.com/Azure-Samples/documentdb-samples/).
@@ -98,10 +101,14 @@ Use the Azure Developer CLI (`azd`) to provision the required Azure OpenAI and D
 
 1. When prompted, select your subscription and a location (for example, `swedencentral` or `eastus2`).
 
-1. After deployment completes, `azd` outputs the environment variables you need. Copy them into your `.env` file (see [Configure environment variables](#configure-environment-variables)).
+1. After deployment completes, generate your `.env` file from the deployed environment:
+
+    ```bash
+    azd env get-values > .env
+    ```
 
 > [!TIP]
-> Run `azd env get-values` at any time to view the current environment values.
+> Run `azd env get-values > .env` at any time to regenerate the `.env` file with current environment values.
 
 ## Configure environment variables
 

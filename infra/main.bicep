@@ -6,8 +6,7 @@ targetScope = 'subscription'
 param environmentName string
 
 @minLength(1)
-@description('Location for the OpenAI resource')
-// https://learn.microsoft.com/azure/ai-services/openai/concepts/models?tabs=python-secure%2Cglobal-standard%2Cstandard-chat-completions#models-by-deployment-type
+@description('Location for all resources')
 @allowed([
   'eastus2'
   'swedencentral'
@@ -18,6 +17,21 @@ param environmentName string
   }
 })
 param location string
+
+@description('Location for Azure OpenAI resource (defaults to main location if not specified). Not all models are available in all regions.')
+// https://learn.microsoft.com/azure/ai-services/openai/concepts/models?tabs=python-secure%2Cglobal-standard%2Cstandard-chat-completions#models-by-deployment-type
+@allowed([
+  'eastus'
+  'eastus2'
+  'eastus3'
+  'westus'
+  'westus2'
+  'westus3'
+  'northeurope'
+  'swedencentral'
+])
+@metadata({ azd: { type: 'location' } })
+param openAiLocation string = location
 
 @description('Id of the principal to assign database and application roles.')
 param deploymentUserPrincipalId string = ''
@@ -45,7 +59,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   tags: tags
 }
 
-module managedIdentity 'br/public:avm/res/managed-identity/user-assigned-identity:0.4.0' = {
+module managedIdentity 'br/public:avm/res/managed-identity/user-assigned-identity:0.5.0' = {
   name: 'user-assigned-identity'
   scope: resourceGroup
   params: {
@@ -55,23 +69,45 @@ module managedIdentity 'br/public:avm/res/managed-identity/user-assigned-identit
   }
 }
 
-// Azure OpenAI model and configuration variables
-var chatModelName = 'gpt-4o-mini'
-var chatModelVersion = '2024-07-18'
-var chatModelApiVersion = '2024-08-01-preview'
-var chatModelType = 'Standard'
+// Azure OpenAI model and configuration parameters
+// https://learn.microsoft.com/azure/ai-services/openai/concepts/models?tabs=python-secure%2Cglobal-standard%2Cstandard-chat-completions#models-by-deployment-type
+// To change deployment type, swap 'Standard' ↔ 'GlobalStandard' in the sku name parameters below.
+// gpt-4o-mini Standard was deprecated 2026-03-31; use gpt-4.1-mini instead.
+
+@description('Chat model name')
+param chatModelName string = 'gpt-4.1-mini'
+
+@description('Chat model version')
+param chatModelVersion string = '2025-04-14'
+
+@description('Chat model deployment type: Standard or GlobalStandard')
+param chatModelType string = 'Standard'
+
+var chatModelApiVersion = '2025-04-01-preview'
 var chatModelCapacity = 50
 
-var synthModelName = 'gpt-4o'
-var synthModelVersion = '2024-11-20'
-var synthModelApiVersion = '2024-08-01-preview'
-var synthModelType = 'GlobalStandard'
+@description('Synthesis model name')
+param synthModelName string = 'gpt-4.1'
+
+@description('Synthesis model version')
+param synthModelVersion string = '2025-04-14'
+
+@description('Synthesis model deployment type: Standard or GlobalStandard')
+param synthModelType string = 'Standard'
+
+var synthModelApiVersion = '2025-04-01-preview'
 var synthModelCapacity = 50
 
-var embeddingModelName = 'text-embedding-3-small'
-var embeddingModelVersion = '1'
+@description('Embedding model name')
+param embeddingModelName string = 'text-embedding-3-small'
+
+@description('Embedding model version')
+param embeddingModelVersion string = '1'
+
+@description('Embedding model deployment type: Standard or GlobalStandard')
+param embeddingModelType string = 'Standard'
+
 var embeddingModelApiVersion = '2023-05-15'
-var embeddingModelType = 'Standard'
 var embeddingModelCapacity = 50
 
 // Data and embedding configuration
@@ -88,12 +124,12 @@ var collectionName = 'hotel_data'
 var indexName = 'vectorIndex'
 
 var openAiServiceName = 'openai-${prefix}'
-module openAi 'br/public:avm/res/cognitive-services/account:0.7.1' = {
+module openAi 'br/public:avm/res/cognitive-services/account:0.14.0' = {
   name: 'openai'
   scope: resourceGroup
   params: {
     name: openAiServiceName
-    location: location
+    location: openAiLocation
     tags: tags
     kind: 'OpenAI'
     sku: 'S0'
@@ -191,7 +227,7 @@ output AZURE_OPENAI_CHAT_DEPLOYMENT string = chatModelName
 output AZURE_OPENAI_CHAT_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_CHAT_API_VERSION string = chatModelApiVersion
 
-// Planner agent uses the same model as chat (gpt-4o-mini)
+// Planner agent uses the same model as chat (gpt-4.1-mini)
 output AZURE_OPENAI_PLANNER_MODEL string = chatModelName
 output AZURE_OPENAI_PLANNER_DEPLOYMENT string = chatModelName
 output AZURE_OPENAI_PLANNER_ENDPOINT string = openAi.outputs.endpoint

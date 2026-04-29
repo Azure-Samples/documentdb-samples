@@ -14,6 +14,9 @@ products:
 
 This project demonstrates vector search capabilities using Azure DocumentDB with Python. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF, along with utilities for embedding generation and data management.
 
+
+> [!NOTE]
+> **Vector indexes can be created or dropped on existing collections at any time** — no special configuration is needed at resource creation.
 ## Overview
 
 Vector search enables semantic similarity searching by converting text into high-dimensional vector representations (embeddings) and finding the most similar vectors in the database. This project shows how to:
@@ -92,6 +95,16 @@ az cognitiveservices account create \
 Learn how to create an Azure DocumentDB account in the [official documentation](https://learn.microsoft.com/azure/documentdb/).
 
 ### Step 3: Configure Environment Variables
+
+If you deployed Azure resources with `azd up` (from the repository root), create a `.env` file with your provisioned resource values:
+
+```bash
+azd env get-values > .env
+```
+
+This creates a `.env` file with the connection strings and endpoints needed to run the sample.
+
+Alternatively, you can configure the environment manually:
 
 1. Copy the example environment file:
 ```bash

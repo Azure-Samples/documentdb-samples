@@ -14,6 +14,9 @@ products:
 
 This project demonstrates vector search capabilities using Azure DocumentDB with TypeScript/Node.js. It includes implementations of three different vector index types: DiskANN, HNSW, and IVF, along with utilities for embedding generation and data management.
 
+
+> [!NOTE]
+> **Vector indexes can be created or dropped on existing collections at any time** — no special configuration is needed at resource creation.
 ## Overview
 
 Vector search enables semantic similarity searching by converting text into high-dimensional vector representations (embeddings) and finding the most similar vectors in the database. This project shows how to:
@@ -92,8 +95,16 @@ The `azd provision` command will:
 - Deploy Azure DocumentDB (MongoDB vCore) cluster
 - Create a managed identity for secure access
 - Configure all necessary permissions and networking
-- Generate a `.env` file with all connection information at the root
 
+### Configure environment variables
+
+After deploying with `azd up`, create a `.env` file with your provisioned resource values:
+
+```bash
+azd env get-values > .env
+```
+
+This creates a `.env` file at the repository root with the connection strings and endpoints needed to run the sample.
 
 ### Install dependencies
 
@@ -104,20 +115,6 @@ cd ai/vector-search-typescript
 # Install dependencies
 npm install
 ```
-
-### Verify Environment Configuration
-
-After deployment completes, verify that the `.env` file was created in the repository root:
-
-```bash
-# View the generated environment variables
-cat ../../.env
-```
-
-The file should contain all necessary configuration including:
-- Azure OpenAI endpoint and model information
-- DocumentDB cluster name and database settings
-- Embedding and data processing configuration
 
 ## Build
 
