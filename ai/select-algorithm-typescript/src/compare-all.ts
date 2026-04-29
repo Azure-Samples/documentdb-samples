@@ -45,33 +45,25 @@ async function main() {
         await dbClient.connect();
         const db = dbClient.db(baseConfig.dbName);
 
-        // Create collection and load data once
-        let collection;
-        const collections = await db.listCollections({ name: collectionName }).toArray();
-        if (collections.length === 0) {
-            collection = await db.createCollection(collectionName);
-            console.log(`Created collection: ${collectionName}`);
-            const data = await readFileReturnJson(path.join(__dirname, '..', baseConfig.dataFile));
-            const insertSummary = await insertData(baseConfig, collection, data);
-            console.log(`Inserted ${insertSummary.inserted}/${insertSummary.total} documents`);
-        } else {
-            collection = db.collection(collectionName);
-            console.log(`Collection "${collectionName}" already exists, skipping data load`);
+        // Drop collection if it exists for a clean comparison
+        const existingCollections = await db.listCollections({ name: collectionName }).toArray();
+        if (existingCollections.length > 0) {
+            await db.dropCollection(collectionName);
+            console.log(`Dropped existing collection: ${collectionName}`);
         }
 
-        // Check existing indexes to avoid duplicates
-        const existingIndexes = await collection.listIndexes().toArray();
-        const existingIndexNames = new Set(existingIndexes.map(idx => idx.name));
+        // Create collection and load data
+        const collection = await db.createCollection(collectionName);
+        console.log(`Created collection: ${collectionName}`);
+        const data = await readFileReturnJson(path.join(__dirname, '..', baseConfig.dataFile));
+        const insertSummary = await insertData(baseConfig, collection, data);
+        console.log(`Inserted ${insertSummary.inserted}/${insertSummary.total} documents`);
 
         // Create all 9 indexes
         console.log('\nCreating vector indexes...');
         for (const algo of ALGORITHMS) {
             for (const sim of SIMILARITIES) {
                 const indexName = `vector_${algo.kind.replace('vector-', '')}_${sim.toLowerCase()}`;
-                if (existingIndexNames.has(indexName)) {
-                    console.log(`  ✓ ${indexName} (already exists)`);
-                    continue;
-                }
                 const indexOptions = {
                     createIndexes: collectionName,
                     indexes: [{
@@ -152,8 +144,18 @@ async function main() {
         console.error('Compare-all failed:', error);
         process.exitCode = 1;
     } finally {
-        if (dbClient) await dbClient.close();
-        console.log('\nDatabase connection closed');
+        // Cleanup: drop the comparison collection
+        if (dbClient) {
+            try {
+                const db = dbClient.db(baseConfig.dbName);
+                await db.dropCollection(collectionName);
+                console.log(`\nCleanup: dropped collection "${collectionName}"`);
+            } catch (cleanupErr) {
+                console.error('Cleanup warning:', cleanupErr);
+            }
+            await dbClient.close();
+            console.log('Database connection closed');
+        }
     }
 }
 

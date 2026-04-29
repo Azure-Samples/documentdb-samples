@@ -118,6 +118,11 @@ public class CompareAll {
                     }
                 }
             }
+
+            // Cleanup: drop the comparison collection
+            System.out.println("\n  Cleanup: dropping comparison collection...");
+            collection.drop();
+            System.out.println("  Cleanup: dropped collection 'hotels'");
         }
 
         // Print comparison table

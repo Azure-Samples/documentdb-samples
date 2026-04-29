@@ -170,9 +170,13 @@ def main():
 
     try:
         database = mongo_client[config["database_name"]]
-        collection = database["hotels"]
 
-        # Load data once
+        # Drop collection for a clean comparison
+        database.drop_collection("hotels")
+        print("Dropped existing 'hotels' collection (if any)")
+
+        # Create fresh collection and load data
+        collection = database["hotels"]
         data = read_file_return_json(config["data_file"])
         documents = [doc for doc in data if config["vector_field"] in doc]
         print(f"Loaded {len(documents)} documents with embeddings")
@@ -227,6 +231,13 @@ def main():
         print(tabulate(table_rows, headers=headers, tablefmt="grid"))
 
     finally:
+        # Cleanup: drop the comparison collection
+        try:
+            database = mongo_client[config["database_name"]]
+            database.drop_collection("hotels")
+            print("\nCleanup: dropped collection 'hotels'")
+        except Exception as e:
+            print(f"Cleanup warning: {e}")
         mongo_client.close()
 
 

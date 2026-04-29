@@ -36,6 +36,11 @@ public static class CompareAll
         try
         {
             var database = mongoClient.GetDatabase(databaseName);
+
+            // Drop collection for a clean comparison
+            database.DropCollection("hotels");
+            Console.WriteLine("Dropped existing 'hotels' collection (if any)");
+
             var collection = database.GetCollection<BsonDocument>("hotels");
 
             // Load data once into single collection
@@ -85,6 +90,17 @@ public static class CompareAll
         }
         finally
         {
+            // Cleanup: drop the comparison collection
+            try
+            {
+                var database = mongoClient.GetDatabase(databaseName);
+                database.DropCollection("hotels");
+                Console.WriteLine("\nCleanup: dropped collection 'hotels'");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Cleanup warning: {ex.Message}");
+            }
             mongoClient.Cluster.Dispose();
         }
     }
