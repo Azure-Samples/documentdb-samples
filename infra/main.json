@@ -1,0 +1,54 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "development"
+    },
+    "location": {
+      "value": "eastus2"
+    },
+    "openAiLocation": {
+      "value": "eastus2"
+    },
+    "deploymentUserPrincipalId": {
+      "value": ""
+    },
+    "currentUserPrincipalId": {
+      "value": ""
+    },
+    "documentDbAdminUsername": {
+      "value": "docdbadmin"
+    },
+    "documentDbAdminPassword": {
+      "value": "TempP@ss123!"
+    },
+    "chatModelName": {
+      "value": "gpt-4.1-mini"
+    },
+    "chatModelVersion": {
+      "value": "2025-04-14"
+    },
+    "chatModelType": {
+      "value": "Standard"
+    },
+    "synthModelName": {
+      "value": "gpt-4.1"
+    },
+    "synthModelVersion": {
+      "value": "2025-04-14"
+    },
+    "synthModelType": {
+      "value": "Standard"
+    },
+    "embeddingModelName": {
+      "value": "text-embedding-3-small"
+    },
+    "embeddingModelVersion": {
+      "value": "1"
+    },
+    "embeddingModelType": {
+      "value": "Standard"
+    }
+  }
+}

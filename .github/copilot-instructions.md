@@ -71,7 +71,8 @@ All samples must support these env vars:
 
 | Variable | Purpose |
 |----------|---------|
-| `AZURE_DOCUMENTDB_CONNECTION_STRING` | MongoDB connection string |
+| `MONGO_CLUSTER_NAME` | DocumentDB cluster name (required for passwordless/OIDC auth) |
+| `AZURE_DOCUMENTDB_CONNECTION_STRING` | MongoDB connection string (fallback when not using passwordless) |
 | `AZURE_DOCUMENTDB_DATABASENAME` | Database name (default: `Hotels`) |
 | `AZURE_OPENAI_EMBEDDING_ENDPOINT` | Azure OpenAI endpoint URL |
 | `AZURE_OPENAI_EMBEDDING_MODEL` | Deployment name (e.g., `text-embedding-3-small`) |

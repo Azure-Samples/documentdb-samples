@@ -124,7 +124,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
-          go-version: '1.24'
+          go-version: '1.23'
           cache-dependency-path: ai/${{ matrix.sample }}/go.sum
       - name: Build Go
         working-directory: ai/${{ matrix.sample }}
@@ -191,6 +191,7 @@ jobs:
     name: Preflight — Verify secret exists
     if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
       - name: Check SAMPLES_ENV_FILE secret
         run: |
@@ -198,14 +199,14 @@ jobs:
             echo "::error::SAMPLES_ENV_FILE secret is not set. See workflow header for setup instructions."
             exit 1
           fi
-          echo "✅ SAMPLES_ENV_FILE secret is configured ($(echo "$ENV_CONTENT" | wc -l) lines)"
+          echo "✅ SAMPLES_ENV_FILE secret is configured"
         env:
           ENV_CONTENT: ${{ secrets.SAMPLES_ENV_FILE }}
 
   run-typescript:
     name: Run TypeScript - ${{ matrix.sample }}
     if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
-    needs: [build-typescript, preflight]
+    needs: [preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -253,7 +254,7 @@ jobs:
   run-python:
     name: Run Python - ${{ matrix.sample }}
     if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
-    needs: [build-python, preflight]
+    needs: [run-typescript, build-python, preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -297,7 +298,7 @@ jobs:
   run-go:
     name: Run Go - ${{ matrix.sample }}
     if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
-    needs: [build-go, preflight]
+    needs: [run-python, build-go, preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -319,7 +320,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
-          go-version: '1.24'
+          go-version: '1.23'
           cache-dependency-path: ai/${{ matrix.sample }}/go.sum
       - name: Write .env from secret
         working-directory: ${{ matrix.workdir }}
@@ -342,7 +343,7 @@ jobs:
   run-java:
     name: Run Java - ${{ matrix.sample }}
     if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
-    needs: [build-java, preflight]
+    needs: [run-go, build-java, preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -365,10 +366,12 @@ jobs:
       - run: mvn compile -DskipTests
         working-directory: ai/${{ matrix.sample }}
       - name: Export env vars from secret
-        # Java uses System.getenv() — write .env then source it into GITHUB_ENV
         run: |
-          while IFS='=' read -r key value; do
-            [[ -z "$key" || "$key" == \#* ]] && continue
+          while IFS= read -r line; do
+            [[ -z "$line" || "$line" == \#* ]] && continue
+            key="${line%%=*}"
+            value="${line#*=}"
+            echo "::add-mask::$value"
             echo "$key=$value" >> "$GITHUB_ENV"
           done <<< "$ENV_CONTENT"
         env:
@@ -392,7 +395,7 @@ jobs:
   run-dotnet:
     name: Run .NET - ${{ matrix.sample }}
     if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
-    needs: [build-dotnet, preflight]
+    needs: [run-java, build-dotnet, preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -409,10 +412,12 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Export env vars from secret
-        # .NET uses Environment.GetEnvironmentVariable() — parse .env into GITHUB_ENV
         run: |
-          while IFS='=' read -r key value; do
-            [[ -z "$key" || "$key" == \#* ]] && continue
+          while IFS= read -r line; do
+            [[ -z "$line" || "$line" == \#* ]] && continue
+            key="${line%%=*}"
+            value="${line#*=}"
+            echo "::add-mask::$value"
             echo "$key=$value" >> "$GITHUB_ENV"
           done <<< "$ENV_CONTENT"
         env:

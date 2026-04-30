@@ -12,6 +12,11 @@ interface AlgorithmConfig {
     options: Record<string, number>;
 }
 
+interface MongoSearchResult {
+    document: { name: string; [key: string]: unknown };
+    score: number;
+}
+
 interface SearchResult {
     query: string;
     algorithm: string;
@@ -154,15 +159,16 @@ async function main() {
                         }
                     ]).toArray();
 
-                    const topDoc = searchResults[0] as any;
+                    const typedResults = searchResults as unknown as MongoSearchResult[];
+                    const topDoc = typedResults[0];
                     allResults.push({
                         query: queryText,
                         algorithm: algo.name,
                         similarity: sim,
                         topScore: topDoc?.score ?? 0,
-                        topResult: topDoc?.document?.HotelName ?? '(none)',
-                        results: searchResults.map((r: any) => ({
-                            name: r.document?.HotelName ?? '(none)',
+                        topResult: (topDoc?.document?.HotelName as string) ?? '(none)',
+                        results: typedResults.map((r) => ({
+                            name: (r.document?.HotelName as string) ?? '(none)',
                             score: r.score ?? 0
                         }))
                     });
@@ -191,14 +197,22 @@ async function main() {
                 const db = dbClient.db(baseConfig.dbName);
                 console.log(`\nCleanup: dropping ${createdCollections.length} comparison collections...`);
                 for (const colName of createdCollections) {
-                    await db.dropCollection(colName);
+                    try {
+                        await db.dropCollection(colName);
+                    } catch (dropErr) {
+                        console.error(`Cleanup warning (drop ${colName}):`, dropErr);
+                    }
                 }
                 console.log('Cleanup complete');
             } catch (cleanupErr) {
                 console.error('Cleanup warning:', cleanupErr);
             }
-            await dbClient.close();
-            console.log('Database connection closed');
+            try {
+                await dbClient.close();
+                console.log('Database connection closed');
+            } catch (closeErr) {
+                console.error('Warning closing connection:', closeErr);
+            }
         }
     }
 }
@@ -359,6 +373,21 @@ function printDivergenceSummary(allResults: SearchResult[], queries: string[]) {
         console.log(`    avg: ${avgGap.toFixed(4)} | min: ${minGap.toFixed(4)} | max: ${maxGap.toFixed(4)}`);
     }
     console.log('');
+}
+
+// Validate required environment variables before starting
+const REQUIRED_ENV_VARS = [
+    'AZURE_OPENAI_EMBEDDING_ENDPOINT',
+    'AZURE_OPENAI_EMBEDDING_MODEL',
+    'AZURE_OPENAI_EMBEDDING_API_VERSION',
+];
+
+const missing = REQUIRED_ENV_VARS.filter(v => !process.env[v]);
+if (!process.env.AZURE_DOCUMENTDB_CONNECTION_STRING && !process.env.MONGO_CLUSTER_NAME) {
+    missing.push('AZURE_DOCUMENTDB_CONNECTION_STRING or MONGO_CLUSTER_NAME');
+}
+if (missing.length > 0) {
+    throw new Error(`Missing required environment variables:\n  - ${missing.join('\n  - ')}`);
 }
 
 main().catch(error => {
