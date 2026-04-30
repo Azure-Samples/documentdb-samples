@@ -230,5 +230,11 @@ func main() {
 	// Display the search results
 	PrintSearchResults(results, 5, true)
 
+	// Drop the collection
+	if err := collection.Drop(ctx); err != nil {
+		log.Printf("Warning: Failed to drop collection: %v", err)
+	}
+	fmt.Println("Dropped collection: hotels_hnsw")
+
 	fmt.Println("\nHNSW demonstration completed successfully!")
 }
