@@ -49,80 +49,85 @@ public class CompareAll {
             MongoDatabase database = mongoClient.getDatabase(databaseName);
             MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
 
-            // Load data ONCE into the single collection
-            System.out.println("  Loading data from: " + dataFile);
-            List<Document> data = Utils.readJsonFile(dataFile);
-            System.out.printf("  Loaded %d documents%n", data.size());
+            try {
+                // Load data ONCE into the single collection
+                System.out.println("  Loading data from: " + dataFile);
+                List<Document> data = Utils.readJsonFile(dataFile);
+                System.out.printf("  Loaded %d documents%n", data.size());
 
-            collection.drop();
-            System.out.println("  Collection reset.");
-            Utils.insertData(collection, data, 100);
-
-            // Generate ONE embedding for the query (reused for all 9 searches)
-            OpenAIClient aiClient = Utils.getOpenAIClient();
-            System.out.printf("%n  Generating embedding for: \"%s\"%n", queryText);
-            List<Float> queryVector = Utils.getEmbedding(aiClient, queryText, model);
-            System.out.printf("  Embedding generated (%d dimensions)%n%n", queryVector.size());
-
-            // Convert to doubles for BSON
-            List<Double> vectorAsDoubles = queryVector.stream()
-                    .map(Float::doubleValue)
-                    .toList();
-
-            // Create all 9 indexes idempotently
-            System.out.println("  Creating 9 vector indexes...");
-            for (String algo : ALGORITHMS) {
-                for (String metric : METRICS) {
-                    createIndex(collection, vectorField, dimensions, algo, metric);
+                // Drop collection if it already exists (clean start)
+                if (database.listCollectionNames().into(new ArrayList<>()).contains(COLLECTION_NAME)) {
+                    collection.drop();
+                    System.out.println("  Dropped existing collection.");
                 }
-            }
-            System.out.println("  All indexes created.\n");
+                Utils.insertData(collection, data, 100);
 
-            // Run searches sequentially for fair timing
-            System.out.println("  Running searches...");
-            for (String algo : ALGORITHMS) {
-                for (String metric : METRICS) {
-                    String indexName = String.format("vector_%s_%s", algo, metric.toLowerCase());
+                // Generate ONE embedding for the query (reused for all 9 searches)
+                OpenAIClient aiClient = Utils.getOpenAIClient();
+                System.out.printf("%n  Generating embedding for: \"%s\"%n", queryText);
+                List<Float> queryVector = Utils.getEmbedding(aiClient, queryText, model);
+                System.out.printf("  Embedding generated (%d dimensions)%n%n", queryVector.size());
 
-                    long startNs = System.nanoTime();
-                    List<Document> searchResults = performSearch(
-                            collection, vectorAsDoubles, vectorField, topK);
-                    long elapsedNs = System.nanoTime() - startNs;
-                    double elapsedMs = elapsedNs / 1_000_000.0;
+                // Convert to doubles for BSON
+                List<Double> vectorAsDoubles = queryVector.stream()
+                        .map(Float::doubleValue)
+                        .toList();
 
-                    // Extract top result info
-                    String topHotel = "-";
-                    double topScore = 0.0;
-                    if (!searchResults.isEmpty()) {
-                        Document top = searchResults.get(0);
-                        topHotel = top.getString("HotelName") != null
-                                ? top.getString("HotelName") : "-";
-                        topScore = top.getDouble("score") != null
-                                ? top.getDouble("score") : 0.0;
+                // Create all 9 indexes idempotently
+                System.out.println("  Creating 9 vector indexes...");
+                for (String algo : ALGORITHMS) {
+                    for (String metric : METRICS) {
+                        createIndex(collection, vectorField, dimensions, algo, metric);
                     }
+                }
+                System.out.println("  All indexes created.\n");
 
-                    results.add(new SearchResult(
-                            algo.toUpperCase(), metric, indexName,
-                            elapsedMs, searchResults.size(), topHotel, topScore));
+                // Run searches sequentially for fair timing
+                System.out.println("  Running searches...");
+                for (String algo : ALGORITHMS) {
+                    for (String metric : METRICS) {
+                        String indexName = String.format("vector_%s_%s", algo, metric.toLowerCase());
 
-                    if (verbose) {
-                        System.out.printf("    [%s] %d results in %.2f ms%n",
-                                indexName, searchResults.size(), elapsedMs);
-                        for (int i = 0; i < searchResults.size(); i++) {
-                            Document doc = searchResults.get(i);
-                            System.out.printf("      %d. %s (%.4f)%n",
-                                    i + 1,
-                                    doc.getString("HotelName"),
-                                    doc.getDouble("score"));
+                        long startNs = System.nanoTime();
+                        List<Document> searchResults = performSearch(
+                                collection, vectorAsDoubles, vectorField, topK);
+                        long elapsedNs = System.nanoTime() - startNs;
+                        double elapsedMs = elapsedNs / 1_000_000.0;
+
+                        // Extract top result info
+                        String topHotel = "-";
+                        double topScore = 0.0;
+                        if (!searchResults.isEmpty()) {
+                            Document top = searchResults.get(0);
+                            topHotel = top.getString("HotelName") != null
+                                    ? top.getString("HotelName") : "-";
+                            topScore = top.getDouble("score") != null
+                                    ? top.getDouble("score") : 0.0;
+                        }
+
+                        results.add(new SearchResult(
+                                algo.toUpperCase(), metric, indexName,
+                                elapsedMs, searchResults.size(), topHotel, topScore));
+
+                        if (verbose) {
+                            System.out.printf("    [%s] %d results in %.2f ms%n",
+                                    indexName, searchResults.size(), elapsedMs);
+                            for (int i = 0; i < searchResults.size(); i++) {
+                                Document doc = searchResults.get(i);
+                                System.out.printf("      %d. %s (%.4f)%n",
+                                        i + 1,
+                                        doc.getString("HotelName"),
+                                        doc.getDouble("score"));
+                            }
                         }
                     }
                 }
+            } finally {
+                // Cleanup: always drop the comparison collection
+                System.out.println("\n  Cleanup: dropping comparison collection...");
+                collection.drop();
+                System.out.println("  Cleanup: dropped collection 'hotels'");
             }
-
-            // Cleanup: drop the comparison collection
-            System.out.println("\n  Cleanup: dropping comparison collection...");
-            collection.drop();
-            System.out.println("  Cleanup: dropped collection 'hotels'");
         }
 
         // Print comparison table

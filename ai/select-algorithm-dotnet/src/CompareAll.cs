@@ -37,9 +37,13 @@ public static class CompareAll
         {
             var database = mongoClient.GetDatabase(databaseName);
 
-            // Drop collection for a clean comparison
-            database.DropCollection("hotels");
-            Console.WriteLine("Dropped existing 'hotels' collection (if any)");
+            // Drop collection if it already exists (clean start)
+            var collectionNames = database.ListCollectionNames().ToList();
+            if (collectionNames.Contains("hotels"))
+            {
+                database.DropCollection("hotels");
+                Console.WriteLine("Dropped existing 'hotels' collection.");
+            }
 
             var collection = database.GetCollection<BsonDocument>("hotels");
 

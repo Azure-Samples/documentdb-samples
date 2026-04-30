@@ -47,15 +47,18 @@ func RunCompareAll(ctx context.Context, config *Config, dbClient *mongo.Client, 
 	fmt.Printf("Top-K:  %d\n", topK)
 	fmt.Printf("Verbose: %v\n", verbose)
 
-	// 1. Drop collection for clean comparison, then load data
+	// 1. Drop collection if it exists for clean comparison, then load data
 	database := dbClient.Database(config.DatabaseName)
 	collection := database.Collection("hotels")
 
-	// Drop existing collection for a clean comparison
-	if err := collection.Drop(ctx); err != nil {
-		fmt.Printf("Note: could not drop collection (may not exist): %v\n", err)
-	} else {
-		fmt.Println("Dropped existing 'hotels' collection")
+	// Drop existing collection if it exists (clean start)
+	names, _ := database.ListCollectionNames(ctx, bson.M{"name": "hotels"})
+	if len(names) > 0 {
+		if err := collection.Drop(ctx); err != nil {
+			fmt.Printf("Note: could not drop collection: %v\n", err)
+		} else {
+			fmt.Println("Dropped existing 'hotels' collection")
+		}
 	}
 
 	// Ensure cleanup on exit

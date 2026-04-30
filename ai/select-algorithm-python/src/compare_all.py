@@ -171,9 +171,10 @@ def main():
     try:
         database = mongo_client[config["database_name"]]
 
-        # Drop collection for a clean comparison
-        database.drop_collection("hotels")
-        print("Dropped existing 'hotels' collection (if any)")
+        # Drop collection if it already exists (clean start)
+        if "hotels" in database.list_collection_names():
+            database.drop_collection("hotels")
+            print("Dropped existing 'hotels' collection")
 
         # Create fresh collection and load data
         collection = database["hotels"]
