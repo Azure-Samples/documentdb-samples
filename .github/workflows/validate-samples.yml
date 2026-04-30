@@ -1,100 +1,135 @@
+# =============================================================================
+# Validate Samples — End-to-end validation for all DocumentDB AI samples
+# =============================================================================
+#
+# PURPOSE:
+#   Validates that every sample in this repo compiles and (optionally) runs
+#   correctly against a live Azure DocumentDB + Azure OpenAI deployment.
+#
+# TWO MODES:
+#   1. BUILD-ONLY (automatic) — Triggered on PR/push to ai/** paths.
+#      Compiles all 5 languages (TypeScript, Python, Go, Java, .NET) to catch
+#      syntax errors, missing imports, and type issues. No secrets needed.
+#
+#   2. FULL RUN (manual) — Triggered via workflow_dispatch ("Run workflow" button).
+#      Builds AND executes every sample against real Azure resources.
+#      Requires the SAMPLES_ENV_FILE repo secret (see setup below).
+#      Captures all stdout/stderr as downloadable artifacts.
+#
+# SETUP — Creating the SAMPLES_ENV_FILE secret:
+#   1. Go to repo Settings > Secrets and variables > Actions
+#   2. Click "New repository secret"
+#   3. Name: SAMPLES_ENV_FILE
+#   4. Value: paste your entire .env file contents, e.g.:
+#        AZURE_DOCUMENTDB_CONNECTION_STRING=mongodb+srv://...
+#        AZURE_DOCUMENTDB_DATABASENAME=quickstart_db
+#        AZURE_OPENAI_EMBEDDING_ENDPOINT=https://...openai.azure.com
+#        AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+#        AZURE_OPENAI_EMBEDDING_KEY=abc123...
+#        AZURE_OPENAI_EMBEDDING_API_VERSION=2024-06-01
+#        TOP_K=3
+#        LOAD_SIZE_BATCH=25
+#   5. Click "Add secret"
+#
+# ARTIFACTS:
+#   Full-run jobs upload output-*.log files as workflow artifacts (7-day retention).
+#   Download them from the workflow run's "Artifacts" section to inspect sample output.
+#
+# =============================================================================
+
 name: Validate Samples
 
 on:
+  # Build-only on PR and push
   pull_request:
     paths:
       - 'ai/**'
       - '.github/workflows/validate-samples.yml'
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'ai/**'
       - '.github/workflows/validate-samples.yml'
+
+  # Manual trigger for full validation (build + run)
+  workflow_dispatch:
+    inputs:
+      run_mode:
+        description: 'build-only = compile check only; full = compile + execute against Azure'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - build-only
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Separate concurrency groups for auto (PR/push) vs manual full-run
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}-${{ inputs.run_mode || 'auto' }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 jobs:
-  validate-typescript:
-    name: TypeScript - ${{ matrix.sample }}
+  # ============================================================
+  # BUILD JOBS — Always run (PR, push, and workflow_dispatch)
+  # Validates that code compiles without needing any secrets.
+  # ============================================================
+
+  build-typescript:
+    name: Build TypeScript - ${{ matrix.sample }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
         sample:
           - vector-search-typescript
-          - vector-search-agent-typescript
-    
+          - select-algorithm-typescript
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: ai/${{ matrix.sample }}/package-lock.json
-      
-      - name: Install dependencies
+      - run: npm ci
         working-directory: ai/${{ matrix.sample }}
-        run: npm ci
-      
-      - name: Build TypeScript
+      - run: npm run build
         working-directory: ai/${{ matrix.sample }}
-        run: npm run build
 
-  validate-dotnet:
-    name: .NET
+  build-dotnet:
+    name: Build .NET
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: false
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-      
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      
-      - name: Build solution
-        run: dotnet build documentdb-samples.sln
+      - run: dotnet build documentdb-samples.sln
 
-  validate-go:
-    name: Go - ${{ matrix.sample }}
+  build-go:
+    name: Build Go - ${{ matrix.sample }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
         sample:
           - vector-search-go
-          - vector-search-agent-go
-    
+          - select-algorithm-go
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-      
-      - name: Setup Go
-        uses: actions/setup-go@v6
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version: '1.24'
           cache-dependency-path: ai/${{ matrix.sample }}/go.sum
-      
-      - name: Validate Go
+      - name: Build Go
         working-directory: ai/${{ matrix.sample }}
+        # Go samples have multiple main() files sharing utils.go — build each independently
         run: |
-          # Check if src/ has multiple main() declarations (independent programs sharing utils)
           if [ -d "src" ] && [ "$(grep -rl '^func main()' src/*.go 2>/dev/null | wc -l)" -gt 1 ]; then
             cd src
             for f in $(grep -l '^func main()' *.go); do
@@ -105,47 +140,315 @@ jobs:
             go build ./...
           fi
 
-  validate-python:
-    name: Python
+  build-python:
+    name: Build Python - ${{ matrix.sample }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: false
-    
+    strategy:
+      fail-fast: false
+      matrix:
+        sample:
+          - vector-search-python
+          - select-algorithm-python
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-      
-      - name: Setup Python
-        uses: actions/setup-python@v6
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      
-      - name: Install dependencies
-        working-directory: ai/vector-search-python
-        run: pip install -r requirements.txt
-      
-      - name: Validate Python syntax
-        working-directory: ai/vector-search-python
-        run: |
-          find . -name "*.py" -exec python -m py_compile {} +
+      - run: pip install -r requirements.txt
+        working-directory: ai/${{ matrix.sample }}
+      - name: Validate syntax
+        working-directory: ai/${{ matrix.sample }}
+        run: find . -name "*.py" -exec python -m py_compile {} +
 
-  validate-java:
-    name: Java
+  build-java:
+    name: Build Java - ${{ matrix.sample }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: false
-    
+    strategy:
+      fail-fast: false
+      matrix:
+        sample:
+          - vector-search-java
+          - select-algorithm-java
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-      
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
-      
-      - name: Compile Java
-        working-directory: ai/vector-search-java
-        run: mvn compile -DskipTests
+      - run: mvn compile -DskipTests
+        working-directory: ai/${{ matrix.sample }}
+
+  # ============================================================
+  # FULL-RUN JOBS — Only on workflow_dispatch with run_mode=full
+  # Executes samples against live Azure resources using the
+  # SAMPLES_ENV_FILE repo secret. Captures output as artifacts.
+  # ============================================================
+
+  preflight:
+    name: Preflight — Verify secret exists
+    if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check SAMPLES_ENV_FILE secret
+        run: |
+          if [ -z "$ENV_CONTENT" ]; then
+            echo "::error::SAMPLES_ENV_FILE secret is not set. See workflow header for setup instructions."
+            exit 1
+          fi
+          echo "✅ SAMPLES_ENV_FILE secret is configured ($(echo "$ENV_CONTENT" | wc -l) lines)"
+        env:
+          ENV_CONTENT: ${{ secrets.SAMPLES_ENV_FILE }}
+
+  run-typescript:
+    name: Run TypeScript - ${{ matrix.sample }}
+    if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
+    needs: [build-typescript, preflight]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sample: vector-search-typescript
+            scripts: |
+              node --env-file .env dist/create-embeddings.js 2>&1 | tee output-embed.log
+              node --env-file .env dist/ivf.js 2>&1 | tee output-ivf.log
+              node --env-file .env dist/hnsw.js 2>&1 | tee output-hnsw.log
+              node --env-file .env dist/diskann.js 2>&1 | tee output-diskann.log
+          - sample: select-algorithm-typescript
+            scripts: |
+              node --env-file .env dist/compare-all.js 2>&1 | tee output-compare.log
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ai/${{ matrix.sample }}/package-lock.json
+      - run: npm ci
+        working-directory: ai/${{ matrix.sample }}
+      - run: npm run build
+        working-directory: ai/${{ matrix.sample }}
+      - name: Write .env from secret
+        working-directory: ai/${{ matrix.sample }}
+        run: printf '%s\n' "$ENV_CONTENT" > .env
+        env:
+          ENV_CONTENT: ${{ secrets.SAMPLES_ENV_FILE }}
+      - name: Run sample
+        working-directory: ai/${{ matrix.sample }}
+        run: |
+          set -euo pipefail
+          ${{ matrix.scripts }}
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-typescript-${{ matrix.sample }}
+          path: ai/${{ matrix.sample }}/output-*.log
+          retention-days: 7
+
+  run-python:
+    name: Run Python - ${{ matrix.sample }}
+    if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
+    needs: [build-python, preflight]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sample: vector-search-python
+            scripts: |
+              python src/create_embeddings.py 2>&1 | tee output-embed.log
+              python src/ivf.py 2>&1 | tee output-ivf.log
+              python src/hnsw.py 2>&1 | tee output-hnsw.log
+              python src/diskann.py 2>&1 | tee output-diskann.log
+          - sample: select-algorithm-python
+            scripts: |
+              python src/compare_all.py 2>&1 | tee output-compare.log
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+        working-directory: ai/${{ matrix.sample }}
+      - name: Write .env from secret
+        working-directory: ai/${{ matrix.sample }}
+        run: printf '%s\n' "$ENV_CONTENT" > .env
+        env:
+          ENV_CONTENT: ${{ secrets.SAMPLES_ENV_FILE }}
+      - name: Run sample
+        working-directory: ai/${{ matrix.sample }}
+        run: |
+          set -euo pipefail
+          ${{ matrix.scripts }}
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-python-${{ matrix.sample }}
+          path: ai/${{ matrix.sample }}/output-*.log
+          retention-days: 7
+
+  run-go:
+    name: Run Go - ${{ matrix.sample }}
+    if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
+    needs: [build-go, preflight]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sample: vector-search-go
+            scripts: |
+              go run create_embeddings.go utils.go 2>&1 | tee output-embed.log
+              go run ivf.go utils.go 2>&1 | tee output-ivf.log
+              go run hnsw.go utils.go 2>&1 | tee output-hnsw.log
+              go run diskann.go utils.go 2>&1 | tee output-diskann.log
+            workdir: ai/vector-search-go/src
+          - sample: select-algorithm-go
+            scripts: |
+              go run compare_all.go utils.go 2>&1 | tee output-compare.log
+            workdir: ai/select-algorithm-go/src
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.24'
+          cache-dependency-path: ai/${{ matrix.sample }}/go.sum
+      - name: Write .env from secret
+        working-directory: ${{ matrix.workdir }}
+        run: printf '%s\n' "$ENV_CONTENT" > .env
+        env:
+          ENV_CONTENT: ${{ secrets.SAMPLES_ENV_FILE }}
+      - name: Run sample
+        working-directory: ${{ matrix.workdir }}
+        run: |
+          set -euo pipefail
+          ${{ matrix.scripts }}
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-go-${{ matrix.sample }}
+          path: ${{ matrix.workdir }}/output-*.log
+          retention-days: 7
+
+  run-java:
+    name: Run Java - ${{ matrix.sample }}
+    if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
+    needs: [build-java, preflight]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sample: vector-search-java
+            classes: DiskAnn HNSW IVF
+            package: com.azure.documentdb.samples
+          - sample: select-algorithm-java
+            classes: CompareAll
+            package: com.azure.documentdb.selectalgorithm
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+      - run: mvn compile -DskipTests
+        working-directory: ai/${{ matrix.sample }}
+      - name: Export env vars from secret
+        # Java uses System.getenv() — write .env then source it into GITHUB_ENV
+        run: |
+          while IFS='=' read -r key value; do
+            [[ -z "$key" || "$key" == \#* ]] && continue
+            echo "$key=$value" >> "$GITHUB_ENV"
+          done <<< "$ENV_CONTENT"
+        env:
+          ENV_CONTENT: ${{ secrets.SAMPLES_ENV_FILE }}
+      - name: Run sample
+        working-directory: ai/${{ matrix.sample }}
+        run: |
+          set -euo pipefail
+          for class in ${{ matrix.classes }}; do
+            echo "=== Running $class ==="
+            mvn exec:java -Dexec.mainClass="${{ matrix.package }}.$class" 2>&1 | tee "output-${class,,}.log"
+          done
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-java-${{ matrix.sample }}
+          path: ai/${{ matrix.sample }}/output-*.log
+          retention-days: 7
+
+  run-dotnet:
+    name: Run .NET - ${{ matrix.sample }}
+    if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full'
+    needs: [build-dotnet, preflight]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sample: vector-search-dotnet
+            project: ai/vector-search-dotnet/DocumentDBVectorSearch.csproj
+          - sample: select-algorithm-dotnet
+            project: ai/select-algorithm-dotnet/src/SelectAlgorithm.csproj
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Export env vars from secret
+        # .NET uses Environment.GetEnvironmentVariable() — parse .env into GITHUB_ENV
+        run: |
+          while IFS='=' read -r key value; do
+            [[ -z "$key" || "$key" == \#* ]] && continue
+            echo "$key=$value" >> "$GITHUB_ENV"
+          done <<< "$ENV_CONTENT"
+        env:
+          ENV_CONTENT: ${{ secrets.SAMPLES_ENV_FILE }}
+      - name: Run sample
+        run: |
+          set -euo pipefail
+          dotnet run --project ${{ matrix.project }} 2>&1 | tee output-run.log
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-dotnet-${{ matrix.sample }}
+          path: output-run.log
+          retention-days: 7
+
+  # ============================================================
+  # SUMMARY — Aggregates pass/fail status across all languages
+  # ============================================================
+
+  summary:
+    name: Results Summary
+    if: github.event_name == 'workflow_dispatch' && inputs.run_mode == 'full' && always()
+    needs: [preflight, run-typescript, run-python, run-go, run-java, run-dotnet]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary table
+        run: |
+          echo "## 🧪 Full Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Language | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| TypeScript | ${{ needs.run-typescript.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Python | ${{ needs.run-python.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Go | ${{ needs.run-go.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Java | ${{ needs.run-java.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| .NET | ${{ needs.run-dotnet.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Download artifacts for full output logs." >> $GITHUB_STEP_SUMMARY

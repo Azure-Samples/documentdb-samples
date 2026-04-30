@@ -75,21 +75,42 @@ npm run start:diskann
 
 ## Compare All Algorithms
 
-Run all 9 combinations (3 algorithms × 3 similarity metrics) in a single invocation and view a formatted comparison table:
+Run all 9 combinations (3 algorithms × 3 similarity metrics) across multiple diverse queries and view formatted comparison tables with a ranking divergence summary:
 
 ```bash
 npm run start:compare-all
 ```
 
+By default, the script runs **5 diverse queries** designed to stress different aspects of similarity ranking:
+
+1. `outdoor adventure with family activities`
+2. `quiet romantic getaway with ocean view`
+3. `budget-friendly downtown hotel with free WiFi`
+4. `historic building with fine dining and spa`
+5. `ski resort with yoga and winter sports`
+
 **Environment variables** (optional overrides):
 
 | Variable | Default | Description |
 |---|---|---|
-| `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
-| `TOP_K` | `3` | Number of results per combination |
+| `QUERY_TEXT` | *(5 built-in queries)* | Override with a single custom query |
+| `TOP_K` | `5` | Number of results per combination |
 | `VERBOSE` | `false` | When `true`, shows all k results per combo |
 
-The script creates a single `hotels` collection, loads data once, creates 9 vector indexes (one per algorithm/metric pair), and runs searches sequentially for fair timing comparison.
+### Architecture
+
+> **DocumentDB limitation:** Only ONE vector index per field per collection is allowed. The script creates 9 separate collections (one per algorithm×metric pair), loads data into each, creates one index per collection, runs searches, and cleans up all collections on exit.
+
+### Output
+
+The script produces:
+- **Per-query comparison table** — shows algorithm, metric, latency, top score, and #1 result for each of the 9 combinations
+- **Ranking divergence summary** — highlights queries where algorithms/metrics disagreed on the #1 result
+- **Score gap analysis** — shows the confidence margin between #1 and #2 results
+
+### Small dataset caveat
+
+With ~50 hotel documents, all algorithms typically return identical rankings. This is expected — the dataset is too small for algorithmic differences to surface. For meaningful differentiation, use 1000+ documents with varied embeddings. The diverse queries help by combining attributes that no single hotel perfectly satisfies, which can reveal metric-level differences (COS vs L2 vs IP) even on small data.
 
 ## Algorithm comparison
 
