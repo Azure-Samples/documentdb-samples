@@ -136,6 +136,13 @@ def main():
         database = mongo_client[config['database_name']]
         collection = database[config['collection_name']]
 
+        # Drop collection if it already exists (clean start)
+        if config['collection_name'] in database.list_collection_names():
+            database.drop_collection(config['collection_name'])
+            print(f"Dropped existing collection '{config['collection_name']}'")
+
+        collection = database[config['collection_name']]
+
         # Load hotel data with embeddings
         print(f"\nLoading data from {config['data_file']}...")
         data = read_file_return_json(config['data_file'])
@@ -196,8 +203,13 @@ def main():
         raise
 
     finally:
-        # Clean up MongoDB connection
+        # Cleanup: drop collection and close connection
         if 'mongo_client' in locals():
+            try:
+                database.drop_collection(config['collection_name'])
+                print(f"Cleanup: dropped collection '{config['collection_name']}'")
+            except Exception as cleanup_err:
+                print(f"Cleanup warning: {cleanup_err}")
             mongo_client.close()
 
 

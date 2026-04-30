@@ -155,6 +155,28 @@ func main() {
 	database := mongoClient.Database(config.DatabaseName)
 	collection := database.Collection("hotels_hnsw")
 
+	// Drop collection if it already exists (clean start)
+	names, err := database.ListCollectionNames(ctx, bson.M{"name": "hotels_hnsw"})
+	if err != nil {
+		log.Fatalf("Failed to list collections: %v", err)
+	}
+	if len(names) > 0 {
+		if err := collection.Drop(ctx); err != nil {
+			log.Fatalf("Failed to drop existing collection: %v", err)
+		}
+		fmt.Println("Dropped existing collection 'hotels_hnsw'")
+	}
+
+	// Ensure cleanup on exit
+	defer func() {
+		fmt.Println("Cleanup: dropping collection 'hotels_hnsw'...")
+		if dropErr := collection.Drop(ctx); dropErr != nil {
+			fmt.Printf("Cleanup warning: %v\n", dropErr)
+		} else {
+			fmt.Println("Cleanup: dropped collection 'hotels_hnsw'")
+		}
+	}()
+
 	// Load hotel data with embeddings
 	fmt.Printf("\nLoading data from %s...\n", config.DataFile)
 	data, err := ReadFileReturnJSON(config.DataFile)
@@ -177,15 +199,6 @@ func main() {
 
 	// Insert data into MongoDB collection
 	fmt.Printf("\nPreparing collection '%s'...\n", config.CollectionName)
-
-	// Clear any existing data to start fresh
-	deleteResult, err := collection.DeleteMany(ctx, bson.M{})
-	if err != nil {
-		log.Fatalf("Failed to clear existing data: %v", err)
-	}
-	if deleteResult.DeletedCount > 0 {
-		fmt.Printf("Cleared %d existing documents from collection\n", deleteResult.DeletedCount)
-	}
 
 	// Insert hotel data with embeddings
 	stats, err := InsertData(ctx, collection, documentsWithEmbeddings, config.BatchSize, nil)

@@ -47,24 +47,33 @@ public class HNSW {
             var database = mongoClient.getDatabase(DATABASE_NAME);
             var collection = database.getCollection(COLLECTION_NAME, Document.class);
 
-            // Drop and recreate collection
-            collection.drop();
+            // Drop collection if it already exists (clean start)
+            if (database.listCollectionNames().into(new ArrayList<>()).contains(COLLECTION_NAME)) {
+                collection.drop();
+                System.out.println("Dropped existing collection: " + COLLECTION_NAME);
+            }
             database.createCollection(COLLECTION_NAME);
             System.out.println("Created collection: " + COLLECTION_NAME);
 
-            // Load and insert data
-            var hotelData = loadHotelData();
-            insertDataInBatches(collection, hotelData);
+            try {
+                // Load and insert data
+                var hotelData = loadHotelData();
+                insertDataInBatches(collection, hotelData);
 
-            // Create standard indexes
-            createStandardIndexes(collection);
+                // Create standard indexes
+                createStandardIndexes(collection);
 
-            // Create vector index
-            createVectorIndex(database);
+                // Create vector index
+                createVectorIndex(database);
 
-            // Perform vector search
-            var queryEmbedding = createEmbedding(openAIClient, SAMPLE_QUERY);
-            performVectorSearch(collection, queryEmbedding);
+                // Perform vector search
+                var queryEmbedding = createEmbedding(openAIClient, SAMPLE_QUERY);
+                performVectorSearch(collection, queryEmbedding);
+            } finally {
+                // Cleanup: always drop collection at end
+                collection.drop();
+                System.out.println("Cleanup: dropped collection '" + COLLECTION_NAME + "'");
+            }
 
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());

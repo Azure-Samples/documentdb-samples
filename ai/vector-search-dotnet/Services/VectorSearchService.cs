@@ -43,24 +43,32 @@ public class VectorSearchService
     /// <param name="indexType">The vector search algorithm to use (IVF, HNSW, or DiskANN)</param>
     public async Task RunSearchAsync(VectorIndexType indexType)
     {
+        _logger.LogInformation($"Starting {indexType} vector search workflow");
+        
+        // Setup collection
+        var collectionSuffix = indexType switch 
+        { 
+            VectorIndexType.IVF => "ivf", 
+            VectorIndexType.HNSW => "hnsw", 
+            VectorIndexType.DiskANN => "diskann", 
+            _ => throw new ArgumentException($"Unknown index type: {indexType}") 
+        };
+        var collectionName = $"hotels_{collectionSuffix}";
+        var indexName = $"vectorIndex_{collectionSuffix}";
+
+        // Drop collection if it already exists (clean start)
+        var database = _mongoService.GetDatabase(_config.VectorSearch.DatabaseName);
+        var existingCollections = (await database.ListCollectionNamesAsync()).ToList();
+        if (existingCollections.Contains(collectionName))
+        {
+            await _mongoService.DropCollectionAsync(_config.VectorSearch.DatabaseName, collectionName);
+        }
+
         try
         {
-            _logger.LogInformation($"Starting {indexType} vector search workflow");
-            
-            // Setup collection
-            var collectionSuffix = indexType switch 
-            { 
-                VectorIndexType.IVF => "ivf", 
-                VectorIndexType.HNSW => "hnsw", 
-                VectorIndexType.DiskANN => "diskann", 
-                _ => throw new ArgumentException($"Unknown index type: {indexType}") 
-            };
-            var collectionName = $"hotels_{collectionSuffix}";
-            var indexName = $"vectorIndex_{collectionSuffix}";
-            
             var collection = _mongoService.GetCollection<HotelData>(_config.VectorSearch.DatabaseName, collectionName);
             
-            // Load data from file if collection is empty
+            // Load data from file
             var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
             var dataFilePath = Path.Combine(assemblyLocation, _config.DataFiles.WithVectors);
             await _mongoService.LoadDataIfNeededAsync(collection, dataFilePath);
@@ -136,6 +144,18 @@ public class VectorSearchService
         {
             _logger.LogError(ex, $"{indexType} vector search failed");
             throw;
+        }
+        finally
+        {
+            // Cleanup: always drop the collection
+            try
+            {
+                await _mongoService.DropCollectionAsync(_config.VectorSearch.DatabaseName, collectionName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, $"Cleanup warning: failed to drop collection '{collectionName}'");
+            }
         }
     }
 
