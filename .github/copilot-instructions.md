@@ -13,17 +13,29 @@ ai/
 ├── vector-search-go/              # Go vector search samples
 ├── vector-search-java/            # Java vector search samples
 ├── vector-search-dotnet/          # .NET vector search samples
+├── select-algorithm-python/       # Python select algorithm quickstart
+├── select-algorithm-typescript/   # TypeScript select algorithm quickstart
+├── select-algorithm-go/           # Go select algorithm quickstart
+├── select-algorithm-java/         # Java select algorithm quickstart
+├── select-algorithm-dotnet/       # .NET select algorithm quickstart
 ├── vector-search-agent-go/        # Go agent sample (separate from quickstart)
 └── vector-search-agent-typescript/ # TypeScript agent sample (separate from quickstart)
 ```
 
 ### Sample Categories
-- **Quickstart samples** (`vector-search-{language}/`): Single algorithm per file, one entry point, uses `MONGO_CLUSTER_NAME` + quickstart env vars
+- **Vector search quickstarts** (`vector-search-{language}/`): Single algorithm per file, one entry point, uses `MONGO_CLUSTER_NAME` + quickstart env vars
+- **Select algorithm quickstarts** (`select-algorithm-{language}/`): Compares all 3 algorithms in one run, single entry point, uses `MONGO_CLUSTER_NAME` + quickstart env vars
 - **Agent samples** (`vector-search-agent-{language}/`): Multi-LLM orchestration, three entry points (upload/agent/cleanup), uses `AZURE_DOCUMENTDB_*` env vars
 
-Each quickstart sample directory contains:
+Vector search quickstart directories contain:
 - `src/` — Source files: one per algorithm (`ivf`, `hnsw`, `diskann`) + `utils` + `create_embeddings` + `show_indexes`
 - `output/` — Expected output files: `ivf.txt`, `hnsw.txt`, `diskann.txt`
+
+Select algorithm quickstart directories contain:
+- `src/` — Source files: `compare_all` (or equivalent) + `utils`
+- `output/` — Expected output: `compare_all.txt` (all algorithms compared in one run)
+
+All sample directories include:
 - `README.md` — Setup, usage, and troubleshooting documentation
 - `.env.example` (Go, Python, TypeScript) or `appsettings.json` (.NET) — Configuration template
 
