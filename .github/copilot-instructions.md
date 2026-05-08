@@ -31,7 +31,6 @@ Each vector-search sample directory contains:
 - github.com/Azure/azure-sdk-for-go/sdk/azidentity
 - github.com/Azure/azure-sdk-for-go/sdk/azcore
 - github.com/openai/openai-go/v3
-- github.com/joho/godotenv
 
 ### Java
 - Java 17+
@@ -45,7 +44,6 @@ Each vector-search sample directory contains:
 - pymongo >= 4.7
 - azure-identity
 - openai
-- python-dotenv
 
 ### TypeScript/Node.js
 - Node.js 20+
@@ -242,3 +240,77 @@ Agent samples default to `IVF_NUM_LISTS=10`. Quickstart samples (vector-search, 
 7. **Similarity metric is COS.** All vector index definitions use `"similarity": "COS"` (cosine similarity).
 8. **Output files are committed.** Each sample has an `output/` directory with expected output for each algorithm (`ivf.txt`, `hnsw.txt`, `diskann.txt`). Update these when output format changes.
 9. **DocumentDB supports all index types at any dataset size.** IVF, HNSW, and DiskANN are all available — do not imply tier restrictions limit algorithm availability.
+10. **No dotenv libraries.** Do NOT use `python-dotenv`, `godotenv`, `dotenv` (npm), or any `.env` file-loading library. Environment variables must be passed via the CLI invocation, not loaded from `.env` files at runtime. This keeps samples explicit and avoids hidden configuration.
+
+## Running Samples — CLI Invocation
+
+Environment variables are passed inline with the run command. Do NOT use `.env` files. Each example below shows the required variables for a vector-search quickstart sample.
+
+### Go
+
+```bash
+MONGO_CLUSTER_NAME=myCluster \
+AZURE_OPENAI_EMBEDDING_ENDPOINT=https://myendpoint.openai.azure.com/ \
+AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-ada-002 \
+go run ./src/ivf.go
+```
+
+### Python
+
+```bash
+MONGO_CLUSTER_NAME=myCluster \
+AZURE_OPENAI_EMBEDDING_ENDPOINT=https://myendpoint.openai.azure.com/ \
+AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-ada-002 \
+python src/ivf.py
+```
+
+### TypeScript/Node.js
+
+```bash
+MONGO_CLUSTER_NAME=myCluster \
+AZURE_OPENAI_EMBEDDING_ENDPOINT=https://myendpoint.openai.azure.com/ \
+AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-ada-002 \
+npx tsx src/ivf.ts
+```
+
+### Java
+
+```bash
+MONGO_CLUSTER_NAME=myCluster \
+AZURE_OPENAI_EMBEDDING_ENDPOINT=https://myendpoint.openai.azure.com/ \
+AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-ada-002 \
+mvn compile exec:java -Dexec.mainClass="com.azure.documentdb.sample.IVF"
+```
+
+### .NET
+
+.NET uses `appsettings.json` for configuration, but environment variables can override:
+
+```bash
+DocumentDB__ClusterName=myCluster \
+AzureOpenAI__Endpoint=https://myendpoint.openai.azure.com/ \
+AzureOpenAI__DeploymentName=text-embedding-ada-002 \
+dotnet run
+```
+
+### Agent Samples (Multi-LLM)
+
+Agent samples require more variables for the planner and synthesizer deployments:
+
+```bash
+AZURE_OPENAI_ENDPOINT=https://myendpoint.openai.azure.com/ \
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002 \
+AZURE_OPENAI_EMBEDDING_API_VERSION=2024-06-01 \
+AZURE_OPENAI_PLANNER_DEPLOYMENT=gpt-4o \
+AZURE_OPENAI_PLANNER_API_VERSION=2024-06-01 \
+AZURE_OPENAI_SYNTH_DEPLOYMENT=gpt-4o \
+AZURE_OPENAI_SYNTH_API_VERSION=2024-06-01 \
+AZURE_DOCUMENTDB_CLUSTER=myCluster \
+AZURE_DOCUMENTDB_DATABASENAME=Hotels \
+AZURE_DOCUMENTDB_COLLECTION=hotels \
+AZURE_DOCUMENTDB_INDEX_NAME=vectorIndex \
+USE_PASSWORDLESS=true \
+go run ./cmd/agent/main.go
+```
+
+> **Windows (PowerShell):** Use `$env:VAR_NAME="value";` syntax or set variables beforehand with `$env:MONGO_CLUSTER_NAME="myCluster"` then run the command separately.
