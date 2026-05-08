@@ -45,7 +45,7 @@ All samples use the same query text: `"quintessential lodging near running trail
 All languages use the same aggregation pipeline structure:
 ```
 [
-  { "$search": { "cosmosSearch": { "vector": <queryEmbedding>, "path": <vectorField>, "k": 5 } } },
+  { "$search": { "cosmosSearch": { "vector": <queryEmbedding>, "path": "DescriptionVector", "k": 5 } } },
   { "$project": { "score": { "$meta": "searchScore" }, "document": "$$ROOT" } }
 ]
 ```

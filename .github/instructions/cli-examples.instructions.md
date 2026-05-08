@@ -5,6 +5,8 @@ applyTo: "ai/**"
 
 Environment variables are passed inline with the run command. Do NOT use `.env` files. Each example below shows the required variables for a vector-search quickstart sample.
 
+> **Note:** Examples show `ivf` but the same pattern applies to all algorithms — replace `ivf` with `hnsw` or `diskann` in file/class names.
+
 ## Go
 
 **Bash:**

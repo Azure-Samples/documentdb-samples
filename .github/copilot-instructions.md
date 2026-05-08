@@ -17,7 +17,11 @@ ai/
 └── vector-search-agent-typescript/ # TypeScript agent sample (separate from quickstart)
 ```
 
-Each vector-search sample directory contains:
+### Sample Categories
+- **Quickstart samples** (`vector-search-{language}/`): Single algorithm per file, one entry point, uses `MONGO_CLUSTER_NAME` + quickstart env vars
+- **Agent samples** (`vector-search-agent-{language}/`): Multi-LLM orchestration, three entry points (upload/agent/cleanup), uses `AZURE_DOCUMENTDB_*` env vars
+
+Each quickstart sample directory contains:
 - `src/` — Source files: one per algorithm (`ivf`, `hnsw`, `diskann`) + `utils` + `create_embeddings` + `show_indexes`
 - `output/` — Expected output files: `ivf.txt`, `hnsw.txt`, `diskann.txt`
 - `README.md` — Setup, usage, and troubleshooting documentation
@@ -80,7 +84,7 @@ All samples MUST use these environment variable names and defaults:
 ## Consistent Algorithm Parameters
 
 ### IVF
-- numLists: 1
+- numLists: 1 *(quickstart samples; agent samples use `IVF_NUM_LISTS=10` for production-like config)*
 - nProbes: 1
 
 ### HNSW
@@ -100,8 +104,10 @@ All samples MUST use these environment variable names and defaults:
 3. **Data file path from env var.** Code reads `DATA_FILE_WITH_VECTORS` which defaults to `../data/Hotels_Vector.json` (the shared data location). .NET copies data locally to `data/Hotels_Vector.json` in the build output.
 4. **Batch size is LOAD_SIZE_BATCH=100.** Do not use BATCH_SIZE or other variants.
 5. **Database name variable is AZURE_DOCUMENTDB_DATABASENAME.** Do not use MONGO_DB_NAME or other variants.
-6. **.NET uses appsettings.json** with configuration sections: `AzureOpenAI`, `DataFiles`, `Embedding`, `MongoDB`, `VectorSearch`.
+6. **.NET uses appsettings.json** with configuration sections: `AzureOpenAI`, `DataFiles`, `Embedding`, `MongoDB`, `VectorSearch`. Environment variables override config using `Section__Key` format (e.g., `AzureOpenAI__Endpoint`).
 7. **Similarity metric is COS.** All vector index definitions use `"similarity": "COS"` (cosine similarity).
 8. **Output files are committed.** Each sample has an `output/` directory with expected output for each algorithm (`ivf.txt`, `hnsw.txt`, `diskann.txt`). Update these when output format changes.
 9. **DocumentDB supports all index types at any dataset size.** IVF, HNSW, and DiskANN are all available — do not imply tier restrictions limit algorithm availability.
 10. **No dotenv libraries.** Do NOT use `python-dotenv`, `godotenv`, `dotenv` (npm), or any `.env` file-loading library. Environment variables must be passed via the CLI invocation, not loaded from `.env` files at runtime. This keeps samples explicit and avoids hidden configuration.
+11. **Collection naming:** `hotels_{algorithm}` (e.g., `hotels_ivf`, `hotels_hnsw`, `hotels_diskann`). Index naming: `vectorIndex_{algorithm}`.
+12. **Vector search uses k=5.** All samples return top 5 results. Do not parameterize k unless explicitly required.
