@@ -113,7 +113,7 @@ All samples MUST use these environment variable names and defaults:
 
 1. **No Cosmos DB references.**Never use "Cosmos DB", "cosmosdb", "MongoDB vCore", or "mongo.cosmos.azure.com". Always use "Azure DocumentDB" and "documentdb.azure.com". Exception: `mongocluster.cosmos.azure.com` (hostname), `cosmosSearch` (API command), and `ms-azuretools.vscode-cosmosdb` (VS Code extension) are valid and NOT Cosmos references.
 2. **Vector field name is DescriptionVector.** Never default to "contentVector".
-3. **Data file path from env var.** Code reads `DATA_FILE_WITH_VECTORS` which defaults to `../data/Hotels_Vector.json` (the shared data location). .NET copies data locally to `data/Hotels_Vector.json` in the build output.
+3. **Data file path from env var.** Code reads `DATA_FILE_WITH_VECTORS`. The default depends on the sample category: vector-search samples use `../data/Hotels_Vector.json` (shared data directory one level up), while select-algorithm samples use `data/Hotels_Vector.json` (local copy in each sample). .NET copies data locally to `data/Hotels_Vector.json` in the build output.
 4. **Batch size is LOAD_SIZE_BATCH=100.** Do not use BATCH_SIZE or other variants.
 5. **Database name variable is AZURE_DOCUMENTDB_DATABASENAME.** Do not use MONGO_DB_NAME or other variants.
 6. **.NET uses appsettings.json** with configuration sections: `AzureOpenAI`, `DataFiles`, `Embedding`, `MongoDB`, `VectorSearch`. Environment variables override config using `Section__Key` format (e.g., `AzureOpenAI__Endpoint`).
@@ -123,3 +123,4 @@ All samples MUST use these environment variable names and defaults:
 10. **No dotenv libraries.** Do NOT use `python-dotenv`, `godotenv`, `dotenv` (npm), or any `.env` file-loading library. Environment variables must be passed via the CLI invocation, not loaded from `.env` files at runtime. This keeps samples explicit and avoids hidden configuration.
 11. **Collection naming:** `hotels_{algorithm}` (e.g., `hotels_ivf`, `hotels_hnsw`, `hotels_diskann`). Index naming: `vectorIndex_{algorithm}`.
 12. **Vector search uses k=5.** All samples return top 5 results. Do not parameterize k unless explicitly required.
+13. **Use the Global read-write hostname.** All samples MUST use the Global read-write connection string format: `<clusterName>.global.mongocluster.cosmos.azure.com`. The `.global.` form auto-follows the active write region after a replica promotion. The non-`.global.` form pins to one cluster and silently becomes read-only after failover — reserve that for read-scale-out scenarios only. (Confirmed by Khelan Modi, DocumentDB PM.)
