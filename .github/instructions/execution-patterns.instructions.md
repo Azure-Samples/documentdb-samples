@@ -39,7 +39,8 @@ All vector search samples follow this consistent lifecycle:
 - **Database name:** `Hotels` (hardcoded, matches `AZURE_DOCUMENTDB_DATABASENAME` default)
 
 ### Standard Search Query
-All samples use the same query text: `"quintessential lodging near running trails, eateries, retail"`
+- **Vector search quickstarts:** `"quintessential lodging near running trails, eateries, retail"`
+- **Select algorithm quickstarts:** May use a different query (e.g., `"luxury hotel near the beach"`) to highlight algorithm comparison differences
 
 ### Vector Search Pipeline Structure
 All languages use the same aggregation pipeline structure:
