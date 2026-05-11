@@ -1,0 +1,47 @@
+======================================================================
+  Compare All Algorithms — 9 Combinations
+  (3 Algorithms × 3 Similarity Metrics)
+======================================================================
+
+  Query:  "luxury hotel near the beach"
+  Top K:  5
+
+Dropped existing 'hotels' collection (if any)
+Loaded 50 documents with embeddings
+Inserted 50/50 documents
+
+Generating embedding for query...
+Running 9 vector searches...
+
+  Created index 'vector_ivf_cos'
+  Created index 'vector_ivf_l2'
+  Created index 'vector_ivf_ip'
+  Created index 'vector_hnsw_cos'
+  Created index 'vector_hnsw_l2'
+  Created index 'vector_hnsw_ip'
+  Created index 'vector_diskann_cos'
+  Created index 'vector_diskann_l2'
+  Created index 'vector_diskann_ip'
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+| Algorithm   | Metric   | Top 1 Result             |   Score | Top 2 Result      |   Score |   Diff |
++=============+==========+==========================+=========+===================+=========+========+
+| IVF         | COS      | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+| IVF         | L2       | Ocean Water Resort & Spa |  0.8736 | Windy Ocean Motel |  0.9943 | 0.1208 |
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+| IVF         | IP       | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+| HNSW        | COS      | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+| HNSW        | L2       | Ocean Water Resort & Spa |  0.8736 | Windy Ocean Motel |  0.9943 | 0.1208 |
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+| HNSW        | IP       | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+| DiskANN     | COS      | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+| DiskANN     | L2       | Ocean Water Resort & Spa |  0.8736 | Windy Ocean Motel |  0.9943 | 0.1208 |
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+| DiskANN     | IP       | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
++-------------+----------+--------------------------+---------+-------------------+---------+--------+
+
+Cleanup: dropped collection 'hotels'

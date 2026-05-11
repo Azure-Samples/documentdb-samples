@@ -1,0 +1,50 @@
+==============================================
+  Azure DocumentDB - Compare All Algorithms
+==============================================
+  Query:   "luxury hotel near the beach"
+  Top K:   5
+  Metrics: COS, L2, IP
+  Algos:   IVF, HNSW, DiskANN
+
+  Loading data from: data/Hotels_Vector.json
+  Loaded 50 documents
+  Collection reset.
+
+  Generating embedding for: "luxury hotel near the beach"
+  Embedding generated (1536 dimensions)
+
+  Running 9 algorithm × metric combinations...
+  ✓ vector_ivf_cos created
+  ✓ vector_ivf_l2 created
+  ✓ vector_ivf_ip created
+  ✓ vector_hnsw_cos created
+  ✓ vector_hnsw_l2 created
+  ✓ vector_hnsw_ip created
+  ✓ vector_diskann_cos created
+  ✓ vector_diskann_l2 created
+  ✓ vector_diskann_ip created
+
+  Cleanup: dropping comparison collection...
+  Cleanup: dropped collection 'hotels'
+
+┌──────────┬────────┬────────────────────────────┬────────┬────────────────────────────┬────────┬───────┐
+│ Algorithm│ Metric │ Top 1 Result               │ Score  │ Top 2 Result               │ Score  │ Diff  │
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ HNSW     │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ HNSW     │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ HNSW     │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ DiskANN  │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ DiskANN  │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ DiskANN  │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+└──────────┴────────┴────────────────────────────┴────────┴────────────────────────────┴────────┴───────┘

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+
+# Local data copy (user copies from ai/data/)
+data/*.json
+!data/README.md
+Hotels_Vector.json

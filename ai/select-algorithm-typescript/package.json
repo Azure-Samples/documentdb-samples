@@ -1,0 +1,20 @@
+{
+  "name": "select-algorithm-typescript",
+  "version": "1.0.0",
+  "description": "Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB",
+  "type": "module",
+  "scripts": {
+    "env:init": "azd env get-values > .env",
+    "build": "tsc",
+    "start": "node --env-file .env dist/compare-all.js"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.11.1",
+    "mongodb": "^6.18.0",
+    "openai": "^5.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  }
+}

@@ -31,6 +31,7 @@ jobs:
         sample:
           - vector-search-typescript
           - vector-search-agent-typescript
+          - select-algorithm-typescript
     
     steps:
       - name: Checkout code
@@ -52,10 +53,16 @@ jobs:
         run: npm run build
 
   validate-dotnet:
-    name: .NET
+    name: .NET - ${{ matrix.sample }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: false
+    strategy:
+      fail-fast: false
+      matrix:
+        sample:
+          - documentdb-samples.sln
+          - ai/select-algorithm-dotnet/SelectAlgorithm.csproj
     
     steps:
       - name: Checkout code
@@ -66,8 +73,8 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       
-      - name: Build solution
-        run: dotnet build documentdb-samples.sln
+      - name: Build
+        run: dotnet build ${{ matrix.sample }}
 
   validate-go:
     name: Go - ${{ matrix.sample }}
@@ -80,6 +87,7 @@ jobs:
         sample:
           - vector-search-go
           - vector-search-agent-go
+          - select-algorithm-go
     
     steps:
       - name: Checkout code
@@ -102,14 +110,20 @@ jobs:
               go build -o /dev/null "$f" utils.go
             done
           else
-            go build ./...
+            go build -o /dev/null ./...
           fi
 
   validate-python:
-    name: Python
+    name: Python - ${{ matrix.sample }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: false
+    strategy:
+      fail-fast: false
+      matrix:
+        sample:
+          - vector-search-python
+          - select-algorithm-python
     
     steps:
       - name: Checkout code
@@ -121,19 +135,25 @@ jobs:
           python-version: '3.11'
       
       - name: Install dependencies
-        working-directory: ai/vector-search-python
+        working-directory: ai/${{ matrix.sample }}
         run: pip install -r requirements.txt
       
       - name: Validate Python syntax
-        working-directory: ai/vector-search-python
+        working-directory: ai/${{ matrix.sample }}
         run: |
           find . -name "*.py" -exec python -m py_compile {} +
 
   validate-java:
-    name: Java
+    name: Java - ${{ matrix.sample }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: false
+    strategy:
+      fail-fast: false
+      matrix:
+        sample:
+          - vector-search-java
+          - select-algorithm-java
     
     steps:
       - name: Checkout code
@@ -147,5 +167,5 @@ jobs:
           cache: 'maven'
       
       - name: Compile Java
-        working-directory: ai/vector-search-java
+        working-directory: ai/${{ matrix.sample }}
         run: mvn compile -DskipTests
