@@ -94,7 +94,7 @@ public class IVF {
             .withMechanismProperty("OIDC_CALLBACK", callback);
 
         var connectionString = new ConnectionString(
-            String.format("mongodb+srv://%s@%s.mongocluster.cosmos.azure.com/?authMechanism=MONGODB-OIDC&tls=true&retrywrites=false&maxIdleTimeMS=120000",
+            String.format("mongodb+srv://%s@%s.global.mongocluster.cosmos.azure.com/?authMechanism=MONGODB-OIDC&tls=true&retrywrites=false&maxIdleTimeMS=120000",
                 managedIdentityPrincipalId, clusterName)
         );
 
