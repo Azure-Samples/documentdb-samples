@@ -80,7 +80,7 @@ export function getClientsPasswordless(): { aiClient: AzureOpenAI | null; dbClie
     // For DocumentDB with DefaultAzureCredential (uses signed-in user)
     {
         dbClient = new MongoClient(
-            `mongodb+srv://${clusterName}.mongocluster.cosmos.azure.com/`, {
+            `mongodb+srv://${clusterName}.global.mongocluster.cosmos.azure.com/`, {
             connectTimeoutMS: 120000,
             tls: true,
             retryWrites: false,
