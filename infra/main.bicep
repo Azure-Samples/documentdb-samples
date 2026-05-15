@@ -254,6 +254,7 @@ output AZURE_DOCUMENTDB_DATABASENAME string = databaseName
 output AZURE_DOCUMENTDB_COLLECTION string = collectionName
 output AZURE_DOCUMENTDB_INDEX_NAME string = indexName
 output MONGO_CLUSTER_NAME string = documentDbCluster.outputs.clusterName
+output DOCUMENTDB_CLUSTER_NAME string = documentDbCluster.outputs.clusterName
 output AZURE_DOCUMENTDB_ADMIN_USERNAME string = documentDbAdminUsername
 
 // Configuration for embedding creation and vector search

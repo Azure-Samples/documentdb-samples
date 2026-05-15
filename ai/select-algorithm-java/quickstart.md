@@ -206,7 +206,7 @@ This quickstart compares vector index algorithms (DiskANN, HNSW, IVF) in Azure D
 
    ```bash
    # Azure DocumentDB cluster name for passwordless authentication
-   MONGO_CLUSTER_NAME=
+   DOCUMENTDB_CLUSTER_NAME=
 
    # Azure managed identity principal ID for authentication
    AZURE_MANAGED_IDENTITY_PRINCIPAL_ID=
@@ -232,7 +232,7 @@ This quickstart compares vector index algorithms (DiskANN, HNSW, IVF) in Azure D
 
    Replace the placeholder values with your Azure resource information:
 
-   - `MONGO_CLUSTER_NAME`: Your Azure DocumentDB cluster name
+   - `DOCUMENTDB_CLUSTER_NAME`: Your Azure DocumentDB cluster name
    - `AZURE_MANAGED_IDENTITY_PRINCIPAL_ID`: Your managed identity principal ID
    - `AZURE_OPENAI_EMBEDDING_ENDPOINT`: Your Azure OpenAI resource endpoint URL
 
@@ -447,48 +447,40 @@ IVF             L2              58.90
 
 ## Understanding the results
 
-### Algorithm characteristics
+### Choosing the right algorithm
 
-**DiskANN** - Disk-based approximate nearest neighbor search
-- Good balance of speed and accuracy
-- Suitable for large datasets that don't fit in memory
-- Parameters: `maxDegree=32` (graph connectivity), `lBuild=50` (build quality), `lSearch=100` (query accuracy)
+Use this comparison to select the best algorithm for your workload:
 
-**HNSW** - Hierarchical Navigable Small World
-- Memory-based hierarchical graph
-- Excellent for real-time applications requiring low latency
-- Parameters: `m=16` (connections per layer), `efConstruction=64` (build quality), `efSearch=80` (query accuracy)
+**IVF** (inverted file index):
+- Best for: Test environments, demos, and small clusters
+- Pros: Fast to build, low resource requirements, works on any cluster tier
+- Cons: Lower recall compared to graph-based algorithms at scale
+- Tune: Increase `numLists` for larger datasets, increase `nProbes` for better recall
 
-**IVF** - Inverted File Index
-- Cluster-based partitioning approach
-- Fast search via centroid comparison
-- Parameters: `numLists=1` (number of clusters), `nProbes=1` (clusters to search)
+**DiskANN** (disk-based approximate nearest neighbor) — *recommended for enterprise production*:
+- Best for: Enterprise production workloads on M30+ clusters
+- Pros: Supports embeddings up to 16,000 dimensions, keeps most index data on disk leaving cluster memory available for regular reads and writes, uses lighter updates that help the system stay smoother and easier to back up and recover
+- Cons: Requires M30+ cluster tier
+- Tune: Increase `maxDegree` and `lBuild` for better accuracy, increase `lSearch` for better recall
 
-### Similarity functions
+**HNSW** (hierarchical navigable small world):
+- Best for: Enterprise production workloads on M30+ clusters requiring highest recall
+- Pros: Excellent recall, fast queries
+- Cons: Requires M30+ cluster tier, supports embeddings up to 8,000 dimensions (vs 16,000 for DiskANN), higher memory usage
+- Tune: Increase `m` and `efConstruction` for better index quality, increase `efSearch` for better recall
 
-**COS (Cosine)** - Measures angle between vectors
-- Best for text embeddings (like those from OpenAI models)
-- Scale-invariant (ignores vector magnitude)
-- Range: -1 to 1 (1 = identical direction)
+> [!TIP]
+> For enterprise production workloads, start with **DiskANN** unless you have a specific reason to prefer HNSW. DiskANN supports higher dimensions (16,000 vs 8,000), uses less cluster memory, and requires fewer index maintenance operations — making it the safer long-term default that's less likely to need an index redesign as your embedding models evolve.
 
-**L2 (Euclidean)** - Measures straight-line distance
-- Sensitive to vector magnitude
-- Good for embeddings where scale matters
-- Range: 0 to infinity (0 = identical)
+### Choosing the right similarity function
 
-**IP (Inner Product)** - Dot product of vectors
-- Fast to compute
-- Can be used with normalized vectors
-- Range: -infinity to infinity
+The similarity function should match your embedding model and use case:
 
-### Choosing the right configuration
+- **COS (Cosine similarity)**: Best for text embeddings and most OpenAI models. Measures angle between vectors (range: -1 to 1, higher is more similar)
+- **L2 (Euclidean distance)**: Measures straight-line distance between vectors (lower is more similar). Good for spatial data
+- **IP (Inner product)**: Measures alignment between vectors. Good when vector magnitudes are meaningful
 
-Use the comparison results to guide your selection:
-
-1. **For real-time applications**: Choose HNSW if latency is critical
-2. **For large datasets**: Choose DiskANN if your data exceeds available memory
-3. **For fast batch processing**: Choose IVF if you can tolerate slightly lower accuracy
-4. **For text embeddings**: Use COS similarity function (most common with OpenAI embeddings)
+For the `text-embedding-3-small` model used in this quickstart, **COS (cosine similarity) is recommended** because OpenAI embeddings are normalized and optimized for cosine similarity.
 
 ## Troubleshooting
 
@@ -501,25 +493,30 @@ Use the comparison results to guide your selection:
 
 ## Clean up resources
 
-When you're done, you can remove the database using mongosh or the Azure portal.
+When you're done, you can remove the database using mongosh or the Azure DocumentDB extension for Visual Studio Code.
 
 ### [mongosh](#tab/mongosh)
 
 Connect to your DocumentDB cluster and drop the database:
 
 ```bash
-mongosh "<your-connection-string>"
+mongosh "mongodb+srv://<your-cluster-name>.global.mongocluster.cosmos.azure.com/" --tls --authenticationMechanism MONGODB-OIDC
+```
+
+```javascript
 use Hotels
 db.dropDatabase()
 ```
 
-### [Azure portal](#tab/portal)
+### [VS Code extension](#tab/vscode)
 
-1. Navigate to your DocumentDB resource in the Azure portal
-2. Select **Data Explorer**
-3. Right-click the **Hotels** database and select **Delete Database**
+1. Install the [Azure Databases extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-cosmosdb) for Visual Studio Code.
+2. Connect to your Azure DocumentDB cluster.
+3. Expand the cluster, right-click the **Hotels** database, and select **Drop Database**.
 
 ---
+
+If you created an Azure DocumentDB cluster specifically for this quickstart, you can also delete the entire resource group in the Azure portal to remove all associated resources.
 
 ## Related content
 

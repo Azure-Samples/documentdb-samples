@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 
 // Validate required environment variables at startup
 const requiredEnvVars = [
-    'MONGO_CLUSTER_NAME',
+    'DOCUMENTDB_CLUSTER_NAME',
     'AZURE_OPENAI_EMBEDDING_ENDPOINT',
     'AZURE_OPENAI_EMBEDDING_MODEL',
     'DATA_FILE_WITH_VECTORS'

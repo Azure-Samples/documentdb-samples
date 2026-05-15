@@ -30,9 +30,9 @@ class AzureIdentityTokenCallback(OIDCCallback):
 
 def get_clients_passwordless() -> Tuple[MongoClient, AzureOpenAI]:
     """Create MongoDB and Azure OpenAI clients using passwordless auth."""
-    cluster_name = os.getenv("MONGO_CLUSTER_NAME")
+    cluster_name = os.getenv("DOCUMENTDB_CLUSTER_NAME")
     if not cluster_name:
-        raise ValueError("MONGO_CLUSTER_NAME environment variable is required")
+        raise ValueError("DOCUMENTDB_CLUSTER_NAME environment variable is required")
 
     credential = DefaultAzureCredential()
 

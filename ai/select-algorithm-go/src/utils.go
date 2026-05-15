@@ -51,7 +51,7 @@ func LoadConfig() *Config {
 	batchSize, _ := strconv.Atoi(getEnvOrDefault("LOAD_SIZE_BATCH", "100"))
 
 	return &Config{
-		ClusterName:  getEnvOrDefault("MONGO_CLUSTER_NAME", ""),
+		ClusterName:  getEnvOrDefault("DOCUMENTDB_CLUSTER_NAME", ""),
 		DatabaseName: getEnvOrDefault("AZURE_DOCUMENTDB_DATABASENAME", "Hotels"),
 		DataFile:     getEnvOrDefault("DATA_FILE_WITH_VECTORS", "data/Hotels_Vector.json"),
 		VectorField:  getEnvOrDefault("EMBEDDED_FIELD", "DescriptionVector"),
@@ -74,7 +74,7 @@ func getEnvOrDefault(key, defaultValue string) string {
 // GetClientsPasswordless creates MongoDB and Azure OpenAI clients with passwordless authentication
 func GetClientsPasswordless(ctx context.Context, config *Config) (*mongo.Client, openai.Client, error) {
 	if config.ClusterName == "" {
-		return nil, openai.Client{}, fmt.Errorf("MONGO_CLUSTER_NAME environment variable is required")
+		return nil, openai.Client{}, fmt.Errorf("DOCUMENTDB_CLUSTER_NAME environment variable is required")
 	}
 
 	// Create Azure credential

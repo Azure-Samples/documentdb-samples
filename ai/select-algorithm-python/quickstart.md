@@ -104,13 +104,12 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
 3. Install the required packages:
 
    ```bash
-   pip install "pymongo>=4.7" openai==1.55.3 azure-identity==1.15.0 python-dotenv==1.0.0
+   pip install "pymongo>=4.7" openai==1.55.3 azure-identity==1.15.0
    ```
 
    - `pymongo`: MongoDB driver for Python (≥4.7 required for OIDC authentication)
    - `openai`: OpenAI client library to create vectors
    - `azure-identity`: Azure Identity library for passwordless authentication
-   - `python-dotenv`: Environment variable management from .env files
 
    Verify the packages are installed:
 
@@ -145,12 +144,12 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    LOAD_SIZE_BATCH=100
    
    # Azure DocumentDB Connection Settings
-   MONGO_CLUSTER_NAME=<CLUSTER-NAME>
+   DOCUMENTDB_CLUSTER_NAME=<CLUSTER-NAME>
    
    # Azure DocumentDB Database Name
    AZURE_DOCUMENTDB_DATABASENAME=Hotels
    
-   # Algorithm Selection (used by select_algorithm.py)
+   # Algorithm Selection (used by compare_all.py)
    # ALGORITHM: "all" | "diskann" | "hnsw" | "ivf"
    ALGORITHM=all
    
@@ -161,7 +160,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    For the passwordless authentication used in this article, replace the placeholder values in the `.env` file with your own information:
 
    - `AZURE_OPENAI_EMBEDDING_ENDPOINT`: Your Azure OpenAI resource endpoint URL
-   - `MONGO_CLUSTER_NAME`: Your Azure DocumentDB cluster name
+   - `DOCUMENTDB_CLUSTER_NAME`: Your Azure DocumentDB cluster name
 
    You should always prefer passwordless authentication, but it requires additional setup. For more information on setting up managed identity and the full range of your authentication options, see [Authenticate Python apps to Azure services by using the Azure SDK for Python](/azure/developer/python/sdk/authentication/overview).
 
@@ -192,7 +191,7 @@ Create the following project structure:
 │   └── Hotels_Vector.json       # Hotel data with vector embeddings
 └── select-algorithm/
     ├── src/
-    │   ├── select_algorithm.py  # Main comparison script
+    │   ├── compare_all.py       # Main comparison script
     │   └── utils.py             # Shared utility functions
     └── .env                     # Environment variables
 ```
@@ -246,7 +245,7 @@ The utilities provide essential functions for:
 Execute the comparison script to test all algorithms with cosine similarity:
 
 ```bash
-python src/select_algorithm.py
+python src/compare_all.py
 ```
 
 The output shows the comparison across all three algorithms:
@@ -342,34 +341,34 @@ To override environment variables at the command line:
 
 ```bash
 # Test only DiskANN across all similarity functions
-ALGORITHM=diskann SIMILARITY=all python src/select_algorithm.py
+ALGORITHM=diskann SIMILARITY=all python src/compare_all.py
 ```
 
 ```bash
 # Test all algorithms with L2 distance
-ALGORITHM=all SIMILARITY=L2 python src/select_algorithm.py
+ALGORITHM=all SIMILARITY=L2 python src/compare_all.py
 ```
 
 ```bash
 # Test HNSW with inner product
-ALGORITHM=hnsw SIMILARITY=IP python src/select_algorithm.py
+ALGORITHM=hnsw SIMILARITY=IP python src/compare_all.py
 ```
 
 ### [PowerShell](#tab/powershell)
 
 ```powershell
 # Test only DiskANN across all similarity functions
-$env:ALGORITHM="diskann"; $env:SIMILARITY="all"; python src/select_algorithm.py
+$env:ALGORITHM="diskann"; $env:SIMILARITY="all"; python src/compare_all.py
 ```
 
 ```powershell
 # Test all algorithms with L2 distance
-$env:ALGORITHM="all"; $env:SIMILARITY="L2"; python src/select_algorithm.py
+$env:ALGORITHM="all"; $env:SIMILARITY="L2"; python src/compare_all.py
 ```
 
 ```powershell
 # Test HNSW with inner product
-$env:ALGORITHM="hnsw"; $env:SIMILARITY="IP"; python src/select_algorithm.py
+$env:ALGORITHM="hnsw"; $env:SIMILARITY="IP"; python src/compare_all.py
 ```
 
 ---
@@ -385,33 +384,40 @@ The comparison table helps you choose the best configuration for your workload:
 - **Score**: Similarity score using the selected function. Higher scores indicate better matches.
 - **Top Result**: The highest-scoring hotel for the query. Consistency across algorithms indicates stable results.
 
-Algorithm selection guidelines:
+### Choosing the right algorithm
 
-- **DiskANN**: Best for large datasets where memory is limited. Stores index on disk while maintaining good performance.
-- **HNSW**: Best for high-accuracy requirements and fast search. Requires more memory but provides excellent recall.
-- **IVF**: Best for very large datasets where some recall can be traded for speed. Uses clustering for efficient search.
+Use this comparison to select the best algorithm for your workload:
 
-Similarity function selection:
+**IVF** (inverted file index):
+- Best for: Test environments, demos, and small clusters
+- Pros: Fast to build, low resource requirements, works on any cluster tier
+- Cons: Lower recall compared to graph-based algorithms at scale
+- Tune: Increase `numLists` for larger datasets, increase `nProbes` for better recall
 
-- **COS (Cosine)**: Best for text embeddings. Normalizes vectors and measures angle between them.
-- **L2 (Euclidean)**: Measures straight-line distance. Sensitive to vector magnitude.
-- **IP (Inner Product)**: Dot product similarity. Useful when vector magnitude is meaningful.
+**DiskANN** (disk-based approximate nearest neighbor) — *recommended for enterprise production*:
+- Best for: Enterprise production workloads on M30+ clusters
+- Pros: Supports embeddings up to 16,000 dimensions, keeps most index data on disk leaving cluster memory available for regular reads and writes, uses lighter updates that help the system stay smoother and easier to back up and recover
+- Cons: Requires M30+ cluster tier
+- Tune: Increase `maxDegree` and `lBuild` for better accuracy, increase `lSearch` for better recall
 
-Tuning parameters:
+**HNSW** (hierarchical navigable small world):
+- Best for: Enterprise production workloads on M30+ clusters requiring highest recall
+- Pros: Excellent recall, fast queries
+- Cons: Requires M30+ cluster tier, supports embeddings up to 8,000 dimensions (vs 16,000 for DiskANN), higher memory usage
+- Tune: Increase `m` and `efConstruction` for better index quality, increase `efSearch` for better recall
 
-DiskANN tuning:
-- `maxDegree`: Higher values improve accuracy but increase memory usage (default: 32)
-- `lBuild`: Higher values improve index quality but slow down index creation (default: 50)
-- `lSearch`: Higher values improve recall but slow down queries (default: 100)
+> [!TIP]
+> For enterprise production workloads, start with **DiskANN** unless you have a specific reason to prefer HNSW. DiskANN supports higher dimensions (16,000 vs 8,000), uses less cluster memory, and requires fewer index maintenance operations — making it the safer long-term default that's less likely to need an index redesign as your embedding models evolve.
 
-HNSW tuning:
-- `m`: Number of connections per layer. Higher improves recall (default: 16)
-- `efConstruction`: Candidates during build. Higher improves quality (default: 64)
-- `efSearch`: Candidates during search. Higher improves recall (default: 80)
+### Choosing the right similarity function
 
-IVF tuning:
-- `numLists`: Number of clusters. Higher speeds up search but may reduce recall (default: 1)
-- `nProbes`: Clusters searched at query time. Higher improves recall but slows queries (default: 1)
+The similarity function should match your embedding model and use case:
+
+- **COS (Cosine similarity)**: Best for text embeddings and most OpenAI models. Measures angle between vectors (range: -1 to 1, higher is more similar)
+- **L2 (Euclidean distance)**: Measures straight-line distance between vectors (lower is more similar). Good for spatial data
+- **IP (Inner product)**: Measures alignment between vectors. Good when vector magnitudes are meaningful
+
+For the `text-embedding-3-small` model used in this quickstart, **COS (cosine similarity) is recommended** because OpenAI embeddings are normalized and optimized for cosine similarity.
 
 ## Troubleshooting
 
@@ -425,14 +431,14 @@ IVF tuning:
 
 ## Clean up resources
 
-When you're done, you can remove the database using mongosh or the Azure portal.
+When you're done, you can remove the database using mongosh or the Azure DocumentDB extension for Visual Studio Code.
 
 ### [mongosh](#tab/mongosh)
 
 Connect to your DocumentDB cluster and drop the database:
 
 ```bash
-mongosh "mongodb+srv://<your-cluster-name>.mongocluster.cosmos.azure.com/" --tls --authenticationMechanism MONGODB-OIDC
+mongosh "mongodb+srv://<your-cluster-name>.global.mongocluster.cosmos.azure.com/" --tls --authenticationMechanism MONGODB-OIDC
 ```
 
 ```javascript
@@ -440,11 +446,11 @@ use Hotels
 db.dropDatabase()
 ```
 
-### [Azure portal](#tab/portal)
+### [VS Code extension](#tab/vscode)
 
-1. Navigate to your DocumentDB resource in the Azure portal.
-2. Select **Data Explorer**.
-3. Right-click the **Hotels** database and select **Delete Database**.
+1. Install the [Azure Databases extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-cosmosdb) for Visual Studio Code.
+2. Connect to your Azure DocumentDB cluster.
+3. Expand the cluster, right-click the **Hotels** database, and select **Drop Database**.
 
 ---
 

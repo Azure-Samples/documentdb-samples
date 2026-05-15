@@ -34,9 +34,9 @@ public class Utils {
     }
 
     public static MongoClient getMongoClient() {
-        String clusterName = getEnv("MONGO_CLUSTER_NAME");
+        String clusterName = getEnv("DOCUMENTDB_CLUSTER_NAME");
         if (clusterName == null) {
-            throw new IllegalStateException("MONGO_CLUSTER_NAME environment variable is required");
+            throw new IllegalStateException("DOCUMENTDB_CLUSTER_NAME environment variable is required");
         }
 
         String connectionUri = String.format(

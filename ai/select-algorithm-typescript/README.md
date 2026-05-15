@@ -41,7 +41,7 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB using
 
     | Variable | Description |
     |---|---|
-    | `MONGO_CLUSTER_NAME` | Your DocumentDB cluster name |
+    | `DOCUMENTDB_CLUSTER_NAME` | Your DocumentDB cluster name |
     | `AZURE_OPENAI_EMBEDDING_ENDPOINT` | Azure OpenAI endpoint URL |
     | `AZURE_OPENAI_EMBEDDING_MODEL` | Embedding model deployment name |
     | `AZURE_OPENAI_EMBEDDING_API_VERSION` | Azure OpenAI API version |

@@ -34,7 +34,7 @@ This sample demonstrates how to compare different vector search algorithms (IVF,
 
    Required variables:
    ```env
-   MONGO_CLUSTER_NAME=your-cluster-name
+   DOCUMENTDB_CLUSTER_NAME=your-cluster-name
    AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-resource.openai.azure.com
    AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
    AZURE_DOCUMENTDB_DATABASENAME=Hotels
@@ -112,7 +112,7 @@ go run ./src/...
 
 | Variable     | Default                          | Description                     |
 |--------------|----------------------------------|---------------------------------|
-| `MONGO_CLUSTER_NAME` | *(required)* | DocumentDB cluster name |
+| `DOCUMENTDB_CLUSTER_NAME` | *(required)* | DocumentDB cluster name |
 | `AZURE_OPENAI_EMBEDDING_ENDPOINT` | *(required)* | Azure OpenAI endpoint |
 | `AZURE_OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | Embedding model name |
 | `AZURE_DOCUMENTDB_DATABASENAME` | `Hotels` | Database name |
@@ -180,7 +180,7 @@ The MongoDB OIDC auth uses the `https://ossrdbms-aad.database.windows.net/.defau
 **"OIDC authentication failed"**
 - Run `az login` and ensure you're authenticated
 - Verify your Azure identity has RBAC permissions on the DocumentDB cluster
-- Check that `MONGO_CLUSTER_NAME` matches your cluster name
+- Check that `DOCUMENTDB_CLUSTER_NAME` matches your cluster name
 
 **"DiskANN indexes require a higher cluster tier"**
 - DiskANN requires M40+ cluster tier

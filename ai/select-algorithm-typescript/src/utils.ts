@@ -33,10 +33,10 @@ export function getClientsPasswordless(): { aiClient: AzureOpenAI | null; dbClie
     // Validate all required environment variables upfront
     const endpoint = process.env.AZURE_OPENAI_EMBEDDING_ENDPOINT!;
     const deployment = process.env.AZURE_OPENAI_EMBEDDING_MODEL!;
-    const clusterName = process.env.MONGO_CLUSTER_NAME!;
+    const clusterName = process.env.DOCUMENTDB_CLUSTER_NAME!;
 
     if (!endpoint || !deployment || !clusterName) {
-        throw new Error('Missing required environment variables: AZURE_OPENAI_EMBEDDING_ENDPOINT, AZURE_OPENAI_EMBEDDING_MODEL, MONGO_CLUSTER_NAME');
+        throw new Error('Missing required environment variables: AZURE_OPENAI_EMBEDDING_ENDPOINT, AZURE_OPENAI_EMBEDDING_MODEL, DOCUMENTDB_CLUSTER_NAME');
     }
 
     console.log(`Using Azure OpenAI Embedding Deployment/Model: ${deployment}`);

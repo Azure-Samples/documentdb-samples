@@ -29,7 +29,7 @@ This sample demonstrates how to compare all three vector search index algorithms
    ```
 
 2. Update `.env` with your Azure resource details (if not using `azd`):
-   - `MONGO_CLUSTER_NAME` — your DocumentDB cluster name
+   - `DOCUMENTDB_CLUSTER_NAME` — your DocumentDB cluster name
    - `AZURE_OPENAI_EMBEDDING_ENDPOINT` — your Azure OpenAI endpoint
    - `AZURE_OPENAI_EMBEDDING_MODEL` — deployment name (e.g., `text-embedding-3-small`)
    - `DATA_FILE_WITH_VECTORS` — path to the pre-computed vectors JSON file
@@ -78,7 +78,7 @@ $env:ALGORITHM="compare"; mvn exec:java
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MONGO_CLUSTER_NAME` | (required) | DocumentDB cluster name |
+| `DOCUMENTDB_CLUSTER_NAME` | (required) | DocumentDB cluster name |
 | `AZURE_OPENAI_EMBEDDING_ENDPOINT` | (required) | Azure OpenAI endpoint |
 | `AZURE_OPENAI_EMBEDDING_MODEL` | (required) | Embedding model deployment name |
 | `DATA_FILE_WITH_VECTORS` | `../data/Hotels_Vector.json` | Path to vectors JSON file |

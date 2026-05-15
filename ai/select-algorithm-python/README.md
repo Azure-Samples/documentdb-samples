@@ -80,7 +80,7 @@ The script creates a single `hotels` collection, loads data once, then for each 
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MONGO_CLUSTER_NAME` | (required) | DocumentDB cluster name |
+| `DOCUMENTDB_CLUSTER_NAME` | (required) | DocumentDB cluster name |
 | `AZURE_OPENAI_EMBEDDING_ENDPOINT` | (required) | Azure OpenAI endpoint |
 | `AZURE_OPENAI_EMBEDDING_MODEL` | (required) | Embedding model deployment name |
 | `DATA_FILE_WITH_VECTORS` | `../data/Hotels_Vector.json` | Path to vectors JSON file |
