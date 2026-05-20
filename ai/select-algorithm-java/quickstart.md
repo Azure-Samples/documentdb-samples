@@ -296,7 +296,7 @@ This main comparison logic provides:
 - **Algorithm comparison logic**: Tests all combinations of algorithms and similarity functions
 - **Collection management**: Creates separate collections for each configuration
 - **Data loading**: Inserts hotel data in batches
-- **Index creation**: Creates both standard and vector indexes
+- **Index creation**: Creates vector indexes for each algorithm and metric combination
 - **Performance measurement**: Measures average query latency
 - **Results display**: Outputs comparison table
 
@@ -310,7 +310,7 @@ This main comparison logic provides:
 
    Verify: The build output ends with `BUILD SUCCESS`.
 
-2. Run the comparison entry point. `Main.java` calls `CompareAll.run()` and always executes all 9 algorithm × 3 metric combinations:
+2. Run the comparison entry point. `Main.java` calls `CompareAll.run()` and always executes all 9 combinations (3 algorithms × 3 metrics):
 
    ### [Bash](#tab/bash)
 
