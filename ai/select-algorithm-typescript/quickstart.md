@@ -418,7 +418,7 @@ For the `text-embedding-3-small` model used in this quickstart, **COS (cosine si
 
 ## Clean up resources
 
-When you're done, you can remove the database using mongosh or the Azure Databases extension for Visual Studio Code.
+When you're done, you can remove the database using mongosh or the DocumentDB for VS Code extension.
 
 ### [mongosh](#tab/mongosh)
 
@@ -435,7 +435,7 @@ db.dropDatabase()
 
 ### [VS Code extension](#tab/vscode)
 
-1. Install the [Azure Databases extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-cosmosdb) for Visual Studio Code.
+1. Install the [DocumentDB for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-documentdb) extension.
 2. Connect to your Azure DocumentDB cluster.
 3. Expand the cluster, right-click the **Hotels** database, and select **Drop Database**.
 
