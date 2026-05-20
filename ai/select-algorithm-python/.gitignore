@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+
+# Local data copy (user copies from ai/data/)
+data/*.json
+!data/README.md

@@ -105,13 +105,14 @@ All samples MUST use these environment variable names and defaults:
 - efSearch: 40
 
 ### DiskANN
-- maxDegree: 20
-- lBuild: 10
+- vector-search samples: maxDegree: 20, lBuild: 10
+- select-algorithm compare-all samples: maxDegree: 32, lBuild: 50
 - lSearch: 40
+- Select-algorithm samples use higher values for meaningful comparison results.
 
 ## Rules
 
-1. **No Cosmos DB references.**Never use "Cosmos DB", "cosmosdb", "MongoDB vCore", or "mongo.cosmos.azure.com". Always use "Azure DocumentDB" and "documentdb.azure.com". Exception: `mongocluster.cosmos.azure.com` (hostname), `cosmosSearch` (API command), and `ms-azuretools.vscode-cosmosdb` (VS Code extension) are valid and NOT Cosmos references.
+1. **No Cosmos DB references.** Never use "Cosmos DB", "cosmosdb", "MongoDB vCore", or "mongo.cosmos.azure.com". Always use "Azure DocumentDB" and "documentdb.azure.com". Exception: `mongocluster.cosmos.azure.com` (hostname) and `cosmosSearch` (API command) are valid and NOT Cosmos references.
 2. **Vector field name is DescriptionVector.** Never default to "contentVector".
 3. **Data file path from env var.** Code reads `DATA_FILE_WITH_VECTORS`. The default depends on the sample category: vector-search samples use `../data/Hotels_Vector.json` (shared data directory one level up), while select-algorithm samples use `data/Hotels_Vector.json` (local copy in each sample). .NET copies data locally to `data/Hotels_Vector.json` in the build output.
 4. **Batch size is LOAD_SIZE_BATCH=100.** Do not use BATCH_SIZE or other variants.
@@ -121,6 +122,37 @@ All samples MUST use these environment variable names and defaults:
 8. **Output files are committed.** Each sample has an `output/` directory with expected output for each algorithm (`ivf.txt`, `hnsw.txt`, `diskann.txt`). Update these when output format changes.
 9. **DocumentDB supports all index types at any dataset size.** IVF, HNSW, and DiskANN are all available — do not imply tier restrictions limit algorithm availability.
 10. **No dotenv libraries.** Do NOT use `python-dotenv`, `godotenv`, `dotenv` (npm), or any `.env` file-loading library. Environment variables must be passed via the CLI invocation, not loaded from `.env` files at runtime. This keeps samples explicit and avoids hidden configuration.
-11. **Collection naming:** `hotels_{algorithm}` (e.g., `hotels_ivf`, `hotels_hnsw`, `hotels_diskann`). Index naming: `vectorIndex_{algorithm}`.
+11. **Collection naming:** Standard per-algorithm samples use `hotels_{algorithm}` (e.g., `hotels_ivf`, `hotels_hnsw`, `hotels_diskann`). Standard index naming is `vectorIndex_{algorithm}`. Compare-all samples that drop and recreate a single collection use collection `hotels` and index naming `vector_{algorithm}_{metric}` (for example, `vector_ivf_cos`). TypeScript `select-algorithm.ts` remains a separate per-collection mode.
 12. **Vector search uses k=5.** All samples return top 5 results. Do not parameterize k unless explicitly required.
 13. **Use the Global read-write hostname.** All samples MUST use the Global read-write connection string format: `<clusterName>.global.mongocluster.cosmos.azure.com`. The `.global.` form auto-follows the active write region after a replica promotion. The non-`.global.` form pins to one cluster and silently becomes read-only after failover — reserve that for read-scale-out scenarios only. (Confirmed by Khelan Modi, DocumentDB PM.)
+14. **VS Code extension is DocumentDB for VS Code.** Always reference [DocumentDB for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-documentdb) (`ms-azuretools.vscode-documentdb`). Never reference the Azure Databases extension (`ms-azuretools.vscode-cosmosdb`).
+
+## Sample Review Checklist
+
+Use this checklist when creating new samples or reviewing existing ones. Derived from PM (Khelan Modi) feedback.
+
+### Branding & Naming
+- [ ] Environment variables use `DOCUMENTDB_CLUSTER_NAME` (not `MONGO_CLUSTER_NAME`) for select-algorithm samples
+- [ ] All references say "Azure DocumentDB" — no "Cosmos DB" or "MongoDB vCore"
+- [ ] Connection hostname uses `.global.mongocluster.cosmos.azure.com` format
+
+### Tooling References
+- [ ] VS Code extension references point to [DocumentDB for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-documentdb) (`ms-azuretools.vscode-documentdb`)
+- [ ] No references to Data Explorer for data browsing — use the VS Code extension instead
+- [ ] No references to the old Azure Databases extension (`ms-azuretools.vscode-cosmosdb`)
+
+### Index Selection Guidance
+- [ ] IVF is positioned for dev/test, demos, and small clusters (works on any tier)
+- [ ] DiskANN is the default recommendation for production (M30+ clusters)
+- [ ] HNSW is positioned for production when maximum recall is the top priority (M30+)
+- [ ] Decision table or clear guidance helps readers pick the right algorithm quickly
+
+### DiskANN as Default
+- [ ] DiskANN recommendation is prominent (not buried in a footnote)
+- [ ] Higher dimension support called out (up to 16,000 vs HNSW's 8,000)
+- [ ] Memory efficiency explained (index on disk, frees RAM for read/write ops)
+- [ ] Operational benefits mentioned (lighter updates, easier backups, faster recovery)
+- [ ] Future-proofing noted (less likely to need index redesign as models evolve)
+
+### Optional Enhancements
+- [ ] Consider mentioning DocumentDB agent kit (`npx skills add Azure/documentdb-agent-kit`) where appropriate — currently beta/optional
