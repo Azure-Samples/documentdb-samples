@@ -8,6 +8,7 @@ Algorithms: IVF, HNSW, DiskANN
 Metrics: COS, L2, IP
 """
 import os
+import sys
 import time
 from typing import Dict, List, Any
 
@@ -229,6 +230,13 @@ def main():
         headers = ["Algorithm", "Metric", "Top 1 Result", "Score",
                    "Top 2 Result", "Score", "Diff"]
         print(tabulate(table_rows, headers=headers, tablefmt="grid"))
+
+        success_count = sum(1 for row in table_rows if row[2] != "(failed)")
+        if success_count == 0:
+            print("\n❌ All 9 comparisons failed — no algorithm returned results.")
+            sys.exit(1)
+        else:
+            print(f"\nSummary: {success_count} succeeded, {9 - success_count} failed")
 
     finally:
         # Cleanup: drop the comparison collection

@@ -23,7 +23,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
 
 [!INCLUDE[Prerequisites](includes/prerequisite-quickstart-vector-index.md)]
 
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later. .NET 9.0 is a Standard Term Support (STS) release. Use the latest available .NET SDK for long-term production workloads.
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) or later.
 
 ## Create data file with vectors
 
@@ -86,7 +86,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    ```bash
    mkdir select-algorithm-dotnet
    cd select-algorithm-dotnet
-   dotnet new console --framework net9.0
+   dotnet new console --framework net8.0
    ```
 
    ### [PowerShell](#tab/powershell)
@@ -94,7 +94,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    ```powershell
    New-Item -ItemType Directory -Name select-algorithm-dotnet
    Set-Location select-algorithm-dotnet
-   dotnet new console --framework net9.0
+   dotnet new console --framework net8.0
    ```
 
    ---
@@ -233,19 +233,26 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
 Continue the project by creating code files for vector search comparison. When you are done, the project structure should look like this:
 
 ```
+select-algorithm-dotnet/
+├── .devcontainer/
+│   └── devcontainer.json
 ├── data/
-│   └── Hotels_Vector.json            # Hotel data with vector embeddings
-└── select-algorithm-dotnet/
-    ├── CompareAll.cs                  # Main comparison logic
-    ├── Models/
-    │   ├── Configuration.cs           # Configuration models
-    │   └── HotelData.cs               # Hotel data model
-    ├── Utilities/
-    │   └── AzureIdentityTokenHandler.cs # OIDC token handler
-    ├── Program.cs                     # Main application entry point
-    ├── Utils.cs                       # Shared utility functions
-    ├── appsettings.json               # Configuration settings
-    └── SelectAlgorithm.csproj         # Project file
+│   └── README.md
+├── Models/
+│   ├── Configuration.cs
+│   └── HotelData.cs
+├── output/
+│   └── compare_all.txt
+├── Utilities/
+│   └── AzureIdentityTokenHandler.cs
+├── .gitignore
+├── appsettings.json
+├── CompareAll.cs
+├── Program.cs
+├── quickstart.md
+├── README.md
+├── SelectAlgorithm.csproj
+└── Utils.cs
 ```
 
 1. Create the directory structure:
@@ -361,21 +368,7 @@ These supporting files provide:
 
    The application loads the sample data once, then creates and tests all 9 algorithm × similarity combinations sequentially.
 
-3. Leave `ALGORITHM` and `SIMILARITY` unset to compare all 9 algorithm × similarity combinations.
-
-   ### [Bash](#tab/bash)
-
-   ```bash
-   dotnet run
-   ```
-
-   ### [PowerShell](#tab/powershell)
-
-   ```powershell
-   dotnet run
-   ```
-
-   ---
+3. The compare-all mode always runs all 9 combinations (3 algorithms × 3 metrics). The `ALGORITHM` and `SIMILARITY` environment variables are used only by the single-algorithm mode.
 
 4. Repeat `dotnet run` whenever you want to rerun the flat `SelectAlgorithm.csproj` entry point:
 
@@ -395,77 +388,59 @@ These supporting files provide:
 
 ### Expected output
 
-The application displays progress logs and a comparison table. Results vary based on data and server load:
+The application displays progress logs and a comparison table:
 
 ```
-Vector Algorithm Comparison
-   Database: Hotels
-   Algorithms: all
-   Similarity: COS
-   Collections to query: hotels_diskann_cos, hotels_hnsw_cos, hotels_ivf_cos
-   Search query: "quintessential lodging near running trails, eateries, retail"
+============================================================
+  Compare All Algorithms × Metrics
+  9 combinations: IVF, HNSW, DiskANN × COS, L2, IP
+============================================================
+Dropped existing 'hotels' collection (if any)
 
-Generating query embedding...
-Query embedding: 1536 dimensions
+Loaded 50 documents with embeddings
+Inserted 50/50 documents
 
---- DiskANN / COS ---
-Collection: hotels_diskann_cos
-Created collection: hotels_diskann_cos
-Inserted: 50/50
-Created vector index: vectorIndex_diskann_cos
-Executing vector search...
-[OK] 5 results, 45ms
+Query: "luxury hotel near the beach"
+Top K: 5
+Embedding generated (reused for all searches)
 
---- HNSW / COS ---
-Collection: hotels_hnsw_cos
-Created collection: hotels_hnsw_cos
-Inserted: 50/50
-Created vector index: vectorIndex_hnsw_cos
-Executing vector search...
-[OK] 5 results, 38ms
+Running 9 algorithm × metric combinations...
+  ✓ vector_ivf_cos created
+  ✓ vector_ivf_l2 created
+  ✓ vector_ivf_ip created
+  ✓ vector_hnsw_cos created
+  ✓ vector_hnsw_l2 created
+  ✓ vector_hnsw_ip created
+  ✓ vector_diskann_cos created
+  ✓ vector_diskann_l2 created
+  ✓ vector_diskann_ip created
 
---- IVF / COS ---
-Collection: hotels_ivf_cos
-Created collection: hotels_ivf_cos
-Inserted: 50/50
-Created vector index: vectorIndex_ivf_cos
-Executing vector search...
-[OK] 5 results, 52ms
+┌──────────┬────────┬────────────────────────────┬────────┬────────────────────────────┬────────┬───────┐
+│ Algorithm│ Metric │ Top 1 Result               │ Score  │ Top 2 Result               │ Score  │ Diff  │
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ HNSW     │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ HNSW     │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ HNSW     │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ DiskANN  │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ DiskANN  │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ DiskANN  │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+└──────────┴────────┴────────────────────────────┴────────┴────────────────────────────┴────────┴───────┘
 
-==========================================================================================
-                     Vector Algorithm Comparison Results
-==========================================================================================
-Algorithm     Similarity    Top 1 Result              Score         Top 2 Result              Score         Diff
-------------------------------------------------------------------------------------------------------------------------
-DiskANN       COS           Historic Downtown Inn      0.8342        Mountain Trail Lodge      0.7891        0.0451
-HNSW          COS           Historic Downtown Inn      0.8342        Mountain Trail Lodge      0.7891        0.0451
-IVF           COS           Historic Downtown Inn      0.8342        Mountain Trail Lodge      0.7891        0.0451
-==========================================================================================
-
---- DiskANN / COS (hotels_diskann_cos) ---
-  1. Historic Downtown Inn, Score: 0.8342
-  2. Mountain Trail Lodge, Score: 0.7891
-  3. Riverside Retreat, Score: 0.7654
-  4. Urban Fitness Suites, Score: 0.7210
-  5. Lakeside Wellness Resort, Score: 0.7045
-  Latency: 45ms
-
---- HNSW / COS (hotels_hnsw_cos) ---
-  1. Historic Downtown Inn, Score: 0.8342
-  2. Mountain Trail Lodge, Score: 0.7891
-  3. Riverside Retreat, Score: 0.7654
-  4. Urban Fitness Suites, Score: 0.7210
-  5. Lakeside Wellness Resort, Score: 0.7045
-  Latency: 38ms
-
---- IVF / COS (hotels_ivf_cos) ---
-  1. Historic Downtown Inn, Score: 0.8342
-  2. Mountain Trail Lodge, Score: 0.7891
-  3. Riverside Retreat, Score: 0.7654
-  4. Urban Fitness Suites, Score: 0.7210
-  5. Lakeside Wellness Resort, Score: 0.7045
-  Latency: 52ms
+Cleanup: dropped collection 'hotels'
 ```
+
+The **Diff** column shows the score gap between the top-1 and top-2 results. A smaller diff indicates the algorithm found results with more similar relevance scores.
 
 [!INCLUDE[Choosing the right algorithm](../includes/choosing-algorithm.md)]
 
@@ -475,7 +450,7 @@ IVF           COS           Historic Downtown Inn      0.8342        Mountain Tr
 |-------|----------|
 | `TimeoutException` during connection | Verify your connection string and environment variables. Ensure your IP is in the DocumentDB firewall rules. |
 | `AuthenticationException` | Check that `DefaultAzureCredential` can acquire a token. Run `az login` to refresh your credentials. |
-| Build errors with .NET version | Ensure you have .NET 9.0 or later installed. Run `dotnet --version` to check. |
+| Build errors with .NET version | Ensure you have .NET 8.0 or later installed. Run `dotnet --version` to check. |
 | `BsonSerializationException` | Ensure your model classes match the document structure in the collection. |
 | Empty search results | The vector index might not be ready yet. The sample includes retry logic, but if you still see empty results, wait a few seconds and retry. |
 | `IndexOptionsConflict` (code 85) | DocumentDB doesn't allow multiple vector indexes of the same kind on the same field. Drop the existing index before creating a new one. |

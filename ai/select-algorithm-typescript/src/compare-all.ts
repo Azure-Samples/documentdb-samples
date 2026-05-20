@@ -45,7 +45,7 @@ async function main() {
         const db = dbClient.db(baseConfig.dbName);
 
         // Drop collection if it exists for a clean start
-        let collections = await db.listCollections({ name: collectionName }).toArray();
+        const collections = await db.listCollections({ name: collectionName }).toArray();
         if (collections.length > 0) {
             try {
                 const col = db.collection(collectionName);
@@ -57,13 +57,11 @@ async function main() {
                         } catch {}
                     }
                 }
-                await new Promise(r => setTimeout(r, 2000));
                 await db.dropCollection(collectionName);
                 console.log(`Dropped existing collection: ${collectionName}`);
             } catch (e: any) {
                 console.log(`Cleanup note: ${e.message.split('\n')[0]}`);
             }
-            await new Promise(r => setTimeout(r, 10000));
         }
 
         // Load data once for reuse
@@ -72,7 +70,7 @@ async function main() {
 
         // Insert data into collection
         const collection = db.collection(collectionName);
-        await insertData(baseConfig, collection, data);
+        await insertData(baseConfig, collection, data, false);
 
         // Generate one embedding for the query
         console.log(`\nQuery: "${queryText}"`);
@@ -100,10 +98,6 @@ async function main() {
                         try { await collection.dropIndex(idx.name); droppedAny = true; } catch {}
                     }
                 }
-                if (droppedAny) {
-                    await new Promise(r => setTimeout(r, 2000));
-                }
-
                 // 2. Create this specific index
                 const indexOptions = {
                     createIndexes: collectionName,
@@ -142,20 +136,19 @@ async function main() {
 
                 let searchResults: any[] = [];
                 let lastSearchError: unknown;
-                await new Promise(r => setTimeout(r, 1000));
-                for (let attempt = 1; attempt <= 5; attempt++) {
+                for (let attempt = 1; attempt <= 6; attempt++) {
                     try {
                         searchResults = await collection.aggregate(searchPipeline).toArray();
-                        if (searchResults.length > 0 || attempt === 5) {
+                        if (searchResults.length > 0 || attempt === 6) {
                             break;
                         }
-                        console.log(`  ...search returned no results yet, retrying (${attempt}/5)`);
+                        console.log(`  ...search returned no results yet, retrying (${attempt}/6)`);
                     } catch (e) {
                         lastSearchError = e;
-                        if (attempt === 5) {
+                        if (attempt === 6) {
                             throw e;
                         }
-                        console.log(`  ...search not ready yet, retrying (${attempt}/5)`);
+                        console.log(`  ...search not ready yet, retrying (${attempt}/6)`);
                     }
 
                     await new Promise(r => setTimeout(r, 2000));

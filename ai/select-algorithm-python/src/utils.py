@@ -4,10 +4,10 @@ import time
 import warnings
 from typing import Dict, List, Any, Optional, Tuple
 
-# Suppress the PyMongo CosmosDB cluster detection warning
+# Suppress the PyMongo DocumentDB cluster detection warning
 warnings.filterwarnings(
     "ignore",
-    message="You appear to be connected to a CosmosDB cluster.*",
+    message="You appear to be connected to a DocumentDB cluster.*",
 )
 
 from pymongo import MongoClient, InsertOne

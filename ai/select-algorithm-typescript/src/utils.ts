@@ -85,7 +85,12 @@ export async function readFileReturnJson(filePath: string): Promise<JsonData[]> 
     return JSON.parse(fileAsString);
 }
 
-export async function insertData(config: { batchSize: number }, collection: Collection, data: Document[]) {
+export async function insertData(
+    config: { batchSize: number },
+    collection: Collection,
+    data: Document[],
+    createScalarIndexes: boolean = true
+) {
     console.log(`Processing in batches of ${config.batchSize}...`);
     const totalBatches = Math.ceil(data.length / config.batchSize);
 
@@ -118,12 +123,13 @@ export async function insertData(config: { batchSize: number }, collection: Coll
         }
     }
 
-    // Create standard field indexes
-    const indexColumns = ["HotelId", "Category", "Description", "Description_fr"];
-    for (const col of indexColumns) {
-        const indexSpec: Record<string, number> = {};
-        indexSpec[col] = 1;
-        await collection.createIndex(indexSpec);
+    if (createScalarIndexes) {
+        const indexColumns = ["HotelId", "Category", "Description", "Description_fr"];
+        for (const col of indexColumns) {
+            const indexSpec: Record<string, number> = {};
+            indexSpec[col] = 1;
+            await collection.createIndex(indexSpec);
+        }
     }
 
     return { total: data.length, inserted, failed };

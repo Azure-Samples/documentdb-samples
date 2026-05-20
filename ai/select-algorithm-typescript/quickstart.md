@@ -164,55 +164,45 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
      "type": "module",
      "scripts": {
        "build": "tsc",
-       "start": "node --env-file .env dist/compare-all.js"
+       "start": "node dist/compare-all.js"
      }
    }
    ```
 
-6. Create a `.env` file for environment variables in the project root:
-
-   ```bash
-   # Azure OpenAI Embedding Settings
-   AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
-   AZURE_OPENAI_EMBEDDING_ENDPOINT=https://<RESOURCE-NAME>.openai.azure.com
-
-   # Data File Paths and Vector Configuration
-   DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
-   EMBEDDED_FIELD=DescriptionVector
-   EMBEDDING_DIMENSIONS=1536
-   LOAD_SIZE_BATCH=100
-
-   # Azure DocumentDB Connection Settings
-   DOCUMENTDB_CLUSTER_NAME=<CLUSTER-NAME>
-
-   # Azure DocumentDB Database Name
-   AZURE_DOCUMENTDB_DATABASENAME=Hotels
-
-   # Leave ALGORITHM and SIMILARITY unset to run all combinations
-   ```
-
-   Verify the `.env` file was created:
+6. Set the required environment variables in your shell before running the sample:
 
    ### [Bash](#tab/bash)
 
    ```bash
-   cat .env
+   export AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+   export AZURE_OPENAI_EMBEDDING_ENDPOINT=https://<RESOURCE-NAME>.openai.azure.com
+   export DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
+   export EMBEDDED_FIELD=DescriptionVector
+   export EMBEDDING_DIMENSIONS=1536
+   export LOAD_SIZE_BATCH=100
+   export DOCUMENTDB_CLUSTER_NAME=<CLUSTER-NAME>
+   export AZURE_DOCUMENTDB_DATABASENAME=Hotels
    ```
 
    ### [PowerShell](#tab/powershell)
 
    ```powershell
-   Get-Content .env
+   $env:AZURE_OPENAI_EMBEDDING_MODEL = "text-embedding-3-small"
+   $env:AZURE_OPENAI_EMBEDDING_ENDPOINT = "https://<RESOURCE-NAME>.openai.azure.com"
+   $env:DATA_FILE_WITH_VECTORS = "data/Hotels_Vector.json"
+   $env:EMBEDDED_FIELD = "DescriptionVector"
+   $env:EMBEDDING_DIMENSIONS = "1536"
+   $env:LOAD_SIZE_BATCH = "100"
+   $env:DOCUMENTDB_CLUSTER_NAME = "<CLUSTER-NAME>"
+   $env:AZURE_DOCUMENTDB_DATABASENAME = "Hotels"
    ```
 
-   ---
-
-   You should see your configuration values including the Azure OpenAI endpoint and cluster name.
-
-   For the passwordless authentication used in this article, replace the placeholder values in the `.env` file with your own information:
+   Replace the placeholder values with your own information:
 
    - `AZURE_OPENAI_EMBEDDING_ENDPOINT`: Your Azure OpenAI resource endpoint URL
    - `DOCUMENTDB_CLUSTER_NAME`: Your Azure DocumentDB cluster name
+
+   The compare-all mode always runs all 9 combinations (3 algorithms × 3 metrics). The `ALGORITHM` and `SIMILARITY` environment variables are used only by the single-algorithm mode.
 
    You should always prefer passwordless authentication, but it requires additional setup. For more information on setting up managed identity and the full range of your authentication options, see [Authenticate JavaScript apps to Azure services using the Azure SDK for JavaScript](/azure/developer/javascript/sdk/authentication/overview).
 
@@ -221,15 +211,21 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
 Create the following project structure:
 
 ```
+select-algorithm-typescript/
 ├── data/
-│   └── Hotels_Vector.json       # Hotel data with vector embeddings
-└── select-algorithm-typescript/
-    ├── src/
-    │   ├── compare-all.ts        # Main comparison script
-    │   └── utils.ts             # Shared utility functions
-    ├── tsconfig.json
-    ├── package.json
-    └── .env                     # Environment variables
+│   └── README.md
+├── output/
+│   └── compare_all.txt
+├── src/
+│   ├── compare-all.ts
+│   ├── select-algorithm.ts
+│   └── utils.ts
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── quickstart.md
+├── README.md
+└── tsconfig.json
 ```
 
 Create the `src` directory:
@@ -288,61 +284,58 @@ npm start
 The output shows the comparison across all algorithms and similarity metrics:
 
 ```
-Vector Algorithm Comparison
-   Database: Hotels
-   Algorithms: all
-   Similarity: all
-   Collections to query: hotels_diskann_cos, hotels_diskann_l2, hotels_diskann_ip, hotels_hnsw_cos, ...
-   Search query: "quintessential lodging near running trails, eateries, retail"
+Using Azure OpenAI Embedding Deployment/Model: text-embedding-3-small
+Reading JSON file from data/Hotels_Vector.json
+Loaded 50 documents
+Processing in batches of 50...
+Batch 1 complete: 50 inserted
 
-Generating query embedding...
-Query embedding: 1536 dimensions
+Query: "luxury hotel near the beach"
+Embedding generated (1536 dimensions)
 
---- DiskANN / COS ---
-Collection: hotels_diskann_cos
-Created collection: hotels_diskann_cos
-Inserted: 50/50
-Created vector index: vectorIndex_diskann_cos
-Executing vector search...
-Success: 5 results, 142ms
+Running searches (top 5 results)...  ✓ vector_ivf_cos created
+  ✓ vector_ivf_l2 created
+  ✓ vector_ivf_ip created
+  ✓ vector_hnsw_cos created
+  ✓ vector_hnsw_l2 created
+  ✓ vector_hnsw_ip created
+  ✓ vector_diskann_cos created
+  ✓ vector_diskann_l2 created
+  ✓ vector_diskann_ip created
+┌──────────┬────────┬────────────────────────────┬────────┬────────────────────────────┬────────┬───────┐
+│ Algorithm│ Metric │ Top 1 Result               │ Score  │ Top 2 Result               │ Score  │ Diff  │
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ HNSW     │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ HNSW     │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ HNSW     │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ DiskANN  │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ DiskANN  │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ DiskANN  │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+└──────────┴────────┴────────────────────────────┴────────┴────────────────────────────┴────────┴───────┘
 
-...
-
-==========================================================================================
-                    Vector Algorithm Comparison Results
-==========================================================================================
-Algorithm   Similarity    Top Result              Score       Latency(ms)
-------------------------------------------------------------------------------------------
-DiskANN     COS           Ocean Water Resort &    0.6184      142
-DiskANN     L2            Ocean Water Resort &    0.8736      128
-DiskANN     IP            Ocean Water Resort &    0.6184      135
-HNSW        COS           Ocean Water Resort &    0.6184      119
-HNSW        L2            Ocean Water Resort &    0.8736      115
-HNSW        IP            Ocean Water Resort &    0.6184      121
-IVF         COS           Ocean Water Resort &    0.6184      108
-IVF         L2            Ocean Water Resort &    0.8736      105
-IVF         IP            Ocean Water Resort &    0.6184      110
-==========================================================================================
-
---- DiskANN / COS (hotels_diskann_cos) ---
-  1. Ocean Water Resort & Spa, Score: 0.6184
-  2. Windy Ocean Motel, Score: 0.5056
-  3. Gastronomic Landscape Hotel, Score: 0.4892
-  4. Sublime Palace Hotel, Score: 0.4753
-  5. Luxury Lion Resort, Score: 0.4612
-  Latency: 142ms
-...
-
-Closing database connection...
+Cleanup: dropped collection "hotels"
 Database connection closed
 ```
+
+The **Diff** column shows the score gap between the top-1 and top-2 results. A smaller diff indicates the algorithm found results with more similar relevance scores.
 
 > [!NOTE]
 > Latency values are approximate and vary by environment. Scores may differ slightly depending on your Azure OpenAI embedding deployment.
 
 ### Run all combinations
 
-Leave `ALGORITHM` and `SIMILARITY` unset to run all 9 algorithm × similarity combinations:
+The compare-all mode always runs all 9 combinations (3 algorithms × 3 metrics). The `ALGORITHM` and `SIMILARITY` environment variables are used only by the single-algorithm mode.
 
 ```bash
 npm run build
@@ -357,9 +350,9 @@ The comparison table demonstrates key behaviors of vector search in DocumentDB:
 
 - **COS and IP produce identical scores** (0.6184 / 0.5056) because the `text-embedding-3-small` model outputs normalized (unit-length) vectors. For normalized vectors, cosine similarity equals inner product mathematically.
 
-- **L2 (Euclidean distance) scores are inverted.** Higher L2 scores mean *more* distance — the #1 result has the *lowest* score (0.8736 = closest to query). This explains the negative Diff value (-0.1208).
+- **L2 (Euclidean distance) scores represent distance.** In this output, the top result has the lower L2 score (0.8736) and the second result is farther away (0.9943).
 
-- **Score separation (Diff column)** shows confidence. A larger positive diff means the search clearly distinguishes the best match from the second-best. This metric helps evaluate result quality regardless of the absolute score values.
+- **Score separation (Diff column)** shows the gap between the top two results. A smaller diff indicates the algorithm found results with more similar relevance scores.
 
 [!INCLUDE[Choosing the right algorithm](../includes/choosing-algorithm.md)]
 
@@ -367,12 +360,12 @@ The comparison table demonstrates key behaviors of vector search in DocumentDB:
 
 | Issue | Solution |
 |-------|----------|
-| `MongoServerSelectionError` | Verify your connection string in `.env`. Ensure your IP is in the DocumentDB firewall rules. |
-| `MongoServerError: Authentication failed` | Check credentials in connection string. Verify you've run `az login` for passwordless auth. |
+| `MongoServerSelectionError` | Verify your `DOCUMENTDB_CLUSTER_NAME` environment variable and ensure your IP is in the DocumentDB firewall rules. |
+| `MongoServerError: Authentication failed` | Check your authentication setup and verify you've run `az login` for passwordless auth. |
 | TypeScript compilation errors | Run `npx tsc --version` to verify TypeScript is installed. Check `tsconfig.json` settings match the values shown in this article. |
 | `Cannot find module` errors | Run `npm install` to ensure all dependencies are installed. |
-| `Embedding dimension mismatch` | Verify `AZURE_OPENAI_EMBEDDING_MODEL` in `.env` matches the model deployed in your Azure OpenAI resource. |
-| Empty search results | The vector index may not be ready yet. The code includes retry logic, but if the dataset is large, increase the wait time. |
+| `Embedding dimension mismatch` | Verify the `AZURE_OPENAI_EMBEDDING_MODEL` environment variable matches the model deployed in your Azure OpenAI resource. |
+| Empty search results | The vector index may not be ready yet. The code retries up to 6 total attempts with a 2-second delay between attempts. |
 
 ## Clean up resources
 

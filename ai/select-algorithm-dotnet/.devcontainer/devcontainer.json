@@ -18,7 +18,7 @@
         "ms-dotnettools.csdevkit",
         "ms-dotnettools.vscodeintellicode-csharp",
         "ms-azuretools.vscode-azureresourcegroups",
-        "ms-azuretools.vscode-cosmosdb",
+        "ms-azuretools.vscode-documentdb",
         "mongodb.mongodb-vscode"
       ],
       "settings": {

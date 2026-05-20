@@ -169,7 +169,8 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    # DocumentDB Configuration
    DOCUMENTDB_CLUSTER_NAME=your-cluster-name
 
-   # Leave ALGORITHM and SIMILARITY unset to run all combinations
+   # The compare-all mode always runs all 9 combinations (3 algorithms × 3 metrics).
+   # The ALGORITHM and SIMILARITY environment variables are used only by the single-algorithm mode.
 
    # Database name
    AZURE_DOCUMENTDB_DATABASENAME=Hotels
@@ -220,16 +221,20 @@ New-Item -ItemType File -Path src/main.go
 
 When you're done, the project structure should look like this:
 
-```
+```text
+select-algorithm-go/
 ├── data/
-│   ├── Hotels.json              # Source hotel data (without vectors)
-│   └── Hotels_Vector.json       # Hotel data with vector embeddings
-└── select-algorithm-go/
-    ├── src/
-    │   └── main.go              # Main application comparing all algorithms
-    ├── go.mod                   # Go module dependencies
-    ├── go.sum                   # Dependency checksums
-    └── .env                     # Environment configuration
+│   └── README.md
+├── output/
+│   └── compare_all.txt
+├── src/
+│   ├── compare_all.go
+│   ├── main.go
+│   └── utils.go
+├── .gitignore
+├── go.mod
+├── quickstart.md
+└── README.md
 ```
 
 ## Create the algorithm comparison code
@@ -253,9 +258,9 @@ This code provides a complete vector algorithm comparison application with these
 - **Passwordless authentication**: Uses `DefaultAzureCredential` for both Azure OpenAI and DocumentDB via OIDC
 - **Three vector algorithms**: Implements DiskANN, HNSW, and IVF with algorithm-specific tuning parameters
 - **Three similarity functions**: Supports COS (cosine), L2 (Euclidean), and IP (inner product)
-- **Single compare-all entry point**: Runs all 9 algorithm × similarity combinations in one pass
-- **Performance measurement**: Tracks query latency for each algorithm/similarity pair
-- **Comparison output**: Generates a formatted table showing results side by side
+- **Single compare-all entry point**: Always runs all 9 algorithm × similarity combinations in one pass
+- **Index lifecycle automation**: Creates, queries, and drops each vector index in sequence
+- **Comparison output**: Generates a formatted table showing the top two results and score gap for each combination
 - **Production-ready patterns**: Includes batched insertion, error handling, and connection pooling
 
 ## Run the code
@@ -289,105 +294,76 @@ go run ./src/
 The application will:
 
 1. Connect to Azure DocumentDB and Azure OpenAI using passwordless authentication
-2. Create separate collections for each algorithm/similarity combination
-3. Insert the hotel data into each collection
-4. Create a vector index on each collection with algorithm-specific parameters
-5. Generate an embedding for the search query
-6. Execute vector searches across all collections
-7. Display a comparison table with results and latencies
+2. Load the hotel data and insert it into the `hotels` collection
+3. Generate an embedding for the search query
+4. Run all 9 vector index comparisons by creating, querying, and dropping each index in sequence
+5. Display a comparison table with the top two results and score gap for each combination
+6. Drop the `hotels` collection during cleanup
 
 Expected output:
 
-```
-Vector Algorithm Comparison
-   Database: Hotels
-   Algorithms: all
-   Similarity: COS
-   Collections to query: hotels_diskann_cos, hotels_hnsw_cos, hotels_ivf_cos
-   Search query: "quintessential lodging near running trails, eateries, retail"
+```text
+======================================================================
+  COMPARE ALL: 3 Algorithms × 3 Similarity Metrics (9 combinations)
+======================================================================
+Query:  "luxury hotel near the beach"
+Top-K:  5
 
-Initializing MongoDB and Azure OpenAI clients...
 Loading data from data/Hotels_Vector.json...
-Loaded 50 documents
-Generating query embedding...
-Query embedding: 1536 dimensions
+Loaded 50 documents with embeddings
+Insertion completed: 50 inserted, 0 failed
 
-━━━ DiskANN / COS ━━━
-Collection: hotels_diskann_cos
-Created collection: hotels_diskann_cos
-Inserted: 50/50
-Created vector index: vectorIndex_diskann_cos
-Executing vector search...
-[OK] 5 results, 42ms
+Generating embedding for query: "luxury hotel near the beach"
+Embedding generated (1536 dimensions)
 
-━━━ HNSW / COS ━━━
-Collection: hotels_hnsw_cos
-Created collection: hotels_hnsw_cos
-Inserted: 50/50
-Created vector index: vectorIndex_hnsw_cos
-Executing vector search...
-[OK] 5 results, 38ms
+Running 9 vector index comparisons (create→search→drop)...
+  ✓ vector_ivf_cos created
+  ✓ vector_ivf_l2 created
+  ✓ vector_ivf_ip created
+  ✓ vector_hnsw_cos created
+  ✓ vector_hnsw_l2 created
+  ✓ vector_hnsw_ip created
+  ✓ vector_diskann_cos created
+  ✓ vector_diskann_l2 created
+  ✓ vector_diskann_ip created
 
-━━━ IVF / COS ━━━
-Collection: hotels_ivf_cos
-Created collection: hotels_ivf_cos
-Inserted: 50/50
-Created vector index: vectorIndex_ivf_cos
-Executing vector search...
-[OK] 5 results, 35ms
+┌──────────┬────────┬────────────────────────────┬────────┬────────────────────────────┬────────┬───────┐
+│ Algorithm│ Metric │ Top 1 Result               │ Score  │ Top 2 Result               │ Score  │ Diff  │
+├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
+│ IVF      │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+│ IVF      │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+│ IVF      │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+│ HNSW     │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+│ HNSW     │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+│ HNSW     │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+│ DiskANN  │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+│ DiskANN  │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+│ DiskANN  │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+└──────────┴────────┴────────────────────────────┴────────┴────────────────────────────┴────────┴───────┘
 
-╔══════════════════════════════════════════════════════════════════════════════════╗
-║                     Vector Algorithm Comparison Results                         ║
-╠══════════════════════════════════════════════════════════════════════════════════╣
-║ Algorithm   Similarity    Top Result              Score       Latency(ms)      ║
-╠══════════════════════════════════════════════════════════════════════════════════╣
-║ DiskANN     COS           Secret Point Motel       0.8562      42              ║
-║ HNSW        COS           Secret Point Motel       0.8562      38              ║
-║ IVF         COS           Secret Point Motel       0.8562      35              ║
-╚══════════════════════════════════════════════════════════════════════════════════╝
+Summary: 9 succeeded, 0 failed
 
---- DiskANN / COS (hotels_diskann_cos) ---
-  1. Secret Point Motel, Score: 0.8562
-  2. Countryside Hotel, Score: 0.8457
-  3. Downtown Modern Hotel, Score: 0.8398
-  4. Old Century Hotel, Score: 0.8321
-  5. Save-the-Light Deluxe Inn, Score: 0.8298
-  Latency: 42ms
-
---- HNSW / COS (hotels_hnsw_cos) ---
-  1. Secret Point Motel, Score: 0.8562
-  2. Countryside Hotel, Score: 0.8457
-  3. Downtown Modern Hotel, Score: 0.8398
-  4. Old Century Hotel, Score: 0.8321
-  5. Save-the-Light Deluxe Inn, Score: 0.8298
-  Latency: 38ms
-
---- IVF / COS (hotels_ivf_cos) ---
-  1. Secret Point Motel, Score: 0.8562
-  2. Countryside Hotel, Score: 0.8457
-  3. Downtown Modern Hotel, Score: 0.8398
-  4. Old Century Hotel, Score: 0.8321
-  5. Save-the-Light Deluxe Inn, Score: 0.8298
-  Latency: 35ms
-
-Done.
+Cleanup: dropped collection 'hotels'
 ```
+
+The **Diff** column shows the score gap between the top-1 and top-2 results. A smaller diff indicates the algorithm found results with more similar relevance scores.
 
 ## Understanding the results
 
 The comparison table shows how different algorithms perform on the same dataset with the same query:
 
 - **Algorithm**: DiskANN, HNSW, or IVF
-- **Similarity**: The distance metric (COS, L2, or IP)
-- **Top Result**: The highest-scoring hotel from the search
-- **Score**: Similarity score (higher is better for COS and IP, lower is better for L2)
-- **Latency**: Query execution time in milliseconds
+- **Metric**: The similarity metric (COS, L2, or IP)
+- **Top 1 Result**: The highest-ranked hotel for that algorithm and metric
+- **Score**: The relevance score for the corresponding result
+- **Top 2 Result**: The second-highest-ranked hotel for that algorithm and metric
+- **Diff**: The score gap between the top two results
 
 [!INCLUDE[Choosing the right algorithm](../includes/choosing-algorithm.md)]
 
 ## Run all combinations
 
-Leave `ALGORITHM` and `SIMILARITY` unset to run all 9 algorithm × similarity combinations.
+The compare-all mode always runs all 9 combinations (3 algorithms × 3 metrics). The `ALGORITHM` and `SIMILARITY` environment variables are used only by the single-algorithm mode.
 
 ## Troubleshooting
 

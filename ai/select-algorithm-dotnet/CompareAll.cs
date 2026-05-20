@@ -107,8 +107,20 @@ public static class CompareAll
                 results.Add(new SearchResult(algoDisplay, config.Similarity, top1Name, top1Score, top2Name, top2Score));
             }
 
+            var successCount = results.Count(r => r.Top1Name != "(failed)");
+
             // Print comparison table
             PrintComparisonTable(results);
+
+            if (successCount == 0)
+            {
+                Console.WriteLine("\n❌ All 9 comparisons failed — no algorithm returned results.");
+                Environment.ExitCode = 1;
+            }
+            else
+            {
+                Console.WriteLine($"\nSummary: {successCount} succeeded, {9 - successCount} failed");
+            }
         }
         finally
         {

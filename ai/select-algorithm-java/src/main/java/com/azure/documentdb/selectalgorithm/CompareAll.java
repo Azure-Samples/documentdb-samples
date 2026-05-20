@@ -108,14 +108,22 @@ public class CompareAll {
                 }
             }
 
+            // Print comparison table
+            printComparisonTable(results);
+
+            int successCount = (int) results.stream().filter(r -> !r.top1Name().equals("(failed)")).count();
+            if (successCount == 0) {
+                System.out.println("\n❌ All 9 comparisons failed — no algorithm returned results.");
+                System.exit(1);
+            } else {
+                System.out.printf("%nSummary: %d succeeded, %d failed%n", successCount, 9 - successCount);
+            }
+
             // Cleanup: drop the comparison collection
             System.out.println("\n  Cleanup: dropping comparison collection...");
             collection.drop();
             System.out.println("  Cleanup: dropped collection 'hotels'");
         }
-
-        // Print comparison table
-        printComparisonTable(results);
     }
 
     private static void dropVectorIndexes(MongoCollection<Document> collection, String vectorField) {

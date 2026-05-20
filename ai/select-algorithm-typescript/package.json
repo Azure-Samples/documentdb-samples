@@ -6,7 +6,7 @@
   "scripts": {
     "env:init": "azd env get-values > .env",
     "build": "tsc",
-    "start": "node --env-file .env dist/compare-all.js"
+    "start": "node dist/compare-all.js"
   },
   "dependencies": {
     "@azure/identity": "^4.11.1",
