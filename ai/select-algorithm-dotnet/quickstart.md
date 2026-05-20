@@ -437,7 +437,11 @@ Running 9 algorithm × metric combinations...
 │ DiskANN  │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
 └──────────┴────────┴────────────────────────────┴────────┴────────────────────────────┴────────┴───────┘
 
+Summary: 9 succeeded, 0 failed
+
 Cleanup: dropped collection 'hotels'
+
+Done!
 ```
 
 The **Diff** column shows the score gap between the top-1 and top-2 results. A smaller diff indicates the algorithm found results with more similar relevance scores.

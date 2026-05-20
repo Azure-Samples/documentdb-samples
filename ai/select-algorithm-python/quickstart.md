@@ -271,24 +271,26 @@ Running 9 vector searches...
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
 | Algorithm   | Metric   | Top 1 Result             |   Score | Top 2 Result      |   Score |   Diff |
 +=============+==========+==========================+=========+===================+=========+========+
-| IVF         | COS      | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
+| IVF         | COS      | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5057 | 0.1128 |
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
-| IVF         | L2       | Ocean Water Resort & Spa |  0.8736 | Windy Ocean Motel |  0.9943 | 0.1208 |
+| IVF         | L2       | Ocean Water Resort & Spa |  0.8735 | Windy Ocean Motel |  0.9942 | 0.1207 |
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
-| IVF         | IP       | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
+| IVF         | IP       | Ocean Water Resort & Spa |  0.6183 | Windy Ocean Motel |  0.5056 | 0.1127 |
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
-| HNSW        | COS      | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
+| HNSW        | COS      | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5057 | 0.1128 |
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
-| HNSW        | L2       | Ocean Water Resort & Spa |  0.8736 | Windy Ocean Motel |  0.9943 | 0.1208 |
+| HNSW        | L2       | Ocean Water Resort & Spa |  0.8735 | Windy Ocean Motel |  0.9942 | 0.1207 |
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
-| HNSW        | IP       | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
+| HNSW        | IP       | Ocean Water Resort & Spa |  0.6183 | Windy Ocean Motel |  0.5056 | 0.1127 |
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
-| DiskANN     | COS      | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
+| DiskANN     | COS      | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5057 | 0.1128 |
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
-| DiskANN     | L2       | Ocean Water Resort & Spa |  0.8736 | Windy Ocean Motel |  0.9943 | 0.1208 |
+| DiskANN     | L2       | Ocean Water Resort & Spa |  0.8735 | Windy Ocean Motel |  0.9942 | 0.1207 |
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
-| DiskANN     | IP       | Ocean Water Resort & Spa |  0.6184 | Windy Ocean Motel |  0.5056 | 0.1128 |
+| DiskANN     | IP       | Ocean Water Resort & Spa |  0.6183 | Windy Ocean Motel |  0.5056 | 0.1127 |
 +-------------+----------+--------------------------+---------+-------------------+---------+--------+
+
+Summary: 9 succeeded, 0 failed
 
 Cleanup: dropped collection 'hotels'
 ```

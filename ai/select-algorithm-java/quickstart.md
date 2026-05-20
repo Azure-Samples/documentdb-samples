@@ -356,10 +356,6 @@ The program prints output similar to the following:
   ✓ vector_diskann_cos created
   ✓ vector_diskann_l2 created
   ✓ vector_diskann_ip created
-
-  Cleanup: dropping comparison collection...
-  Cleanup: dropped collection 'hotels'
-
 ┌──────────┬────────┬────────────────────────────┬────────┬────────────────────────────┬────────┬───────┐
 │ Algorithm│ Metric │ Top 1 Result               │ Score  │ Top 2 Result               │ Score  │ Diff  │
 ├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
@@ -375,12 +371,20 @@ The program prints output similar to the following:
 ├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
 │ HNSW     │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
 ├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
-│ DiskANN  │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+│ DISKANN  │ COS    │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
 ├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
-│ DiskANN  │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
+│ DISKANN  │ L2     │ Ocean Water Resort & Spa   │ 0.8736 │ Windy Ocean Motel          │ 0.9943 │ 0.1208│
 ├──────────┼────────┼────────────────────────────┼────────┼────────────────────────────┼────────┼───────┤
-│ DiskANN  │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
+│ DISKANN  │ IP     │ Ocean Water Resort & Spa   │ 0.6184 │ Windy Ocean Motel          │ 0.5056 │ 0.1128│
 └──────────┴────────┴────────────────────────────┴────────┴────────────────────────────┴────────┴───────┘
+
+Summary: 9 succeeded, 0 failed
+
+  Cleanup: dropping comparison collection...
+  Cleanup: dropped collection 'hotels'
+==============================================
+  Comparison complete.
+==============================================
 ```
 
 The **Diff** column shows the score gap between the top-1 and top-2 results. A smaller diff indicates the algorithm found results with more similar relevance scores.
