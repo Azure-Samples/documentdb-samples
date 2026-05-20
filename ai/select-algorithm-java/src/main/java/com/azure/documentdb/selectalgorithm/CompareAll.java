@@ -83,14 +83,15 @@ public class CompareAll {
                     createIndex(database, collection, vectorField, dimensions, algo, metric);
                     System.out.printf("  ✓ %s created%n", indexName);
 
-                    // 3. Wait for index to build
-                    try { Thread.sleep(5000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+                    // 3. Search with retries while the index becomes available
+                    List<Document> searchResults = performSearchWithRetry(
+                            collection, vectorAsDoubles, vectorField, topK, indexName);
+                    if (searchResults.isEmpty()) {
+                        results.add(new SearchResult(algo.toUpperCase(), metric, "(failed)", 0.0, "(failed)", 0.0));
+                        continue;
+                    }
 
-                    // 4. Search
-                    List<Document> searchResults = performSearch(
-                            collection, vectorAsDoubles, vectorField, topK);
-
-                    // 5. Extract top 2 results
+                    // 4. Extract top 2 results
                     String top1Name = "-"; double top1Score = 0.0;
                     String top2Name = "-"; double top2Score = 0.0;
                     if (!searchResults.isEmpty()) {
@@ -190,6 +191,37 @@ public class CompareAll {
         List<Document> results = new ArrayList<>();
         collection.aggregate(pipeline).forEach(results::add);
         return results;
+    }
+
+    private static List<Document> performSearchWithRetry(MongoCollection<Document> collection,
+                                                         List<Double> vectorAsDoubles,
+                                                         String vectorField,
+                                                         int topK,
+                                                         String indexName) {
+        int maxRetries = 5;
+        int retryDelayMs = 2000;
+
+        for (int attempt = 0; attempt <= maxRetries; attempt++) {
+            List<Document> results = performSearch(collection, vectorAsDoubles, vectorField, topK);
+            if (!results.isEmpty()) {
+                return results;
+            }
+
+            if (attempt < maxRetries) {
+                System.out.printf("  No results for %s yet. Retrying in 2 seconds (%d/%d)...%n",
+                        indexName, attempt + 1, maxRetries);
+                try {
+                    Thread.sleep(retryDelayMs);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+
+        System.out.printf("  Search for %s did not return results after %d retries. Recording as failed.%n",
+                indexName, maxRetries);
+        return List.of();
     }
 
     private static void printComparisonTable(List<SearchResult> results) {

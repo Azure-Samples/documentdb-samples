@@ -10,7 +10,10 @@ func main() {
 	fmt.Println("Starting vector algorithm comparison...")
 
 	ctx := context.Background()
-	config := LoadConfig()
+	config, err := LoadConfig()
+	if err != nil {
+		log.Fatalf("Invalid configuration: %v", err)
+	}
 
 	fmt.Println("\nInitializing clients with passwordless authentication...")
 	mongoClient, azureOpenAIClient, err := GetClientsPasswordless(ctx, config)

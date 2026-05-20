@@ -24,9 +24,16 @@ if (missing.length > 0) {
 
 type Algorithm = 'diskann' | 'hnsw' | 'ivf';
 type Similarity = 'COS' | 'L2' | 'IP';
+type SimilarityEnv = 'cos' | 'l2' | 'ip';
 
 const ALGORITHMS: Algorithm[] = ['diskann', 'hnsw', 'ivf'];
 const SIMILARITIES: Similarity[] = ['COS', 'L2', 'IP'];
+const SIMILARITY_ENV_VALUES: SimilarityEnv[] = ['cos', 'l2', 'ip'];
+const SIMILARITY_BY_ENV: Record<SimilarityEnv, Similarity> = {
+    cos: 'COS',
+    l2: 'L2',
+    ip: 'IP',
+};
 
 const ALGORITHM_LABELS: Record<Algorithm, string> = {
     diskann: 'DiskANN',
@@ -120,27 +127,37 @@ function getSearchPipeline(
 
 /**
  * Determine which collections to create/query based on ALGORITHM and SIMILARITY env vars.
+ * Leave either env var unset or empty to run all valid combinations.
+ * Valid ALGORITHM values: ivf, hnsw, diskann
+ * Valid SIMILARITY values: cos, l2, ip
  * Collection naming: hotels_{algorithm}_{similarity}
  */
 function getTargetCollections(
     algorithmEnv: string,
     similarityEnv: string
 ): Array<{ collectionName: string; algorithm: Algorithm; similarity: Similarity }> {
-    const algorithms: Algorithm[] =
-        !algorithmEnv ? ALGORITHMS : [algorithmEnv as Algorithm];
-    const similarities: Similarity[] =
-        !similarityEnv ? SIMILARITIES : [similarityEnv as Similarity];
+    const algorithms: Algorithm[] = !algorithmEnv
+        ? ALGORITHMS
+        : (() => {
+            if (!ALGORITHMS.includes(algorithmEnv as Algorithm)) {
+                throw new Error(`Invalid ALGORITHM '${algorithmEnv}'. Must be one of: ${ALGORITHMS.join(', ')}`);
+            }
+            return [algorithmEnv as Algorithm];
+        })();
+
+    const similarities: Similarity[] = !similarityEnv
+        ? SIMILARITIES
+        : (() => {
+            if (!SIMILARITY_ENV_VALUES.includes(similarityEnv as SimilarityEnv)) {
+                throw new Error(`Invalid SIMILARITY '${similarityEnv}'. Must be one of: ${SIMILARITY_ENV_VALUES.join(', ')}`);
+            }
+            return [SIMILARITY_BY_ENV[similarityEnv as SimilarityEnv]];
+        })();
 
     const targets: Array<{ collectionName: string; algorithm: Algorithm; similarity: Similarity }> = [];
 
     for (const alg of algorithms) {
-        if (!ALGORITHMS.includes(alg)) {
-            throw new Error(`Invalid ALGORITHM '${alg}'. Must be one of: ${ALGORITHMS.join(', ')}`);
-        }
         for (const sim of similarities) {
-            if (!SIMILARITIES.includes(sim)) {
-                throw new Error(`Invalid SIMILARITY '${sim}'. Must be one of: ${SIMILARITIES.join(', ')}`);
-            }
             targets.push({
                 collectionName: `hotels_${alg}_${sim.toLowerCase()}`,
                 algorithm: alg,
@@ -170,15 +187,15 @@ async function main() {
         const deployment = process.env.AZURE_OPENAI_EMBEDDING_MODEL!;
         const batchSize = parseInt(process.env.LOAD_SIZE_BATCH || '100', 10);
         const algorithmEnv = (process.env.ALGORITHM || '').trim().toLowerCase();
-        const similarityEnv = (process.env.SIMILARITY || '').trim().toUpperCase();
+        const similarityEnv = (process.env.SIMILARITY || '').trim().toLowerCase();
         const searchQuery = 'quintessential lodging near running trails, eateries, retail';
 
         const targets = getTargetCollections(algorithmEnv, similarityEnv);
 
         console.log(`\n🔬 Vector Algorithm Comparison`);
         console.log(`   Database: ${dbName}`);
-        console.log(`   Algorithms: ${algorithmEnv}`);
-        console.log(`   Similarity: ${similarityEnv}`);
+        console.log(`   Algorithms: ${algorithmEnv || ALGORITHMS.join(', ')}`);
+        console.log(`   Similarity: ${similarityEnv || SIMILARITY_ENV_VALUES.join(', ')}`);
         console.log(`   Collections to query: ${targets.map(t => t.collectionName).join(', ')}`);
         console.log(`   Search query: "${searchQuery}"\n`);
 
@@ -212,6 +229,7 @@ async function main() {
             searchResults: any[];
             latencyMs: number;
         }> = [];
+        const failedTargets: Array<{ collectionName: string; error: string }> = [];
 
         for (const target of targets) {
             console.log(`\n━━━ ${ALGORITHM_LABELS[target.algorithm]} / ${target.similarity} ━━━`);
@@ -263,13 +281,25 @@ async function main() {
 
                 console.log(`✓ ${searchResults.length} results, ${latencyMs}ms`);
             } catch (error) {
-                console.error(`✗ Error with ${target.collectionName}:`, (error as Error).message);
+                const message = (error as Error).message;
+                failedTargets.push({ collectionName: target.collectionName, error: message });
+                console.error(`✗ Error with ${target.collectionName}:`, message);
+            }
+        }
+
+        if (failedTargets.length > 0) {
+            console.error(`\nFailure summary: ${failedTargets.length} of ${targets.length} target collection(s) failed.`);
+            for (const failure of failedTargets) {
+                console.error(` - ${failure.collectionName}: ${failure.error}`);
             }
         }
 
         // Print comparison table
         if (comparisonResults.length > 0) {
             printComparisonTable(comparisonResults);
+        } else {
+            console.error('\nNo comparison results were produced. All target collections failed.');
+            process.exitCode = 1;
         }
     } catch (error) {
         console.error('App failed:', error);

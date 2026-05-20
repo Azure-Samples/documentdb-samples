@@ -164,7 +164,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
      "type": "module",
      "scripts": {
        "build": "tsc",
-       "start": "node --env-file .env dist/select-algorithm.js"
+       "start": "node --env-file .env dist/compare-all.js"
      }
    }
    ```
@@ -177,7 +177,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    AZURE_OPENAI_EMBEDDING_ENDPOINT=https://<RESOURCE-NAME>.openai.azure.com
 
    # Data File Paths and Vector Configuration
-   DATA_FILE_WITH_VECTORS=../data/Hotels_Vector.json
+   DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
    EMBEDDED_FIELD=DescriptionVector
    EMBEDDING_DIMENSIONS=1536
    LOAD_SIZE_BATCH=100
@@ -188,12 +188,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    # Azure DocumentDB Database Name
    AZURE_DOCUMENTDB_DATABASENAME=Hotels
 
-   # Algorithm Selection (used by select-algorithm.ts)
-   # ALGORITHM: "all" | "diskann" | "hnsw" | "ivf"
-   ALGORITHM=all
-
-   # SIMILARITY: "all" | "COS" | "L2" | "IP"
-   SIMILARITY=all
+   # Leave ALGORITHM and SIMILARITY unset to run all combinations
    ```
 
    Verify the `.env` file was created:
@@ -230,7 +225,7 @@ Create the following project structure:
 │   └── Hotels_Vector.json       # Hotel data with vector embeddings
 └── select-algorithm-typescript/
     ├── src/
-    │   ├── select-algorithm.ts  # Main comparison script
+    │   ├── compare-all.ts        # Main comparison script
     │   └── utils.ts             # Shared utility functions
     ├── tsconfig.json
     ├── package.json
@@ -255,9 +250,9 @@ New-Item -ItemType Directory -Name src
 
 ## Create the algorithm comparison code
 
-Create the `src/select-algorithm.ts` file with the following code:
+Create the `src/compare-all.ts` file with the following code:
 
-:::code language="typescript" source="~/../documentdb-samples/ai/select-algorithm-typescript/src/select-algorithm.ts" :::
+:::code language="typescript" source="~/../documentdb-samples/ai/select-algorithm-typescript/src/compare-all.ts" :::
 
 This script orchestrates the algorithm comparison by:
 
@@ -345,15 +340,11 @@ Database connection closed
 > [!NOTE]
 > Latency values are approximate and vary by environment. Scores may differ slightly depending on your Azure OpenAI embedding deployment.
 
-### Test individual algorithms
+### Run all combinations
 
-To test a specific algorithm, update the `ALGORITHM` and `SIMILARITY` values in your `.env` file:
+Leave `ALGORITHM` and `SIMILARITY` unset to run all 9 algorithm × similarity combinations:
 
 ```bash
-# Edit .env to set specific values, for example:
-# ALGORITHM=ivf
-# SIMILARITY=COS
-
 npm run build
 npm start
 ```

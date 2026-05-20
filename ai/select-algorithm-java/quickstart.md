@@ -192,7 +192,7 @@ This quickstart compares vector index algorithms (DiskANN, HNSW, IVF) in Azure D
                    <artifactId>exec-maven-plugin</artifactId>
                    <version>3.1.0</version>
                    <configuration>
-                       <mainClass>com.azure.documentdb.selectalgorithm.SelectAlgorithm</mainClass>
+                       <mainClass>com.azure.documentdb.selectalgorithm.Main</mainClass>
                    </configuration>
                </plugin>
            </plugins>
@@ -216,18 +216,14 @@ This quickstart compares vector index algorithms (DiskANN, HNSW, IVF) in Azure D
    AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 
    # Data file path (relative to project root)
-   DATA_FILE_WITH_VECTORS=../data/Hotels_Vector.json
+   DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
 
    # Vector configuration
    EMBEDDED_FIELD=DescriptionVector
    EMBEDDING_DIMENSIONS=1536
    LOAD_SIZE_BATCH=100
 
-   # Algorithm selection: all, diskann, hnsw, ivf
-   ALGORITHM=all
-
-   # Similarity function: COS, L2, IP, all
-   SIMILARITY=COS
+   # Leave ALGORITHM and SIMILARITY unset to run all combinations
    ```
 
    Replace the placeholder values with your Azure resource information:
@@ -271,7 +267,8 @@ select-algorithm-quickstart/
 │               └── azure/
 │                   └── documentdb/
 │                       └── selectalgorithm/
-│                           ├── SelectAlgorithm.java  # Main comparison logic
+│                           ├── CompareAll.java       # Main comparison logic
+│                           ├── Main.java             # Entry point that runs CompareAll
 │                           └── Utils.java            # Shared utility functions
 ├── pom.xml                          # Maven dependencies
 └── .env                             # Environment variables
@@ -329,95 +326,24 @@ This main comparison logic provides:
 
    Verify: The build output ends with `BUILD SUCCESS`.
 
-2. Run the comparison for all algorithms with cosine similarity (default):
+2. Run the comparison entry point. `Main.java` calls `CompareAll.run()` and executes all 9 algorithm × similarity combinations:
 
    ```bash
-   mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.SelectAlgorithm"
+   mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.Main"
    ```
 
-3. Run the comparison for a specific algorithm:
+3. Leave `ALGORITHM` and `SIMILARITY` unset to run all combinations.
 
    ### [Bash](#tab/bash)
 
    ```bash
-   # Test only DiskANN
-   ALGORITHM=diskann mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-
-   # Test only HNSW
-   ALGORITHM=hnsw mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-
-   # Test only IVF
-   ALGORITHM=ivf mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.SelectAlgorithm"
+   mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.Main"
    ```
 
    ### [PowerShell](#tab/powershell)
 
    ```powershell
-   # Test only DiskANN
-   $env:ALGORITHM="diskann"
-   mvn exec:java "-Dexec.mainClass=com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-
-   # Test only HNSW
-   $env:ALGORITHM="hnsw"
-   mvn exec:java "-Dexec.mainClass=com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-
-   # Test only IVF
-   $env:ALGORITHM="ivf"
-   mvn exec:java "-Dexec.mainClass=com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-   ```
-
-   ---
-
-4. Run the comparison for all similarity functions:
-
-   ### [Bash](#tab/bash)
-
-   ```bash
-   # Test all algorithms with all similarity functions
-   ALGORITHM=all SIMILARITY=all mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-
-   # Test DiskANN with all similarity functions
-   ALGORITHM=diskann SIMILARITY=all mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-   ```
-
-   ### [PowerShell](#tab/powershell)
-
-   ```powershell
-   # Test all algorithms with all similarity functions
-   $env:ALGORITHM="all"
-   $env:SIMILARITY="all"
-   mvn exec:java "-Dexec.mainClass=com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-
-   # Test DiskANN with all similarity functions
-   $env:ALGORITHM="diskann"
-   $env:SIMILARITY="all"
-   mvn exec:java "-Dexec.mainClass=com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-   ```
-
-   ---
-
-5. Run the comparison for a specific similarity function:
-
-   ### [Bash](#tab/bash)
-
-   ```bash
-   # Test all algorithms with L2 (Euclidean) distance
-   SIMILARITY=L2 mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-
-   # Test all algorithms with IP (inner product)
-   SIMILARITY=IP mvn exec:java -Dexec.mainClass="com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-   ```
-
-   ### [PowerShell](#tab/powershell)
-
-   ```powershell
-   # Test all algorithms with L2 (Euclidean) distance
-   $env:SIMILARITY="L2"
-   mvn exec:java "-Dexec.mainClass=com.azure.documentdb.selectalgorithm.SelectAlgorithm"
-
-   # Test all algorithms with IP (inner product)
-   $env:SIMILARITY="IP"
-   mvn exec:java "-Dexec.mainClass=com.azure.documentdb.selectalgorithm.SelectAlgorithm"
+   mvn exec:java "-Dexec.mainClass=com.azure.documentdb.selectalgorithm.Main"
    ```
 
    ---

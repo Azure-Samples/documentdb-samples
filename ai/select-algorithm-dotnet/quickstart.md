@@ -142,34 +142,36 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    dotnet list package
    ```
 
-3. Create environment variables for authentication. The sample uses DefaultAzureCredential for passwordless authentication:
+3. Create environment variables for authentication and configuration overrides. The sample uses `DefaultAzureCredential` for passwordless authentication, and .NET maps environment variables to `appsettings.json` keys by using the `Section__Key` format:
 
    ### [Bash](#tab/bash)
 
    ```bash
-   export AZURE_OPENAI_EMBEDDING_ENDPOINT="https://<your-openai-resource>.openai.azure.com"
-   export AZURE_OPENAI_EMBEDDING_MODEL="text-embedding-3-small"
-   export DOCUMENTDB_CLUSTER_NAME="<your-documentdb-cluster-name>"
+   export AzureOpenAI__Endpoint="https://<your-resource>.openai.azure.com"
+   export AzureOpenAI__EmbeddingModel="text-embedding-3-small"
+   export MongoDB__ClusterName="<your-cluster-name>"
+   export DataFiles__WithVectors="data/Hotels_Vector.json"
    export AZURE_TENANT_ID="<your-tenant-id>"
-   export DATA_FILE_WITH_VECTORS="../../data/Hotels_Vector.json"
    ```
 
    ### [PowerShell](#tab/powershell)
 
    ```powershell
-   $env:AZURE_OPENAI_EMBEDDING_ENDPOINT="https://<your-openai-resource>.openai.azure.com"
-   $env:AZURE_OPENAI_EMBEDDING_MODEL="text-embedding-3-small"
-   $env:DOCUMENTDB_CLUSTER_NAME="<your-documentdb-cluster-name>"
+   $env:AzureOpenAI__Endpoint="https://<your-resource>.openai.azure.com"
+   $env:AzureOpenAI__EmbeddingModel="text-embedding-3-small"
+   $env:MongoDB__ClusterName="<your-cluster-name>"
+   $env:DataFiles__WithVectors="data/Hotels_Vector.json"
    $env:AZURE_TENANT_ID="<your-tenant-id>"
-   $env:DATA_FILE_WITH_VECTORS="../../data/Hotels_Vector.json"
    ```
 
    ---
 
    Replace the placeholder values with your own information:
-   - `<your-openai-resource>`: Your Azure OpenAI resource name
-   - `<your-documentdb-cluster-name>`: Your Azure DocumentDB cluster name
+   - `<your-resource>`: Your Azure OpenAI resource name
+   - `<your-cluster-name>`: Your Azure DocumentDB cluster name
    - `<your-tenant-id>`: Your Microsoft Entra tenant ID
+
+   These environment variables override the matching values in `appsettings.json`. For example, `MongoDB__ClusterName` overrides `MongoDB:ClusterName` and `AzureOpenAI__Endpoint` overrides `AzureOpenAI:Endpoint`.
 
    You should always prefer passwordless authentication. For more information on setting up managed identity and the full range of your authentication options, see [Authenticate .NET apps to Azure services by using the Azure SDK for .NET](/dotnet/azure/sdk/authentication).
 
@@ -199,14 +201,32 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
 
    ```json
    {
-     "DatabaseName": "Hotels",
-     "EmbeddedField": "DescriptionVector",
-     "EmbeddingDimensions": 1536,
-     "LoadBatchSize": 100,
-     "SearchQuery": "quintessential lodging near running trails, eateries, retail",
-     "TopK": 5
+     "AzureOpenAI": {
+       "Endpoint": "https://<your-resource>.openai.azure.com",
+       "EmbeddingModel": "text-embedding-3-small"
+     },
+     "MongoDB": {
+       "ClusterName": "<your-cluster-name>",
+       "DatabaseName": "Hotels",
+       "LoadBatchSize": 100
+     },
+     "Embedding": {
+       "EmbeddedField": "DescriptionVector",
+       "Dimensions": 1536,
+       "EmbeddingSizeBatch": 16
+     },
+     "VectorSearch": {
+       "Query": "quintessential lodging near running trails, eateries, retail",
+       "Similarity": "",
+       "TopK": 5
+     },
+     "DataFiles": {
+       "WithVectors": "data/Hotels_Vector.json"
+     }
    }
    ```
+
+   You can keep placeholder values in `appsettings.json` and override them at runtime with environment variables such as `AzureOpenAI__Endpoint` and `MongoDB__ClusterName`.
 
 ## Create code files
 
@@ -216,13 +236,15 @@ Continue the project by creating code files for vector search comparison. When y
 ├── data/
 │   └── Hotels_Vector.json            # Hotel data with vector embeddings
 └── select-algorithm-dotnet/
-    ├── Services/
-    │   └── VectorComparisonService.cs # Service to compare vector algorithms
+    ├── CompareAll.cs                  # Main comparison logic
+    ├── Models/
+    │   ├── Configuration.cs           # Configuration models
+    │   └── HotelData.cs               # Hotel data model
     ├── Utilities/
-    │   └── Utils.cs                   # Shared utility functions
+    │   └── AzureIdentityTokenHandler.cs # OIDC token handler
     ├── Program.cs                     # Main application entry point
+    ├── Utils.cs                       # Shared utility functions
     ├── appsettings.json               # Configuration settings
-    ├── global.json                    # .NET SDK version specification
     └── SelectAlgorithm.csproj         # Project file
 ```
 
@@ -231,14 +253,14 @@ Continue the project by creating code files for vector search comparison. When y
    ### [Bash](#tab/bash)
 
    ```bash
-   mkdir Services
+   mkdir Models
    mkdir Utilities
    ```
 
    ### [PowerShell](#tab/powershell)
 
    ```powershell
-   New-Item -ItemType Directory -Name Services
+   New-Item -ItemType Directory -Name Models
    New-Item -ItemType Directory -Name Utilities
    ```
 
@@ -249,17 +271,21 @@ Continue the project by creating code files for vector search comparison. When y
    ### [Bash](#tab/bash)
 
    ```bash
-   touch Services/VectorComparisonService.cs
-   touch Utilities/Utils.cs
-   touch global.json
+   touch CompareAll.cs
+   touch Utils.cs
+   touch Models/Configuration.cs
+   touch Models/HotelData.cs
+   touch Utilities/AzureIdentityTokenHandler.cs
    ```
 
    ### [PowerShell](#tab/powershell)
 
    ```powershell
-   New-Item -ItemType File -Path Services\VectorComparisonService.cs
-   New-Item -ItemType File -Path Utilities\Utils.cs
-   New-Item -ItemType File -Name global.json
+   New-Item -ItemType File -Name CompareAll.cs
+   New-Item -ItemType File -Name Utils.cs
+   New-Item -ItemType File -Path Models\Configuration.cs
+   New-Item -ItemType File -Path Models\HotelData.cs
+   New-Item -ItemType File -Path Utilities\AzureIdentityTokenHandler.cs
    ```
 
    ---
@@ -276,7 +302,7 @@ This main entry point:
 - Loads configuration from appsettings.json and environment variables
 - Sets up dependency injection with logging infrastructure
 - Initializes Azure OpenAI and DocumentDB clients using passwordless authentication
-- Creates a VectorComparisonService to test all algorithms
+- Calls `CompareAll.Run()` to execute the flat project entry point
 - Runs the comparison and prints results in a table format
 
 ### CompareAll.cs
@@ -319,21 +345,6 @@ These supporting files provide:
 - Batch data insertion with error handling
 - Results formatting and display
 
-### global.json
-
-Add this code to `global.json`:
-
-```json
-{
-  "sdk": {
-    "version": "9.0.200",
-    "rollForward": "latestFeature"
-  }
-}
-```
-
-This file specifies the .NET SDK version requirements for the project.
-
 ## Run the code
 
 1. Build the project:
@@ -342,51 +353,41 @@ This file specifies the .NET SDK version requirements for the project.
    dotnet build
    ```
 
-2. Run the application to compare all algorithms with COS similarity (default):
+2. Run the flat `SelectAlgorithm.csproj` entry point to compare all 9 algorithm × similarity combinations:
 
    ```bash
    dotnet run
    ```
 
-   The application creates three collections (`hotels_diskann_cos`, `hotels_hnsw_cos`, `hotels_ivf_cos`), inserts data, creates vector indexes, and performs searches on each.
+   The application loads the sample data once, then creates and tests all 9 algorithm × similarity combinations sequentially.
 
-3. To compare all algorithms with all similarity functions, set environment variables:
+3. Leave `ALGORITHM` and `SIMILARITY` unset to compare all 9 algorithm × similarity combinations.
 
    ### [Bash](#tab/bash)
 
    ```bash
-   export ALGORITHM=all
-   export SIMILARITY=all
    dotnet run
    ```
 
    ### [PowerShell](#tab/powershell)
 
    ```powershell
-   $env:ALGORITHM="all"
-   $env:SIMILARITY="all"
    dotnet run
    ```
 
    ---
 
-   This creates nine collections (3 algorithms x 3 similarity functions) and compares all combinations.
-
-4. To test a specific algorithm with a specific similarity function:
+4. Repeat `dotnet run` whenever you want to rerun the flat `SelectAlgorithm.csproj` entry point:
 
    ### [Bash](#tab/bash)
 
    ```bash
-   export ALGORITHM=diskann
-   export SIMILARITY=COS
    dotnet run
    ```
 
    ### [PowerShell](#tab/powershell)
 
    ```powershell
-   $env:ALGORITHM="diskann"
-   $env:SIMILARITY="COS"
    dotnet run
    ```
 
@@ -434,11 +435,11 @@ Executing vector search...
 ==========================================================================================
                      Vector Algorithm Comparison Results
 ==========================================================================================
-Algorithm     Similarity    Top Result                Score         Latency(ms)
-------------------------------------------------------------------------------------------
-DiskANN       COS           Historic Downtown Inn      0.8342        45
-HNSW          COS           Historic Downtown Inn      0.8342        38
-IVF           COS           Historic Downtown Inn      0.8342        52
+Algorithm     Similarity    Top 1 Result              Score         Top 2 Result              Score         Diff
+------------------------------------------------------------------------------------------------------------------------
+DiskANN       COS           Historic Downtown Inn      0.8342        Mountain Trail Lodge      0.7891        0.0451
+HNSW          COS           Historic Downtown Inn      0.8342        Mountain Trail Lodge      0.7891        0.0451
+IVF           COS           Historic Downtown Inn      0.8342        Mountain Trail Lodge      0.7891        0.0451
 ==========================================================================================
 
 --- DiskANN / COS (hotels_diskann_cos) ---

@@ -115,6 +115,35 @@ def vector_search_with_index(collection, query_embedding: List[float],
     return results
 
 
+def vector_search_with_retry(collection, query_embedding: List[float],
+                             vector_field: str, top_k: int,
+                             index_name_value: str) -> List[Dict[str, Any]]:
+    """Retry vector search until results are available or retries are exhausted."""
+    max_retries = 5
+    retry_delay_seconds = 2
+
+    for attempt in range(max_retries + 1):
+        results = vector_search_with_index(
+            collection, query_embedding, vector_field, top_k
+        )
+        if results:
+            return results
+
+        if attempt < max_retries:
+            print(
+                f"  No results for '{index_name_value}' yet. "
+                f"Retrying in {retry_delay_seconds} seconds "
+                f"({attempt + 1}/{max_retries})..."
+            )
+            time.sleep(retry_delay_seconds)
+
+    print(
+        f"  Search for '{index_name_value}' did not return results "
+        f"after {max_retries} retries. Recording as failed."
+    )
+    return []
+
+
 def main():
     print("=" * 70)
     print("  Compare All Algorithms — 9 Combinations")
@@ -165,11 +194,21 @@ def main():
                     config["dimensions"], metric, extra_params
                 )
                 print(f"  Created index '{name}'")
-                time.sleep(5)  # Increased wait time
-                # Search (no index name needed)
-                results = vector_search_with_index(
-                    collection, query_embedding, config["vector_field"], top_k
+                results = vector_search_with_retry(
+                    collection, query_embedding, config["vector_field"], top_k, name
                 )
+
+                if not results:
+                    table_rows.append([
+                        algo_label,
+                        metric,
+                        "(failed)",
+                        f"{0:.4f}",
+                        "(failed)",
+                        f"{0:.4f}",
+                        f"{0:.4f}",
+                    ])
+                    continue
 
                 top1_name = results[0].get("document", results[0]).get("HotelName", "Unknown") if len(results) > 0 else "(no results)"
                 top1_score = results[0].get("score", 0) if len(results) > 0 else 0

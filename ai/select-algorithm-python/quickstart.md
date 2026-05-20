@@ -33,14 +33,14 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
 
    ```bash
    mkdir -p data
-   curl -o data/Hotels_Vector.json https://raw.githubusercontent.com/Azure-Samples/documentdb-samples/main/data/Hotels_Vector.json
+   curl -o data/Hotels_Vector.json https://raw.githubusercontent.com/Azure-Samples/documentdb-samples/refs/heads/main/ai/data/Hotels_Vector.json
    ```
 
    ### [PowerShell](#tab/powershell)
 
    ```powershell
    New-Item -ItemType Directory -Force -Path data
-   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Azure-Samples/documentdb-samples/main/data/Hotels_Vector.json" -OutFile "data/Hotels_Vector.json"
+   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Azure-Samples/documentdb-samples/refs/heads/main/ai/data/Hotels_Vector.json" -OutFile "data/Hotels_Vector.json"
    ```
 
    ---
@@ -138,7 +138,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    AZURE_OPENAI_EMBEDDING_ENDPOINT=https://<RESOURCE-NAME>.openai.azure.com
    
    # Data File Paths and Vector Configuration
-   DATA_FILE_WITH_VECTORS=../data/Hotels_Vector.json
+   DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
    EMBEDDED_FIELD=DescriptionVector
    EMBEDDING_DIMENSIONS=1536
    LOAD_SIZE_BATCH=100
@@ -149,12 +149,8 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    # Azure DocumentDB Database Name
    AZURE_DOCUMENTDB_DATABASENAME=Hotels
    
-   # Algorithm Selection (used by compare_all.py)
-   # ALGORITHM: "all" | "diskann" | "hnsw" | "ivf"
-   ALGORITHM=all
+   # Leave ALGORITHM and SIMILARITY unset to run all combinations
    
-   # SIMILARITY: "all" | "COS" | "L2" | "IP"
-   SIMILARITY=COS
    ```
 
    For the passwordless authentication used in this article, replace the placeholder values in the `.env` file with your own information:
@@ -260,7 +256,7 @@ Vector Algorithm Comparison
 
 Initializing MongoDB and Azure OpenAI clients...
 
-Loading data from ../data/Hotels_Vector.json...
+Loading data from data/Hotels_Vector.json...
 Loaded 50 documents
 Generating query embedding...
 Query embedding: 1536 dimensions
@@ -333,48 +329,23 @@ Closing database connection...
 Database connection closed
 ```
 
-### Test specific combinations
+### Run all combinations
 
-To override environment variables at the command line:
+Leave `ALGORITHM` and `SIMILARITY` unset to run all 9 combinations (3 algorithms × 3 similarity functions):
 
 ### [Bash](#tab/bash)
 
 ```bash
-# Test only DiskANN across all similarity functions
-ALGORITHM=diskann SIMILARITY=all python src/compare_all.py
-```
-
-```bash
-# Test all algorithms with L2 distance
-ALGORITHM=all SIMILARITY=L2 python src/compare_all.py
-```
-
-```bash
-# Test HNSW with inner product
-ALGORITHM=hnsw SIMILARITY=IP python src/compare_all.py
+python src/compare_all.py
 ```
 
 ### [PowerShell](#tab/powershell)
 
 ```powershell
-# Test only DiskANN across all similarity functions
-$env:ALGORITHM="diskann"; $env:SIMILARITY="all"; python src/compare_all.py
-```
-
-```powershell
-# Test all algorithms with L2 distance
-$env:ALGORITHM="all"; $env:SIMILARITY="L2"; python src/compare_all.py
-```
-
-```powershell
-# Test HNSW with inner product
-$env:ALGORITHM="hnsw"; $env:SIMILARITY="IP"; python src/compare_all.py
+python src/compare_all.py
 ```
 
 ---
-
-> [!NOTE]
-> When using `SIMILARITY=all`, the script tests all three similarity functions (COS, L2, IP) for each selected algorithm. Combined with `ALGORITHM=all`, this runs all 9 combinations (3 algorithms × 3 similarity functions). Each combination creates a separate collection, so the full run takes longer.
 
 ### Understanding the results
 

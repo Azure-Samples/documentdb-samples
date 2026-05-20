@@ -121,37 +121,48 @@ async function main() {
                 await db.command(indexOptions);
                 console.log(`  ✓ ${indexName} created`);
 
-                // 3. Wait for index to be ready
-                await new Promise(r => setTimeout(r, 5000));
-
-                // 4. Search with retry (index may need more time)
-                let searchResults: any[] = [];
-                for (let attempt = 0; attempt < 3; attempt++) {
-                    if (attempt > 0) {
-                        await new Promise(r => setTimeout(r, 5000));
-                    }
-                    try {
-                        searchResults = await collection.aggregate([
-                            {
-                                $search: {
-                                    cosmosSearch: {
-                                        vector: queryVector,
-                                        path: baseConfig.embeddedField,
-                                        k: topK
-                                    }
-                                }
-                            },
-                            {
-                                $project: {
-                                    score: { $meta: 'searchScore' },
-                                    document: '$$ROOT'
-                                }
+                // 3. Search with bounded retry while the new index becomes ready
+                const searchPipeline = [
+                    {
+                        $search: {
+                            cosmosSearch: {
+                                vector: queryVector,
+                                path: baseConfig.embeddedField,
+                                k: topK
                             }
-                        ]).toArray();
-                        if (searchResults.length > 0) break;
-                    } catch (e) {
-                        if (attempt === 2) throw e;
+                        }
+                    },
+                    {
+                        $project: {
+                            score: { $meta: 'searchScore' },
+                            document: '$$ROOT'
+                        }
                     }
+                ];
+
+                let searchResults: any[] = [];
+                let lastSearchError: unknown;
+                await new Promise(r => setTimeout(r, 1000));
+                for (let attempt = 1; attempt <= 5; attempt++) {
+                    try {
+                        searchResults = await collection.aggregate(searchPipeline).toArray();
+                        if (searchResults.length > 0 || attempt === 5) {
+                            break;
+                        }
+                        console.log(`  ...search returned no results yet, retrying (${attempt}/5)`);
+                    } catch (e) {
+                        lastSearchError = e;
+                        if (attempt === 5) {
+                            throw e;
+                        }
+                        console.log(`  ...search not ready yet, retrying (${attempt}/5)`);
+                    }
+
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+
+                if (searchResults.length === 0 && lastSearchError) {
+                    throw lastSearchError;
                 }
 
                 // Record top 2 results

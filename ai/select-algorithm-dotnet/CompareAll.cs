@@ -80,13 +80,15 @@ public static class CompareAll
                 CreateIndex(collection, vectorField, config);
                 Console.WriteLine($"  ✓ {config.Name} created");
 
-                // 3. Wait for index to build
-                Thread.Sleep(5000);
+                // 3. Search with retries while the index becomes available
+                var searchResults = RunVectorSearchWithRetry(collection, queryVector, vectorField, config.Name, topK);
+                if (searchResults.Count == 0)
+                {
+                    results.Add(new SearchResult(GetAlgoDisplay(config.Kind), config.Similarity, "(failed)", 0.0, "(failed)", 0.0));
+                    continue;
+                }
 
-                // 4. Search
-                var searchResults = RunVectorSearch(collection, queryVector, vectorField, config.Name, topK);
-
-                // 5. Extract top 2 results and record
+                // 4. Extract top 2 results and record
                 var algoDisplay = GetAlgoDisplay(config.Kind);
                 var top1Name = "-"; var top1Score = 0.0;
                 var top2Name = "-"; var top2Score = 0.0;
@@ -235,6 +237,35 @@ public static class CompareAll
         };
 
         return collection.Aggregate<BsonDocument>(pipeline).ToList();
+    }
+
+    private static List<BsonDocument> RunVectorSearchWithRetry(
+        IMongoCollection<BsonDocument> collection,
+        float[] queryVector,
+        string vectorField,
+        string indexName,
+        int topK)
+    {
+        const int maxRetries = 5;
+        const int retryDelayMs = 2000;
+
+        for (var attempt = 0; attempt <= maxRetries; attempt++)
+        {
+            var results = RunVectorSearch(collection, queryVector, vectorField, indexName, topK);
+            if (results.Count > 0)
+            {
+                return results;
+            }
+
+            if (attempt < maxRetries)
+            {
+                Console.WriteLine($"  No results for {indexName} yet. Retrying in 2 seconds ({attempt + 1}/{maxRetries})...");
+                Thread.Sleep(retryDelayMs);
+            }
+        }
+
+        Console.WriteLine($"  Search for {indexName} did not return results after {maxRetries} retries. Recording as failed.");
+        return [];
     }
 
     private static void PrintComparisonTable(List<SearchResult> results)

@@ -161,7 +161,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-openai-resource.openai.azure.com/
 
    # Data File Configuration
-   DATA_FILE_WITH_VECTORS=../data/Hotels_Vector.json
+   DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
    EMBEDDED_FIELD=DescriptionVector
    EMBEDDING_DIMENSIONS=1536
    LOAD_SIZE_BATCH=100
@@ -169,12 +169,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    # DocumentDB Configuration
    DOCUMENTDB_CLUSTER_NAME=your-cluster-name
 
-   # Algorithm Selection
-   # ALGORITHM: "all" | "diskann" | "hnsw" | "ivf"
-   ALGORITHM=all
-
-   # SIMILARITY: "all" | "COS" | "L2" | "IP"
-   SIMILARITY=COS
+   # Leave ALGORITHM and SIMILARITY unset to run all combinations
 
    # Database name
    AZURE_DOCUMENTDB_DATABASENAME=Hotels
@@ -258,7 +253,7 @@ This code provides a complete vector algorithm comparison application with these
 - **Passwordless authentication**: Uses `DefaultAzureCredential` for both Azure OpenAI and DocumentDB via OIDC
 - **Three vector algorithms**: Implements DiskANN, HNSW, and IVF with algorithm-specific tuning parameters
 - **Three similarity functions**: Supports COS (cosine), L2 (Euclidean), and IP (inner product)
-- **Flexible configuration**: Use environment variables to compare all algorithms or test specific combinations
+- **Single compare-all entry point**: Runs all 9 algorithm × similarity combinations in one pass
 - **Performance measurement**: Tracks query latency for each algorithm/similarity pair
 - **Comparison output**: Generates a formatted table showing results side by side
 - **Production-ready patterns**: Includes batched insertion, error handling, and connection pooling
@@ -288,7 +283,7 @@ Get-Content .env | ForEach-Object {
 After sourcing the environment variables, run the application:
 
 ```bash
-go run src/main.go
+go run ./src/
 ```
 
 The application will:
@@ -312,7 +307,7 @@ Vector Algorithm Comparison
    Search query: "quintessential lodging near running trails, eateries, retail"
 
 Initializing MongoDB and Azure OpenAI clients...
-Loading data from ../data/Hotels_Vector.json...
+Loading data from data/Hotels_Vector.json...
 Loaded 50 documents
 Generating query embedding...
 Query embedding: 1536 dimensions
@@ -390,41 +385,9 @@ The comparison table shows how different algorithms perform on the same dataset 
 
 [!INCLUDE[Choosing the right algorithm](../includes/choosing-algorithm.md)]
 
-## Experiment with different configurations
+## Run all combinations
 
-You can compare different combinations by setting environment variables:
-
-**Compare all algorithms with cosine similarity (default):**
-
-```bash
-# .env file
-ALGORITHM=all
-SIMILARITY=COS
-```
-
-**Compare all algorithms with all similarity functions (9 collections):**
-
-```bash
-# .env file
-ALGORITHM=all
-SIMILARITY=all
-```
-
-**Test only DiskANN with all similarity functions:**
-
-```bash
-# .env file
-ALGORITHM=diskann
-SIMILARITY=all
-```
-
-**Test only cosine similarity across all algorithms:**
-
-```bash
-# .env file
-ALGORITHM=all
-SIMILARITY=COS
-```
+Leave `ALGORITHM` and `SIMILARITY` unset to run all 9 algorithm × similarity combinations.
 
 ## Troubleshooting
 

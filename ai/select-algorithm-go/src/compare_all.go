@@ -99,6 +99,8 @@ func RunCompareAll(ctx context.Context, config *Config, dbClient *mongo.Client, 
 	// 4. Create→search→drop each index sequentially (DocumentDB only allows one vector index per field)
 	fmt.Printf("\nRunning %d vector index comparisons (create→search→drop)...\n", len(specs))
 	var results []CompareResult
+	successfulComparisons := 0
+	failedComparisons := 0
 
 	for _, spec := range specs {
 		// Drop all existing vector indexes on this field
@@ -121,26 +123,14 @@ func RunCompareAll(ctx context.Context, config *Config, dbClient *mongo.Client, 
 				Metric:    spec.Metric,
 				Error:     createErr,
 			})
+			failedComparisons++
 			fmt.Printf("  ⚠ %s: %v\n", spec.IndexName, createErr)
 			continue
 		}
 		fmt.Printf("  ✓ %s created\n", spec.IndexName)
 
-		// Wait for index to become ready
-		time.Sleep(10 * time.Second)
-
-		// Search using simple cosmosSearch (with retry for index readiness)
-		var searchResults []SearchResult
-		var searchErr error
-		for searchAttempt := 0; searchAttempt < 3; searchAttempt++ {
-			if searchAttempt > 0 {
-				time.Sleep(5 * time.Second)
-			}
-			searchResults, searchErr = vectorSearchSimple(ctx, collection, queryEmbedding, config.VectorField, topK)
-			if searchErr == nil && len(searchResults) > 0 {
-				break
-			}
-		}
+		// Search using simple cosmosSearch with bounded retry for index readiness.
+		searchResults, searchErr := runVectorSearchWithRetry(ctx, collection, queryEmbedding, config.VectorField, topK)
 
 		top1Name, top1Score := extractResult(searchResults, 0)
 		top2Name, top2Score := extractResult(searchResults, 1)
@@ -156,13 +146,46 @@ func RunCompareAll(ctx context.Context, config *Config, dbClient *mongo.Client, 
 			Error:     searchErr,
 		}
 		results = append(results, cr)
+		if searchErr != nil {
+			failedComparisons++
+		} else {
+			successfulComparisons++
+		}
 	}
 
 	// 6. Print comparison table
 	fmt.Println()
 	printComparisonTable(results)
+	fmt.Printf("\nSummary: %d succeeded, %d failed\n", successfulComparisons, failedComparisons)
+	if successfulComparisons == 0 {
+		return fmt.Errorf("all %d comparisons failed", failedComparisons)
+	}
 
 	return nil
+}
+
+func runVectorSearchWithRetry(ctx context.Context, collection *mongo.Collection, queryEmbedding []float64, vectorField string, topK int) ([]SearchResult, error) {
+	const maxAttempts = 6
+	const retryDelay = 2 * time.Second
+
+	var searchResults []SearchResult
+	var searchErr error
+
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		searchResults, searchErr = vectorSearchSimple(ctx, collection, queryEmbedding, vectorField, topK)
+		if searchErr == nil {
+			if len(searchResults) > 0 {
+				return searchResults, nil
+			}
+			searchErr = fmt.Errorf("search returned no results")
+		}
+
+		if attempt < maxAttempts {
+			time.Sleep(retryDelay)
+		}
+	}
+
+	return searchResults, searchErr
 }
 
 // buildIndexSpecs creates the 9 index specifications

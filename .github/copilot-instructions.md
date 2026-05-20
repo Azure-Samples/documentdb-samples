@@ -105,9 +105,10 @@ All samples MUST use these environment variable names and defaults:
 - efSearch: 40
 
 ### DiskANN
-- maxDegree: 20
-- lBuild: 10
+- vector-search samples: maxDegree: 20, lBuild: 10
+- select-algorithm compare-all samples: maxDegree: 32, lBuild: 50
 - lSearch: 40
+- Select-algorithm samples use higher values for meaningful comparison results.
 
 ## Rules
 
@@ -121,7 +122,7 @@ All samples MUST use these environment variable names and defaults:
 8. **Output files are committed.** Each sample has an `output/` directory with expected output for each algorithm (`ivf.txt`, `hnsw.txt`, `diskann.txt`). Update these when output format changes.
 9. **DocumentDB supports all index types at any dataset size.** IVF, HNSW, and DiskANN are all available — do not imply tier restrictions limit algorithm availability.
 10. **No dotenv libraries.** Do NOT use `python-dotenv`, `godotenv`, `dotenv` (npm), or any `.env` file-loading library. Environment variables must be passed via the CLI invocation, not loaded from `.env` files at runtime. This keeps samples explicit and avoids hidden configuration.
-11. **Collection naming:** `hotels_{algorithm}` (e.g., `hotels_ivf`, `hotels_hnsw`, `hotels_diskann`). Index naming: `vectorIndex_{algorithm}`.
+11. **Collection naming:** Standard per-algorithm samples use `hotels_{algorithm}` (e.g., `hotels_ivf`, `hotels_hnsw`, `hotels_diskann`). Standard index naming is `vectorIndex_{algorithm}`. Compare-all samples that drop and recreate a single collection use collection `hotels` and index naming `vector_{algorithm}_{metric}` (for example, `vector_ivf_cos`). TypeScript `select-algorithm.ts` remains a separate per-collection mode.
 12. **Vector search uses k=5.** All samples return top 5 results. Do not parameterize k unless explicitly required.
 13. **Use the Global read-write hostname.** All samples MUST use the Global read-write connection string format: `<clusterName>.global.mongocluster.cosmos.azure.com`. The `.global.` form auto-follows the active write region after a replica promotion. The non-`.global.` form pins to one cluster and silently becomes read-only after failover — reserve that for read-scale-out scenarios only. (Confirmed by Khelan Modi, DocumentDB PM.)
 14. **VS Code extension is DocumentDB for VS Code.** Always reference [DocumentDB for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-documentdb) (`ms-azuretools.vscode-documentdb`). Never reference the Azure Databases extension (`ms-azuretools.vscode-cosmosdb`).

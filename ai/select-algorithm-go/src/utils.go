@@ -46,9 +46,16 @@ type InsertStats struct {
 }
 
 // LoadConfig loads configuration from environment variables
-func LoadConfig() *Config {
-	dimensions, _ := strconv.Atoi(getEnvOrDefault("EMBEDDING_DIMENSIONS", "1536"))
-	batchSize, _ := strconv.Atoi(getEnvOrDefault("LOAD_SIZE_BATCH", "100"))
+func LoadConfig() (*Config, error) {
+	dimensions, err := parsePositiveIntEnv("EMBEDDING_DIMENSIONS", "1536")
+	if err != nil {
+		return nil, err
+	}
+
+	batchSize, err := parsePositiveIntEnv("LOAD_SIZE_BATCH", "100")
+	if err != nil {
+		return nil, err
+	}
 
 	return &Config{
 		ClusterName:  getEnvOrDefault("DOCUMENTDB_CLUSTER_NAME", ""),
@@ -60,7 +67,19 @@ func LoadConfig() *Config {
 		BatchSize:    batchSize,
 		Similarity:   getEnvOrDefault("SIMILARITY", ""),
 		Algorithm:    strings.ToLower(getEnvOrDefault("ALGORITHM", "")),
+	}, nil
+}
+
+func parsePositiveIntEnv(key, defaultValue string) (int, error) {
+	value := getEnvOrDefault(key, defaultValue)
+	parsedValue, err := strconv.Atoi(value)
+	if err != nil {
+		return 0, fmt.Errorf("%s must be a positive integer, got %q", key, value)
 	}
+	if parsedValue <= 0 {
+		return 0, fmt.Errorf("%s must be greater than 0, got %q", key, value)
+	}
+	return parsedValue, nil
 }
 
 // getEnvOrDefault returns environment variable value or default if not set
