@@ -111,7 +111,7 @@ All samples MUST use these environment variable names and defaults:
 
 ## Rules
 
-1. **No Cosmos DB references.**Never use "Cosmos DB", "cosmosdb", "MongoDB vCore", or "mongo.cosmos.azure.com". Always use "Azure DocumentDB" and "documentdb.azure.com". Exception: `mongocluster.cosmos.azure.com` (hostname), `cosmosSearch` (API command), and `ms-azuretools.vscode-cosmosdb` (VS Code extension) are valid and NOT Cosmos references.
+1. **No Cosmos DB references.** Never use "Cosmos DB", "cosmosdb", "MongoDB vCore", or "mongo.cosmos.azure.com". Always use "Azure DocumentDB" and "documentdb.azure.com". Exception: `mongocluster.cosmos.azure.com` (hostname) and `cosmosSearch` (API command) are valid and NOT Cosmos references.
 2. **Vector field name is DescriptionVector.** Never default to "contentVector".
 3. **Data file path from env var.** Code reads `DATA_FILE_WITH_VECTORS`. The default depends on the sample category: vector-search samples use `../data/Hotels_Vector.json` (shared data directory one level up), while select-algorithm samples use `data/Hotels_Vector.json` (local copy in each sample). .NET copies data locally to `data/Hotels_Vector.json` in the build output.
 4. **Batch size is LOAD_SIZE_BATCH=100.** Do not use BATCH_SIZE or other variants.
@@ -124,3 +124,4 @@ All samples MUST use these environment variable names and defaults:
 11. **Collection naming:** `hotels_{algorithm}` (e.g., `hotels_ivf`, `hotels_hnsw`, `hotels_diskann`). Index naming: `vectorIndex_{algorithm}`.
 12. **Vector search uses k=5.** All samples return top 5 results. Do not parameterize k unless explicitly required.
 13. **Use the Global read-write hostname.** All samples MUST use the Global read-write connection string format: `<clusterName>.global.mongocluster.cosmos.azure.com`. The `.global.` form auto-follows the active write region after a replica promotion. The non-`.global.` form pins to one cluster and silently becomes read-only after failover — reserve that for read-scale-out scenarios only. (Confirmed by Khelan Modi, DocumentDB PM.)
+14. **VS Code extension is DocumentDB for VS Code.** Always reference [DocumentDB for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-documentdb) (`ms-azuretools.vscode-documentdb`). Never reference the Azure Databases extension (`ms-azuretools.vscode-cosmosdb`).
