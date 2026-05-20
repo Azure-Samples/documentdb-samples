@@ -125,3 +125,33 @@ All samples MUST use these environment variable names and defaults:
 12. **Vector search uses k=5.** All samples return top 5 results. Do not parameterize k unless explicitly required.
 13. **Use the Global read-write hostname.** All samples MUST use the Global read-write connection string format: `<clusterName>.global.mongocluster.cosmos.azure.com`. The `.global.` form auto-follows the active write region after a replica promotion. The non-`.global.` form pins to one cluster and silently becomes read-only after failover — reserve that for read-scale-out scenarios only. (Confirmed by Khelan Modi, DocumentDB PM.)
 14. **VS Code extension is DocumentDB for VS Code.** Always reference [DocumentDB for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-documentdb) (`ms-azuretools.vscode-documentdb`). Never reference the Azure Databases extension (`ms-azuretools.vscode-cosmosdb`).
+
+## Sample Review Checklist
+
+Use this checklist when creating new samples or reviewing existing ones. Derived from PM (Khelan Modi) feedback.
+
+### Branding & Naming
+- [ ] Environment variables use `DOCUMENTDB_CLUSTER_NAME` (not `MONGO_CLUSTER_NAME`) for select-algorithm samples
+- [ ] All references say "Azure DocumentDB" — no "Cosmos DB" or "MongoDB vCore"
+- [ ] Connection hostname uses `.global.mongocluster.cosmos.azure.com` format
+
+### Tooling References
+- [ ] VS Code extension references point to [DocumentDB for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-documentdb) (`ms-azuretools.vscode-documentdb`)
+- [ ] No references to Data Explorer for data browsing — use the VS Code extension instead
+- [ ] No references to the old Azure Databases extension (`ms-azuretools.vscode-cosmosdb`)
+
+### Index Selection Guidance
+- [ ] IVF is positioned for dev/test, demos, and small clusters (works on any tier)
+- [ ] DiskANN is the default recommendation for production (M30+ clusters)
+- [ ] HNSW is positioned for production when maximum recall is the top priority (M30+)
+- [ ] Decision table or clear guidance helps readers pick the right algorithm quickly
+
+### DiskANN as Default
+- [ ] DiskANN recommendation is prominent (not buried in a footnote)
+- [ ] Higher dimension support called out (up to 16,000 vs HNSW's 8,000)
+- [ ] Memory efficiency explained (index on disk, frees RAM for read/write ops)
+- [ ] Operational benefits mentioned (lighter updates, easier backups, faster recovery)
+- [ ] Future-proofing noted (less likely to need index redesign as models evolve)
+
+### Optional Enhancements
+- [ ] Consider mentioning DocumentDB agent kit (`npx skills add Azure/documentdb-agent-kit`) where appropriate — currently beta/optional
