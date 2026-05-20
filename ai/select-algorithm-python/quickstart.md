@@ -384,40 +384,7 @@ The comparison table helps you choose the best configuration for your workload:
 - **Score**: Similarity score using the selected function. Higher scores indicate better matches.
 - **Top Result**: The highest-scoring hotel for the query. Consistency across algorithms indicates stable results.
 
-### Choosing the right algorithm
-
-Use this comparison to select the best algorithm for your workload:
-
-**IVF** (inverted file index):
-- Best for: Test environments, demos, and small clusters
-- Pros: Fast to build, low resource requirements, works on any cluster tier
-- Cons: Lower recall compared to graph-based algorithms at scale
-- Tune: Increase `numLists` for larger datasets, increase `nProbes` for better recall
-
-**DiskANN** (disk-based approximate nearest neighbor) — *recommended for enterprise production*:
-- Best for: Enterprise production workloads on M30+ clusters
-- Pros: Supports embeddings up to 16,000 dimensions, keeps most index data on disk leaving cluster memory available for regular reads and writes, uses lighter updates that help the system stay smoother and easier to back up and recover
-- Cons: Requires M30+ cluster tier
-- Tune: Increase `maxDegree` and `lBuild` for better accuracy, increase `lSearch` for better recall
-
-**HNSW** (hierarchical navigable small world):
-- Best for: Enterprise production workloads on M30+ clusters requiring highest recall
-- Pros: Excellent recall, fast queries
-- Cons: Requires M30+ cluster tier, supports embeddings up to 8,000 dimensions (vs 16,000 for DiskANN), higher memory usage
-- Tune: Increase `m` and `efConstruction` for better index quality, increase `efSearch` for better recall
-
-> [!TIP]
-> For enterprise production workloads, start with **DiskANN** unless you have a specific reason to prefer HNSW. DiskANN supports higher dimensions (16,000 vs 8,000), uses less cluster memory, and requires fewer index maintenance operations — making it the safer long-term default that's less likely to need an index redesign as your embedding models evolve.
-
-### Choosing the right similarity function
-
-The similarity function should match your embedding model and use case:
-
-- **COS (Cosine similarity)**: Best for text embeddings and most OpenAI models. Measures angle between vectors (range: -1 to 1, higher is more similar)
-- **L2 (Euclidean distance)**: Measures straight-line distance between vectors (lower is more similar). Good for spatial data
-- **IP (Inner product)**: Measures alignment between vectors. Good when vector magnitudes are meaningful
-
-For the `text-embedding-3-small` model used in this quickstart, **COS (cosine similarity) is recommended** because OpenAI embeddings are normalized and optimized for cosine similarity.
+[!INCLUDE[Choosing the right algorithm](../includes/choosing-algorithm.md)]
 
 ## Troubleshooting
 

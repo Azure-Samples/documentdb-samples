@@ -370,40 +370,7 @@ The comparison table demonstrates key behaviors of vector search in DocumentDB:
 
 - **Score separation (Diff column)** shows confidence. A larger positive diff means the search clearly distinguishes the best match from the second-best. This metric helps evaluate result quality regardless of the absolute score values.
 
-### Choosing the right algorithm
-
-Use this comparison to select the best algorithm for your workload:
-
-**IVF** (inverted file index):
-- Best for: Test environments, demos, and small clusters
-- Pros: Fast to build, low resource requirements, works on any cluster tier
-- Cons: Lower recall compared to graph-based algorithms at scale
-- Tune: Increase `numLists` for larger datasets, increase `nProbes` for better recall
-
-**DiskANN** (disk-based approximate nearest neighbor) — *recommended for enterprise production*:
-- Best for: Enterprise production workloads on M30+ clusters
-- Pros: Supports embeddings up to 16,000 dimensions, keeps most index data on disk leaving cluster memory available for regular reads and writes, uses lighter updates that help the system stay smoother and easier to back up and recover
-- Cons: Requires M30+ cluster tier
-- Tune: Increase `maxDegree` and `lBuild` for better accuracy, increase `lSearch` for better recall
-
-**HNSW** (hierarchical navigable small world):
-- Best for: Enterprise production workloads on M30+ clusters requiring highest recall
-- Pros: Excellent recall, fast queries
-- Cons: Requires M30+ cluster tier, supports embeddings up to 8,000 dimensions (vs 16,000 for DiskANN), higher memory usage
-- Tune: Increase `m` and `efConstruction` for better index quality, increase `efSearch` for better recall
-
-> [!TIP]
-> For enterprise production workloads, start with **DiskANN** unless you have a specific reason to prefer HNSW. DiskANN supports higher dimensions (16,000 vs 8,000), uses less cluster memory, and requires fewer index maintenance operations — making it the safer long-term default that's less likely to need an index redesign as your embedding models evolve.
-
-### Choosing the right similarity function
-
-| Function | Score meaning | Best for |
-|----------|-------------|----------|
-| **COS (Cosine)** | Higher = more similar (0–1) | Text embeddings (normalized vectors) |
-| **L2 (Euclidean)** | Lower = more similar (distance) | When magnitude matters |
-| **IP (Inner Product)** | Higher = more similar | Equivalent to COS for normalized vectors |
-
-For the `text-embedding-3-small` model used in this quickstart, **COS (cosine similarity) is recommended** because OpenAI embeddings are normalized and optimized for cosine similarity.
+[!INCLUDE[Choosing the right algorithm](../includes/choosing-algorithm.md)]
 
 ## Troubleshooting
 
