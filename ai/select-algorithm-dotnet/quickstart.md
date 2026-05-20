@@ -514,7 +514,7 @@ For the `text-embedding-3-small` model used in this quickstart, **COS (cosine si
 
 ## Clean up resources
 
-When you're done, you can remove the database using mongosh or the Azure DocumentDB extension for Visual Studio Code.
+When you're done, you can remove the database using mongosh or the Azure Databases extension for Visual Studio Code.
 
 ### [mongosh](#tab/mongosh)
 
