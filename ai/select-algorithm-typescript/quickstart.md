@@ -202,8 +202,6 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    - `AZURE_OPENAI_EMBEDDING_ENDPOINT`: Your Azure OpenAI resource endpoint URL
    - `DOCUMENTDB_CLUSTER_NAME`: Your Azure DocumentDB cluster name
 
-   The compare-all mode always runs all 9 combinations (3 algorithms × 3 metrics). The `ALGORITHM` and `SIMILARITY` environment variables are used only by the single-algorithm mode.
-
    You should always prefer passwordless authentication, but it requires additional setup. For more information on setting up managed identity and the full range of your authentication options, see [Authenticate JavaScript apps to Azure services using the Azure SDK for JavaScript](/azure/developer/javascript/sdk/authentication/overview).
 
 ## Create code files
@@ -218,7 +216,6 @@ select-algorithm-typescript/
 │   └── compare_all.txt
 ├── src/
 │   ├── compare-all.ts
-│   ├── select-algorithm.ts
 │   └── utils.ts
 ├── .gitignore
 ├── package.json
@@ -334,8 +331,6 @@ The **Diff** column shows the score gap between the top-1 and top-2 results. A s
 > Latency values are approximate and vary by environment. Scores may differ slightly depending on your Azure OpenAI embedding deployment.
 
 ### Run all combinations
-
-The compare-all mode always runs all 9 combinations (3 algorithms × 3 metrics). The `ALGORITHM` and `SIMILARITY` environment variables are used only by the single-algorithm mode.
 
 ```bash
 npm run build
