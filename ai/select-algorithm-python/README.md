@@ -34,18 +34,16 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB. Each
 
 1. ### Configure environment variables
 
-   After deploying with `azd up`, create a `.env` file with your provisioned resource values:
+   After deploying with `azd up`, use the provisioned output values to set the required environment variables in your terminal:
 
    ```bash
-   azd env get-values > .env
-   ```
-
-   This creates a `.env` file at the repository root with the configuration values and endpoints needed to run the sample.
-
-   Alternatively, copy the example and fill in values manually:
-
-   ```bash
-   cp .env.example .env
+   export DOCUMENTDB_CLUSTER_NAME=your-cluster-name
+   export AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-resource.openai.azure.com
+   export AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+   export AZURE_DOCUMENTDB_DATABASENAME=Hotels
+   export DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
+   export EMBEDDED_FIELD=DescriptionVector
+   export EMBEDDING_DIMENSIONS=1536
    ```
 
 2. Install dependencies:

@@ -14,27 +14,19 @@ This sample demonstrates how to compare all three vector search index algorithms
 
 1. ### Configure environment variables
 
-   After deploying with `azd up`, create a `.env` file with your provisioned resource values:
+   After deploying with `azd up`, use the provisioned output values to set the required environment variables in your terminal:
 
    ```bash
-   azd env get-values > .env
+   export DOCUMENTDB_CLUSTER_NAME=your-cluster-name
+   export AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-resource.openai.azure.com
+   export AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+   export AZURE_DOCUMENTDB_DATABASENAME=Hotels
+   export DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
+   export EMBEDDED_FIELD=DescriptionVector
+   export EMBEDDING_DIMENSIONS=1536
    ```
 
-   This creates a `.env` file at the repository root with the configuration values and endpoints needed to run the sample.
-
-   Alternatively, copy the example and fill in values manually:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Update `.env` with your Azure resource details (if not using `azd`):
-   - `DOCUMENTDB_CLUSTER_NAME` — your DocumentDB cluster name
-   - `AZURE_OPENAI_EMBEDDING_ENDPOINT` — your Azure OpenAI endpoint
-   - `AZURE_OPENAI_EMBEDDING_MODEL` — deployment name (e.g., `text-embedding-3-small`)
-   - `DATA_FILE_WITH_VECTORS` — path to the pre-computed vectors JSON file
-
-3. Copy the shared data file into the local `data/` directory:
+2. Copy the shared data file into the local `data/` directory:
 
    ```bash
    mkdir -p data && cp ../data/Hotels_Vector.json data/
