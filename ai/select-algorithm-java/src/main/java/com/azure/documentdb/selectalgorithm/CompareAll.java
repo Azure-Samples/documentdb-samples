@@ -55,7 +55,8 @@ public class CompareAll {
 
             collection.drop();
             System.out.println("  Collection reset.");
-            Utils.insertData(collection, data, 100);
+            int batchSize = Integer.parseInt(System.getenv().getOrDefault("LOAD_SIZE_BATCH", "100"));
+            Utils.insertData(collection, data, batchSize);
 
             // Generate ONE embedding for the query (reused for all 9 searches)
             OpenAIClient aiClient = Utils.getOpenAIClient();
