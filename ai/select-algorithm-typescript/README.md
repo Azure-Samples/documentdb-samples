@@ -52,13 +52,14 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB using
     | `LOAD_SIZE_BATCH` | Batch size for data insertion |
     | `SIMILARITY` | Similarity metric: `COS`, `L2`, or `IP` |
 
-5. **Copy the shared data file** into this directory:
+5. **Create a `data/` directory and copy the data file:**
 
     ```bash
-    cp ../data/Hotels_Vector.json .
+    mkdir -p data
+    cp ../data/Hotels_Vector.json data/
     ```
 
-    The `DATA_FILE_WITH_VECTORS` env var defaults to `../data/Hotels_Vector.json`.
+    The `DATA_FILE_WITH_VECTORS` env var defaults to `data/Hotels_Vector.json`.
 
 6. **Build the project:**
 
