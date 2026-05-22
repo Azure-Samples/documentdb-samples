@@ -28,7 +28,7 @@ public class CompareAll {
         int topK = Integer.parseInt(Utils.getEnv("TOP_K", "5"));
 
         String databaseName = Utils.getEnv("AZURE_DOCUMENTDB_DATABASENAME", "Hotels");
-        String dataFile = Utils.getEnv("DATA_FILE_WITH_VECTORS", "../data/Hotels_Vector.json");
+        String dataFile = Utils.getEnv("DATA_FILE_WITH_VECTORS", "data/Hotels_Vector.json");
         String vectorField = Utils.getEnv("EMBEDDED_FIELD", "DescriptionVector");
         int dimensions = Integer.parseInt(Utils.getEnv("EMBEDDING_DIMENSIONS", "1536"));
         String model = Utils.getEnv("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-small");

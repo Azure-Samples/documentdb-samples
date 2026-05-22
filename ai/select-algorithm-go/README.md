@@ -38,7 +38,7 @@ This sample demonstrates how to compare different vector search algorithms (IVF,
    AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-resource.openai.azure.com
    AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
    AZURE_DOCUMENTDB_DATABASENAME=Hotels
-   DATA_FILE_WITH_VECTORS=../data/Hotels_Vector.json
+   DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
    EMBEDDED_FIELD=DescriptionVector
    EMBEDDING_DIMENSIONS=1536
    ```
@@ -46,10 +46,10 @@ This sample demonstrates how to compare different vector search algorithms (IVF,
 3. **Copy the shared data file** into this directory:
 
    ```bash
-   cp ../data/Hotels_Vector.json .
+   cp data/Hotels_Vector.json .
    ```
 
-   The `DATA_FILE_WITH_VECTORS` env var defaults to `../data/Hotels_Vector.json`.
+   The `DATA_FILE_WITH_VECTORS` env var defaults to `data/Hotels_Vector.json`.
 
 4. **Install dependencies**:
 
@@ -116,7 +116,7 @@ go run ./src/...
 | `AZURE_OPENAI_EMBEDDING_ENDPOINT` | *(required)* | Azure OpenAI endpoint |
 | `AZURE_OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | Embedding model name |
 | `AZURE_DOCUMENTDB_DATABASENAME` | `Hotels` | Database name |
-| `DATA_FILE_WITH_VECTORS` | `../data/Hotels_Vector.json` | Path to data file |
+| `DATA_FILE_WITH_VECTORS` | `data/Hotels_Vector.json` | Path to data file |
 | `EMBEDDED_FIELD` | `DescriptionVector` | Field containing embeddings |
 | `EMBEDDING_DIMENSIONS` | `1536` | Embedding vector dimensions |
 | `LOAD_SIZE_BATCH` | `100` | Batch size for data insertion |

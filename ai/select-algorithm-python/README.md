@@ -57,7 +57,7 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB. Each
 3. Copy the shared data file:
 
    ```bash
-   cp ../data/Hotels_Vector.json .
+   cp data/Hotels_Vector.json .
    ```
 
 4. Ensure you're logged in to Azure:
@@ -83,7 +83,7 @@ The script creates a single `hotels` collection, loads data once, then for each 
 | `DOCUMENTDB_CLUSTER_NAME` | (required) | DocumentDB cluster name |
 | `AZURE_OPENAI_EMBEDDING_ENDPOINT` | (required) | Azure OpenAI endpoint |
 | `AZURE_OPENAI_EMBEDDING_MODEL` | (required) | Embedding model deployment name |
-| `DATA_FILE_WITH_VECTORS` | `../data/Hotels_Vector.json` | Path to vectors JSON file |
+| `DATA_FILE_WITH_VECTORS` | `data/Hotels_Vector.json` | Path to vectors JSON file |
 | `EMBEDDED_FIELD` | `DescriptionVector` | Field name containing embeddings |
 | `EMBEDDING_DIMENSIONS` | `1536` | Vector dimensions |
 | `AZURE_DOCUMENTDB_DATABASENAME` | `Hotels` | Target database name |

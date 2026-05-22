@@ -57,7 +57,7 @@ public class Utils {
                 .applyToClusterSettings(builder -> builder.srvHost(clusterHost))
                 .applyToSslSettings(builder -> builder.enabled(true))
                 .credential(mongoCredential)
-                .retryWrites(true)
+                .retryWrites(false)
                 .build();
 
         return MongoClients.create(settings);

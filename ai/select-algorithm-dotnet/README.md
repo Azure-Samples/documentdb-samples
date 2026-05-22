@@ -46,7 +46,7 @@ Demonstrates three vector index algorithms available in Azure DocumentDB:
        "EmbeddingSizeBatch": 16
      },
      "DataFiles": {
-       "WithVectors": "../data/Hotels_Vector.json"
+       "WithVectors": "data/Hotels_Vector.json"
      }
    }
    ```
@@ -54,7 +54,7 @@ Demonstrates three vector index algorithms available in Azure DocumentDB:
 3. Copy the shared data file:
 
    ```bash
-   cp ../data/Hotels_Vector.json .
+   cp data/Hotels_Vector.json .
    ```
 
 4. Restore packages:
@@ -78,7 +78,7 @@ dotnet run
 | `MongoDB:ClusterName` | (required) | DocumentDB cluster name |
 | `AzureOpenAI:Endpoint` | (required) | Azure OpenAI endpoint |
 | `AzureOpenAI:EmbeddingModel` | (required) | Embedding model deployment name |
-| `DataFiles:WithVectors` | `../data/Hotels_Vector.json` | Path to vectors JSON file |
+| `DataFiles:WithVectors` | `data/Hotels_Vector.json` | Path to vectors JSON file |
 | `Embedding:EmbeddedField` | `DescriptionVector` | Field name containing embeddings |
 | `Embedding:Dimensions` | `1536` | Vector dimensions |
 | `MongoDB:DatabaseName` | `Hotels` | Target database name |
