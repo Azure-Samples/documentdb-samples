@@ -28,7 +28,7 @@ public class CompareAll {
         int topK = Integer.parseInt(Utils.getEnv("TOP_K", "5"));
 
         String databaseName = Utils.getEnv("AZURE_DOCUMENTDB_DATABASENAME", "Hotels");
-        String dataFile = Utils.getEnv("DATA_FILE_WITH_VECTORS", "data/Hotels_Vector.json");
+        String dataFile = Utils.getEnv("DATA_FILE_WITH_VECTORS", "../data/Hotels_Vector.json");
         String vectorField = Utils.getEnv("EMBEDDED_FIELD", "DescriptionVector");
         int dimensions = Integer.parseInt(Utils.getEnv("EMBEDDING_DIMENSIONS", "1536"));
         String model = Utils.getEnv("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-small");
@@ -113,11 +113,10 @@ public class CompareAll {
 
             int successCount = (int) results.stream().filter(r -> !r.top1Name().equals("(failed)")).count();
             if (successCount == 0) {
-                System.out.println("\n❌ All 9 comparisons failed — no algorithm returned results.");
-                System.exit(1);
-            } else {
-                System.out.printf("%nSummary: %d succeeded, %d failed%n", successCount, 9 - successCount);
+                throw new IllegalStateException("All 9 comparisons failed — no algorithm returned results.");
             }
+
+            System.out.printf("%nSummary: %d succeeded, %d failed%n", successCount, 9 - successCount);
 
             // Cleanup: drop the comparison collection
             System.out.println("\n  Cleanup: dropping comparison collection...");

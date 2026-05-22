@@ -37,5 +37,5 @@ public class VectorSearchConfiguration
 
 public class DataFilesConfiguration
 {
-    public string WithVectors { get; set; } = "data/Hotels_Vector.json";
+    public string WithVectors { get; set; } = "../data/Hotels_Vector.json";
 }
