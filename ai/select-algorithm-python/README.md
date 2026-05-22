@@ -48,8 +48,7 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB. Each
 
 2. Install dependencies:
    ```bash
-   cd src
-   pip install -r ../requirements.txt
+   pip install -r requirements.txt
    ```
 
 3. Copy the shared data file into the local `data/` directory:
@@ -68,8 +67,7 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB. Each
 Compare all 9 combinations (3 algorithms × 3 similarity metrics) in a single invocation:
 
 ```bash
-cd src
-python compare_all.py
+python src/compare_all.py
 ```
 
 The script creates a single `hotels` collection, loads data once, then for each of the 9 algorithm/metric combinations: creates the index → searches → drops the index. DocumentDB only allows one vector index per kind per field, so indexes are created sequentially.
