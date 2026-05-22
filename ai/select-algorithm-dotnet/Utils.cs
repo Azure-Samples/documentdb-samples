@@ -34,9 +34,9 @@ public static class Utils
 {
     public static IMongoClient GetMongoClientPasswordless(AppConfiguration config)
     {
-        var clusterName = config.MongoDB.ClusterName;
+        var clusterName = config.DocumentDB.ClusterName;
         if (string.IsNullOrEmpty(clusterName))
-            throw new InvalidOperationException("MongoDB:ClusterName is required in appsettings.json");
+            throw new InvalidOperationException("DocumentDB:ClusterName is required in appsettings.json");
 
         var credential = new DefaultAzureCredential();
 

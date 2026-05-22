@@ -30,11 +30,11 @@ public static class CompareAll
         Console.WriteLine(new string('=', 60));
 
         // Use config values with env var overrides for compare-specific settings
-        var databaseName = appConfig.MongoDB.DatabaseName;
+        var databaseName = appConfig.DocumentDB.DatabaseName;
         var dataFile = appConfig.DataFiles.WithVectors;
         var vectorField = appConfig.Embedding.EmbeddedField;
         var dimensions = appConfig.Embedding.Dimensions;
-        var batchSize = appConfig.MongoDB.LoadBatchSize;
+        var batchSize = appConfig.DocumentDB.LoadBatchSize;
         var queryText = Environment.GetEnvironmentVariable("QUERY_TEXT") ?? "luxury hotel near the beach";
         var topK = int.Parse(Environment.GetEnvironmentVariable("TOP_K") ?? "5");
 

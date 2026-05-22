@@ -149,7 +149,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    ```bash
    export AzureOpenAI__Endpoint="https://<your-resource>.openai.azure.com"
    export AzureOpenAI__EmbeddingModel="text-embedding-3-small"
-   export MongoDB__ClusterName="<your-cluster-name>"
+   export DocumentDB__ClusterName="<your-cluster-name>"
    export DataFiles__WithVectors="data/Hotels_Vector.json"
    export AZURE_TENANT_ID="<your-tenant-id>"
    ```
@@ -159,7 +159,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    ```powershell
    $env:AzureOpenAI__Endpoint="https://<your-resource>.openai.azure.com"
    $env:AzureOpenAI__EmbeddingModel="text-embedding-3-small"
-   $env:MongoDB__ClusterName="<your-cluster-name>"
+   $env:DocumentDB__ClusterName="<your-cluster-name>"
    $env:DataFiles__WithVectors="data/Hotels_Vector.json"
    $env:AZURE_TENANT_ID="<your-tenant-id>"
    ```
@@ -171,7 +171,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    - `<your-cluster-name>`: Your Azure DocumentDB cluster name
    - `<your-tenant-id>`: Your Microsoft Entra tenant ID
 
-   These environment variables override the matching values in `appsettings.json`. For example, `MongoDB__ClusterName` overrides `MongoDB:ClusterName` and `AzureOpenAI__Endpoint` overrides `AzureOpenAI:Endpoint`.
+   These environment variables override the matching values in `appsettings.json`. For example, `DocumentDB__ClusterName` overrides `DocumentDB:ClusterName` and `AzureOpenAI__Endpoint` overrides `AzureOpenAI:Endpoint`.
 
    You should always prefer passwordless authentication. For more information on setting up managed identity and the full range of your authentication options, see [Authenticate .NET apps to Azure services by using the Azure SDK for .NET](/dotnet/azure/sdk/authentication).
 
@@ -205,7 +205,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
        "Endpoint": "https://<your-resource>.openai.azure.com",
        "EmbeddingModel": "text-embedding-3-small"
      },
-     "MongoDB": {
+     "DocumentDB": {
        "ClusterName": "<your-cluster-name>",
        "DatabaseName": "Hotels",
        "LoadBatchSize": 100
@@ -226,7 +226,7 @@ Find the [sample code](https://github.com/Azure-Samples/documentdb-samples/tree/
    }
    ```
 
-   You can keep placeholder values in `appsettings.json` and override them at runtime with environment variables such as `AzureOpenAI__Endpoint` and `MongoDB__ClusterName`.
+   You can keep placeholder values in `appsettings.json` and override them at runtime with environment variables such as `AzureOpenAI__Endpoint` and `DocumentDB__ClusterName`.
 
 ## Create code files
 
