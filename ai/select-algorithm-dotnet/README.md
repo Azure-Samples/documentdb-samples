@@ -19,13 +19,13 @@ Demonstrates three vector index algorithms available in Azure DocumentDB:
 
 1. **Configure environment:**
 
-   The .NET sample uses `appsettings.json` for configuration. After deploying with `azd up`, you can export values:
+   The .NET sample uses `appsettings.json` for configuration. You can set values directly in `appsettings.json`, or if you deployed with `azd up`, export your provisioned values first:
 
    ```bash
    azd env get-values
    ```
 
-   Then update `appsettings.json` with your Azure resource values.
+   > **Note:** `azd` is optional. You can skip it and edit `appsettings.json` manually with your Azure resource values.
 
 2. Edit `appsettings.json` with your configuration:
 
@@ -51,10 +51,10 @@ Demonstrates three vector index algorithms available in Azure DocumentDB:
    }
    ```
 
-3. Copy the shared data file:
+3. Copy the shared data file into the local `data/` directory:
 
    ```bash
-   cp data/Hotels_Vector.json .
+   mkdir -p data && cp ../data/Hotels_Vector.json data/
    ```
 
 4. Restore packages:

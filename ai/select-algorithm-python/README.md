@@ -40,7 +40,7 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB. Each
    azd env get-values > .env
    ```
 
-   This creates a `.env` file at the repository root with the connection strings and endpoints needed to run the sample.
+   This creates a `.env` file at the repository root with the configuration values and endpoints needed to run the sample.
 
    Alternatively, copy the example and fill in values manually:
 
@@ -54,10 +54,10 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB. Each
    pip install -r ../requirements.txt
    ```
 
-3. Copy the shared data file:
+3. Copy the shared data file into the local `data/` directory:
 
    ```bash
-   cp data/Hotels_Vector.json .
+   mkdir -p data && cp ../data/Hotels_Vector.json data/
    ```
 
 4. Ensure you're logged in to Azure:

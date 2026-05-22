@@ -43,10 +43,10 @@ This sample demonstrates how to compare different vector search algorithms (IVF,
    EMBEDDING_DIMENSIONS=1536
    ```
 
-3. **Copy the shared data file** into this directory:
+3. **Copy the shared data file** into the local `data/` directory:
 
    ```bash
-   cp data/Hotels_Vector.json .
+   mkdir -p data && cp ../data/Hotels_Vector.json data/
    ```
 
    The `DATA_FILE_WITH_VECTORS` env var defaults to `data/Hotels_Vector.json`.

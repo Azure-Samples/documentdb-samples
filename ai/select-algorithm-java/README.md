@@ -20,7 +20,7 @@ This sample demonstrates how to compare all three vector search index algorithms
    azd env get-values > .env
    ```
 
-   This creates a `.env` file at the repository root with the connection strings and endpoints needed to run the sample.
+   This creates a `.env` file at the repository root with the configuration values and endpoints needed to run the sample.
 
    Alternatively, copy the example and fill in values manually:
 
@@ -34,10 +34,10 @@ This sample demonstrates how to compare all three vector search index algorithms
    - `AZURE_OPENAI_EMBEDDING_MODEL` — deployment name (e.g., `text-embedding-3-small`)
    - `DATA_FILE_WITH_VECTORS` — path to the pre-computed vectors JSON file
 
-3. Copy the shared data file:
+3. Copy the shared data file into the local `data/` directory:
 
    ```bash
-   cp data/Hotels_Vector.json .
+   mkdir -p data && cp ../data/Hotels_Vector.json data/
    ```
 
 ## Build
