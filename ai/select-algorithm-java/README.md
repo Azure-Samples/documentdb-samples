@@ -66,16 +66,13 @@ mvn exec:java -Pcompare
 |----------|---------|-------------|
 | `DOCUMENTDB_CLUSTER_NAME` | (required) | DocumentDB cluster name |
 | `AZURE_OPENAI_EMBEDDING_ENDPOINT` | (required) | Azure OpenAI endpoint |
-| `AZURE_OPENAI_EMBEDDING_MODEL` | (required) | Embedding model deployment name |
+| `AZURE_OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | Embedding model deployment name |
 | `DATA_FILE_WITH_VECTORS` | `data/Hotels_Vector.json` | Path to vectors JSON file |
 | `EMBEDDED_FIELD` | `DescriptionVector` | Field name containing embeddings |
 | `EMBEDDING_DIMENSIONS` | `1536` | Vector dimensions |
 | `AZURE_DOCUMENTDB_DATABASENAME` | `Hotels` | Target database name |
-| `LOAD_SIZE_BATCH` | `100` | Batch size for data loading |
-| `EMBEDDING_SIZE_BATCH` | `16` | Batch size for embedding requests |
 | `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
 | `TOP_K` | `5` | Number of results per search |
-| `VERBOSE` | `false` | Print detailed per-index results |
 
 `CompareAll.java` always runs all 9 algorithm/metric combinations. It does not read `ALGORITHM` or `SIMILARITY` environment variables.
 

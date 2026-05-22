@@ -42,8 +42,7 @@ Demonstrates three vector index algorithms available in Azure DocumentDB:
      },
      "Embedding": {
        "EmbeddedField": "DescriptionVector",
-       "Dimensions": 1536,
-       "EmbeddingSizeBatch": 16
+       "Dimensions": 1536
      },
      "DataFiles": {
        "WithVectors": "data/Hotels_Vector.json"
@@ -92,13 +91,12 @@ dotnet run
 |---------------------------|---------|-------------|
 | `DocumentDB:ClusterName` | (required) | DocumentDB cluster name |
 | `AzureOpenAI:Endpoint` | (required) | Azure OpenAI endpoint |
-| `AzureOpenAI:EmbeddingModel` | (required) | Embedding model deployment name |
+| `AzureOpenAI:EmbeddingModel` | `text-embedding-3-small` | Embedding model deployment name |
 | `DataFiles:WithVectors` | `data/Hotels_Vector.json` | Path to vectors JSON file |
 | `Embedding:EmbeddedField` | `DescriptionVector` | Field name containing embeddings |
 | `Embedding:Dimensions` | `1536` | Vector dimensions |
 | `DocumentDB:DatabaseName` | `Hotels` | Target database name |
 | `DocumentDB:LoadBatchSize` | `100` | Batch size for data loading |
-| `Embedding:EmbeddingSizeBatch` | `16` | Batch size for embedding requests |
 
 **Additional environment variables for compare mode:**
 
@@ -106,7 +104,6 @@ dotnet run
 |----------|---------|-------------|
 | `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
 | `TOP_K` | `5` | Number of results per search |
-| `VERBOSE` | `false` | Show detailed per-result output |
 
 ## How It Works
 
