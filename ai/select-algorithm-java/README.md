@@ -46,16 +46,10 @@ Compare all 9 algorithm × similarity combinations:
 mvn exec:java -Pcompare
 ```
 
-Or via the `ALGORITHM` environment variable:
-
-```bash
-ALGORITHM=compare mvn exec:java
-```
-
 On Windows (PowerShell):
 
 ```powershell
-$env:ALGORITHM="compare"; mvn exec:java
+mvn exec:java -Pcompare
 ```
 
 ## Algorithms
@@ -79,11 +73,11 @@ $env:ALGORITHM="compare"; mvn exec:java
 | `AZURE_DOCUMENTDB_DATABASENAME` | `Hotels` | Target database name |
 | `LOAD_SIZE_BATCH` | `100` | Batch size for data loading |
 | `EMBEDDING_SIZE_BATCH` | `16` | Batch size for embedding requests |
-| `ALGORITHM` | (empty = all) | Which algorithm to run |
-| `SIMILARITY` | (empty = all) | Similarity metric: `COS`, `L2`, `IP` |
 | `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
 | `TOP_K` | `5` | Number of results per search |
 | `VERBOSE` | `false` | Print detailed per-index results |
+
+`CompareAll.java` always runs all 9 algorithm/metric combinations. It does not read `ALGORITHM` or `SIMILARITY` environment variables.
 
 ## Authentication
 

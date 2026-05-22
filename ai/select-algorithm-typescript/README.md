@@ -50,9 +50,10 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB using
     | `EMBEDDED_FIELD` | Field name containing the vector (default: `DescriptionVector`) |
     | `EMBEDDING_DIMENSIONS` | Vector dimensions (default: `1536`) |
     | `LOAD_SIZE_BATCH` | Batch size for data insertion |
-    | `SIMILARITY` | Not used in compare-all mode — all 3 similarity metrics (COS, L2, IP) are tested automatically |
 
-4. **Create a `data/` directory and copy the data file:**
+    `compare-all.ts` always runs all 9 algorithm/metric combinations. It does not read `ALGORITHM` or `SIMILARITY` environment variables.
+
+    4. **Create a `data/` directory and copy the data file:**
 
     ```bash
     mkdir -p data

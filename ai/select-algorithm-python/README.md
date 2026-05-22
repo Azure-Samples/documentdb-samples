@@ -87,8 +87,8 @@ The script creates a single `hotels` collection, loads data once, then for each 
 | `AZURE_DOCUMENTDB_DATABASENAME` | `Hotels` | Target database name |
 | `LOAD_SIZE_BATCH` | `100` | Batch size for data loading |
 | `EMBEDDING_SIZE_BATCH` | `16` | Batch size for embedding requests |
-| `ALGORITHM` | (empty = all) | Which algorithm to run |
-| `SIMILARITY` | (empty = all) | Similarity metric: `COS`, `L2`, `IP` |
 | `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
 | `TOP_K` | `5` | Number of results per search |
 | `VERBOSE` | `false` | Show all k results per combo |
+
+`compare_all.py` always runs all 9 algorithm/metric combinations. It does not read `ALGORITHM` or `SIMILARITY` environment variables.

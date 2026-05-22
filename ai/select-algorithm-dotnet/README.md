@@ -51,13 +51,28 @@ Demonstrates three vector index algorithms available in Azure DocumentDB:
    }
    ```
 
+   > **Note:** .NET configuration also supports environment variable overrides. Use double-underscore (`__`) as the hierarchy separator:
+   > ```bash
+   > export DocumentDB__ClusterName=your-cluster-name
+   > export DocumentDB__DatabaseName=Hotels
+   > export AzureOpenAI__Endpoint=https://your-resource.openai.azure.com
+   > export AzureOpenAI__EmbeddingModel=text-embedding-3-small
+   > ```
+   > Environment variables take precedence over `appsettings.json` values.
+
 3. Copy the shared data file into the local `data/` directory:
 
    ```bash
    mkdir -p data && cp ../data/Hotels_Vector.json data/
    ```
 
-4. Restore packages:
+4. Sign in to Azure for passwordless authentication:
+
+   ```bash
+   az login
+   ```
+
+5. Restore packages:
 
    ```bash
    dotnet restore
