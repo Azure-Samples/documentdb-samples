@@ -3,7 +3,7 @@ namespace SelectAlgorithm.Models;
 public class AppConfiguration
 {
     public AzureOpenAIConfiguration AzureOpenAI { get; set; } = new();
-    public MongoDBConfiguration MongoDB { get; set; } = new();
+    public DocumentDBConfiguration DocumentDB { get; set; } = new();
     public EmbeddingConfiguration Embedding { get; set; } = new();
     public VectorSearchConfiguration VectorSearch { get; set; } = new();
     public DataFilesConfiguration DataFiles { get; set; } = new();
@@ -15,7 +15,7 @@ public class AzureOpenAIConfiguration
     public string EmbeddingModel { get; set; } = "text-embedding-3-small";
 }
 
-public class MongoDBConfiguration
+public class DocumentDBConfiguration
 {
     public string ClusterName { get; set; } = string.Empty;
     public string DatabaseName { get; set; } = "Hotels";

@@ -20,9 +20,14 @@ export function getConfig() {
 
 export const AzureIdentityTokenCallback = async (params: OIDCCallbackParams, credential: TokenCredential): Promise<OIDCResponse> => {
     const tokenResponse: AccessToken | null = await credential.getToken(['https://ossrdbms-aad.database.windows.net/.default']);
+
+    if (!tokenResponse || !tokenResponse.token) {
+        throw new Error('Failed to acquire token');
+    }
+
     return {
-        accessToken: tokenResponse?.token || '',
-        expiresInSeconds: Math.floor(((tokenResponse?.expiresOnTimestamp || 0) - Date.now()) / 1000)
+        accessToken: tokenResponse.token,
+        expiresInSeconds: Math.floor((tokenResponse.expiresOnTimestamp - Date.now()) / 1000)
     };
 };
 

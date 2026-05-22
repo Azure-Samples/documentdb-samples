@@ -7,7 +7,6 @@ import com.azure.ai.openai.models.EmbeddingsOptions;
 import com.azure.core.credential.AccessToken;
 import com.azure.identity.DefaultAzureCredential;
 import com.azure.identity.DefaultAzureCredentialBuilder;
-import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
@@ -39,8 +38,7 @@ public class Utils {
             throw new IllegalStateException("DOCUMENTDB_CLUSTER_NAME environment variable is required");
         }
 
-        String connectionUri = String.format(
-                "mongodb+srv://%s.global.mongocluster.cosmos.azure.com/", clusterName);
+        String clusterHost = String.format("%s.global.mongocluster.cosmos.azure.com", clusterName);
 
         // Use custom OIDC callback with DefaultAzureCredential
         // This chains through CLI, managed identity, etc.
@@ -56,7 +54,8 @@ public class Utils {
                 });
 
         MongoClientSettings settings = MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString(connectionUri))
+                .applyToClusterSettings(builder -> builder.srvHost(clusterHost))
+                .applyToSslSettings(builder -> builder.enabled(true))
                 .credential(mongoCredential)
                 .retryWrites(false)
                 .build();

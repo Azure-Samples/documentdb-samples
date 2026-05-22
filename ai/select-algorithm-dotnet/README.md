@@ -19,13 +19,13 @@ Demonstrates three vector index algorithms available in Azure DocumentDB:
 
 1. **Configure environment:**
 
-   The .NET sample uses `appsettings.json` for configuration. After deploying with `azd up`, you can export values:
+   The .NET sample uses `appsettings.json` for configuration. You can set values directly in `appsettings.json`, or if you deployed with `azd up`, export your provisioned values first:
 
    ```bash
    azd env get-values
    ```
 
-   Then update `appsettings.json` with your Azure resource values.
+   > **Note:** `azd` is optional. You can skip it and edit `appsettings.json` manually with your Azure resource values.
 
 2. Edit `appsettings.json` with your configuration:
 
@@ -35,29 +35,43 @@ Demonstrates three vector index algorithms available in Azure DocumentDB:
        "EmbeddingModel": "text-embedding-3-small",
        "Endpoint": "https://<your-resource>.openai.azure.com"
      },
-     "MongoDB": {
+     "DocumentDB": {
        "ClusterName": "<your-cluster-name>",
        "DatabaseName": "Hotels",
        "LoadBatchSize": 100
      },
      "Embedding": {
        "EmbeddedField": "DescriptionVector",
-       "Dimensions": 1536,
-       "EmbeddingSizeBatch": 16
+       "Dimensions": 1536
      },
      "DataFiles": {
-       "WithVectors": "../data/Hotels_Vector.json"
+       "WithVectors": "data/Hotels_Vector.json"
      }
    }
    ```
 
-3. Copy the shared data file:
+   > **Note:** .NET configuration also supports environment variable overrides. Use double-underscore (`__`) as the hierarchy separator:
+   > ```bash
+   > export DocumentDB__ClusterName=your-cluster-name
+   > export DocumentDB__DatabaseName=Hotels
+   > export AzureOpenAI__Endpoint=https://your-resource.openai.azure.com
+   > export AzureOpenAI__EmbeddingModel=text-embedding-3-small
+   > ```
+   > Environment variables take precedence over `appsettings.json` values.
+
+3. Copy the shared data file into the local `data/` directory:
 
    ```bash
-   cp ../data/Hotels_Vector.json .
+   mkdir -p data && cp ../data/Hotels_Vector.json data/
    ```
 
-4. Restore packages:
+4. Sign in to Azure for passwordless authentication:
+
+   ```bash
+   az login
+   ```
+
+5. Restore packages:
 
    ```bash
    dotnet restore
@@ -75,15 +89,14 @@ dotnet run
 
 | Setting (appsettings.json) | Default | Description |
 |---------------------------|---------|-------------|
-| `MongoDB:ClusterName` | (required) | DocumentDB cluster name |
+| `DocumentDB:ClusterName` | (required) | DocumentDB cluster name |
 | `AzureOpenAI:Endpoint` | (required) | Azure OpenAI endpoint |
-| `AzureOpenAI:EmbeddingModel` | (required) | Embedding model deployment name |
-| `DataFiles:WithVectors` | `../data/Hotels_Vector.json` | Path to vectors JSON file |
+| `AzureOpenAI:EmbeddingModel` | `text-embedding-3-small` | Embedding model deployment name |
+| `DataFiles:WithVectors` | `data/Hotels_Vector.json` | Path to vectors JSON file |
 | `Embedding:EmbeddedField` | `DescriptionVector` | Field name containing embeddings |
 | `Embedding:Dimensions` | `1536` | Vector dimensions |
-| `MongoDB:DatabaseName` | `Hotels` | Target database name |
-| `MongoDB:LoadBatchSize` | `100` | Batch size for data loading |
-| `Embedding:EmbeddingSizeBatch` | `16` | Batch size for embedding requests |
+| `DocumentDB:DatabaseName` | `Hotels` | Target database name |
+| `DocumentDB:LoadBatchSize` | `100` | Batch size for data loading |
 
 **Additional environment variables for compare mode:**
 
@@ -91,7 +104,6 @@ dotnet run
 |----------|---------|-------------|
 | `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
 | `TOP_K` | `5` | Number of results per search |
-| `VERBOSE` | `false` | Show detailed per-result output |
 
 ## How It Works
 

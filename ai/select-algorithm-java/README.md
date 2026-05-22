@@ -14,30 +14,22 @@ This sample demonstrates how to compare all three vector search index algorithms
 
 1. ### Configure environment variables
 
-   After deploying with `azd up`, create a `.env` file with your provisioned resource values:
+   After deploying with `azd up`, use the provisioned output values to set the required environment variables in your terminal:
 
    ```bash
-   azd env get-values > .env
+   export DOCUMENTDB_CLUSTER_NAME=your-cluster-name
+   export AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-resource.openai.azure.com
+   export AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+   export AZURE_DOCUMENTDB_DATABASENAME=Hotels
+   export DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
+   export EMBEDDED_FIELD=DescriptionVector
+   export EMBEDDING_DIMENSIONS=1536
    ```
 
-   This creates a `.env` file at the repository root with the connection strings and endpoints needed to run the sample.
-
-   Alternatively, copy the example and fill in values manually:
+2. Copy the shared data file into the local `data/` directory:
 
    ```bash
-   cp .env.example .env
-   ```
-
-2. Update `.env` with your Azure resource details (if not using `azd`):
-   - `DOCUMENTDB_CLUSTER_NAME` — your DocumentDB cluster name
-   - `AZURE_OPENAI_EMBEDDING_ENDPOINT` — your Azure OpenAI endpoint
-   - `AZURE_OPENAI_EMBEDDING_MODEL` — deployment name (e.g., `text-embedding-3-small`)
-   - `DATA_FILE_WITH_VECTORS` — path to the pre-computed vectors JSON file
-
-3. Copy the shared data file:
-
-   ```bash
-   cp ../data/Hotels_Vector.json .
+   mkdir -p data && cp ../data/Hotels_Vector.json data/
    ```
 
 ## Build
@@ -54,16 +46,10 @@ Compare all 9 algorithm × similarity combinations:
 mvn exec:java -Pcompare
 ```
 
-Or via the `ALGORITHM` environment variable:
-
-```bash
-ALGORITHM=compare mvn exec:java
-```
-
 On Windows (PowerShell):
 
 ```powershell
-$env:ALGORITHM="compare"; mvn exec:java
+mvn exec:java -Pcompare
 ```
 
 ## Algorithms
@@ -80,18 +66,15 @@ $env:ALGORITHM="compare"; mvn exec:java
 |----------|---------|-------------|
 | `DOCUMENTDB_CLUSTER_NAME` | (required) | DocumentDB cluster name |
 | `AZURE_OPENAI_EMBEDDING_ENDPOINT` | (required) | Azure OpenAI endpoint |
-| `AZURE_OPENAI_EMBEDDING_MODEL` | (required) | Embedding model deployment name |
-| `DATA_FILE_WITH_VECTORS` | `../data/Hotels_Vector.json` | Path to vectors JSON file |
+| `AZURE_OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | Embedding model deployment name |
+| `DATA_FILE_WITH_VECTORS` | `data/Hotels_Vector.json` | Path to vectors JSON file |
 | `EMBEDDED_FIELD` | `DescriptionVector` | Field name containing embeddings |
 | `EMBEDDING_DIMENSIONS` | `1536` | Vector dimensions |
 | `AZURE_DOCUMENTDB_DATABASENAME` | `Hotels` | Target database name |
-| `LOAD_SIZE_BATCH` | `100` | Batch size for data loading |
-| `EMBEDDING_SIZE_BATCH` | `16` | Batch size for embedding requests |
-| `ALGORITHM` | (empty = all) | Which algorithm to run |
-| `SIMILARITY` | (empty = all) | Similarity metric: `COS`, `L2`, `IP` |
 | `QUERY_TEXT` | `luxury hotel near the beach` | Search query text |
 | `TOP_K` | `5` | Number of results per search |
-| `VERBOSE` | `false` | Print detailed per-index results |
+
+`CompareAll.java` always runs all 9 algorithm/metric combinations. It does not read `ALGORITHM` or `SIMILARITY` environment variables.
 
 ## Authentication
 

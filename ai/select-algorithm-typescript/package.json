@@ -4,7 +4,6 @@
   "description": "Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB",
   "type": "module",
   "scripts": {
-    "env:init": "azd env get-values > .env",
     "build": "tsc",
     "start": "node dist/compare-all.js"
   },

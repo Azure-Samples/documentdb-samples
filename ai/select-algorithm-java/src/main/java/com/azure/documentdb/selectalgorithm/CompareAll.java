@@ -55,7 +55,8 @@ public class CompareAll {
 
             collection.drop();
             System.out.println("  Collection reset.");
-            Utils.insertData(collection, data, 100);
+            int batchSize = Integer.parseInt(System.getenv().getOrDefault("LOAD_SIZE_BATCH", "100"));
+            Utils.insertData(collection, data, batchSize);
 
             // Generate ONE embedding for the query (reused for all 9 searches)
             OpenAIClient aiClient = Utils.getOpenAIClient();
@@ -113,11 +114,10 @@ public class CompareAll {
 
             int successCount = (int) results.stream().filter(r -> !r.top1Name().equals("(failed)")).count();
             if (successCount == 0) {
-                System.out.println("\n❌ All 9 comparisons failed — no algorithm returned results.");
-                System.exit(1);
-            } else {
-                System.out.printf("%nSummary: %d succeeded, %d failed%n", successCount, 9 - successCount);
+                throw new IllegalStateException("All 9 comparisons failed — no algorithm returned results.");
             }
+
+            System.out.printf("%nSummary: %d succeeded, %d failed%n", successCount, 9 - successCount);
 
             // Cleanup: drop the comparison collection
             System.out.println("\n  Cleanup: dropping comparison collection...");

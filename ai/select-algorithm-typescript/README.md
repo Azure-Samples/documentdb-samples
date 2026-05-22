@@ -25,18 +25,18 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB using
 
 3. **Configure environment variables:**
 
-    After deploying with `azd up`, create a `.env` file with your provisioned resource values:
+    This sample reads configuration from environment variables. Export them in your shell before running:
 
     ```bash
-    azd env get-values > .env
-    ```
-
-    This creates a `.env` file in the project folder with the connection strings and endpoints needed to run the sample.
-
-    Alternatively, copy the example and fill in values manually:
-
-    ```bash
-    cp .env.example .env
+    export DOCUMENTDB_CLUSTER_NAME=your-cluster
+    export AZURE_OPENAI_EMBEDDING_ENDPOINT=https://your-resource.openai.azure.com
+    export AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+    export AZURE_OPENAI_EMBEDDING_API_VERSION=2023-05-15
+    export AZURE_DOCUMENTDB_DATABASENAME=Hotels
+    export DATA_FILE_WITH_VECTORS=data/Hotels_Vector.json
+    export EMBEDDED_FIELD=DescriptionVector
+    export EMBEDDING_DIMENSIONS=1536
+    export LOAD_SIZE_BATCH=100
     ```
 
     | Variable | Description |
@@ -50,17 +50,19 @@ Compare IVF, HNSW, and DiskANN vector index algorithms in Azure DocumentDB using
     | `EMBEDDED_FIELD` | Field name containing the vector (default: `DescriptionVector`) |
     | `EMBEDDING_DIMENSIONS` | Vector dimensions (default: `1536`) |
     | `LOAD_SIZE_BATCH` | Batch size for data insertion |
-    | `SIMILARITY` | Similarity metric: `COS`, `L2`, or `IP` |
 
-5. **Copy the shared data file** into this directory:
+    `compare-all.ts` always runs all 9 algorithm/metric combinations. It does not read `ALGORITHM` or `SIMILARITY` environment variables.
+
+    4. **Create a `data/` directory and copy the data file:**
 
     ```bash
-    cp ../data/Hotels_Vector.json .
+    mkdir -p data
+    cp ../data/Hotels_Vector.json data/
     ```
 
-    The `DATA_FILE_WITH_VECTORS` env var defaults to `../data/Hotels_Vector.json`.
+    The `DATA_FILE_WITH_VECTORS` env var defaults to `data/Hotels_Vector.json`.
 
-6. **Build the project:**
+5. **Build the project:**
 
     ```bash
     npm run build

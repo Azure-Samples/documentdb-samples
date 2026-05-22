@@ -30,11 +30,11 @@ public static class CompareAll
         Console.WriteLine(new string('=', 60));
 
         // Use config values with env var overrides for compare-specific settings
-        var databaseName = appConfig.MongoDB.DatabaseName;
+        var databaseName = appConfig.DocumentDB.DatabaseName;
         var dataFile = appConfig.DataFiles.WithVectors;
         var vectorField = appConfig.Embedding.EmbeddedField;
         var dimensions = appConfig.Embedding.Dimensions;
-        var batchSize = appConfig.MongoDB.LoadBatchSize;
+        var batchSize = appConfig.DocumentDB.LoadBatchSize;
         var queryText = Environment.GetEnvironmentVariable("QUERY_TEXT") ?? "luxury hotel near the beach";
         var topK = int.Parse(Environment.GetEnvironmentVariable("TOP_K") ?? "5");
 
@@ -65,7 +65,7 @@ public static class CompareAll
             Console.WriteLine("Embedding generated (reused for all searches)\n");
 
             // Define 9 index configurations
-            var configs = BuildIndexConfigs(dimensions);
+            var configs = BuildIndexConfigs();
 
             // Run each config sequentially: drop→create→wait→search
             // DocumentDB doesn't allow multiple vector indexes of the same kind on the same field
@@ -77,7 +77,7 @@ public static class CompareAll
                 DropVectorIndexes(collection, vectorField);
 
                 // 2. Create this specific index
-                CreateIndex(collection, vectorField, config);
+                CreateIndex(collection, vectorField, dimensions, config);
                 Console.WriteLine($"  ✓ {config.Name} created");
 
                 // 3. Search with retries while the index becomes available
@@ -139,7 +139,7 @@ public static class CompareAll
         }
     }
 
-    private static List<IndexConfig> BuildIndexConfigs(int dimensions)
+    private static List<IndexConfig> BuildIndexConfigs()
     {
         string[] metrics = ["COS", "L2", "IP"];
         var configs = new List<IndexConfig>();
@@ -177,7 +177,7 @@ public static class CompareAll
         catch { }
     }
 
-    private static void CreateIndex(IMongoCollection<BsonDocument> collection, string vectorField, IndexConfig config)
+    private static void CreateIndex(IMongoCollection<BsonDocument> collection, string vectorField, int dimensions, IndexConfig config)
     {
         // Drop existing index with same name if present
         try
@@ -192,7 +192,7 @@ public static class CompareAll
         var cosmosSearchOptions = new BsonDocument
         {
             { "kind", config.Kind },
-            { "dimensions", int.Parse(Environment.GetEnvironmentVariable("EMBEDDING_DIMENSIONS") ?? "1536") },
+            { "dimensions", dimensions },
             { "similarity", config.Similarity }
         };
 
