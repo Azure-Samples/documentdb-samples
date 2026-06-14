@@ -131,6 +131,10 @@ public class VectorSearchService
                     _logger.LogInformation($"  {i + 1}. {hotelName} (Similarity: {result.Score:F4})");
                 }
             }
+
+            // Drop the collection
+            await _mongoService.DropCollectionAsync(_config.VectorSearch.DatabaseName, collectionName);
+            _logger.LogInformation($"Dropped collection: {collectionName}");
         }
         catch (Exception ex)
         {

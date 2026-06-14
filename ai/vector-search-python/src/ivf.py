@@ -191,8 +191,10 @@ def main():
         raise
 
     finally:
-        # Ensure MongoDB connection is properly closed
+        # Drop the collection and close connection
         if 'mongo_client' in locals():
+            mongo_client[config['database_name']].drop_collection(config['collection_name'])
+            print(f"Dropped collection: {config['collection_name']}")
             mongo_client.close()
 
 

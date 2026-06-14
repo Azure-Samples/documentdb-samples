@@ -66,6 +66,10 @@ public class IVF {
             var queryEmbedding = createEmbedding(openAIClient, SAMPLE_QUERY);
             performVectorSearch(collection, queryEmbedding);
 
+            // Drop the collection
+            collection.drop();
+            System.out.println("Dropped collection: " + COLLECTION_NAME);
+
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();

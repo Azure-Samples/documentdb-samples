@@ -95,9 +95,13 @@ async function main() {
         console.error('App failed:', error);
         process.exitCode = 1;
     } finally {
-        console.log('Closing database connection...');
-        if (dbClient) await dbClient.close();
-        console.log('Database connection closed');
+        if (dbClient) {
+            const db = dbClient.db(config.dbName);
+            await db.dropCollection(config.collectionName);
+            console.log('Dropped collection:', config.collectionName);
+            await dbClient.close();
+            console.log('Database connection closed');
+        }
     }
 }
 
