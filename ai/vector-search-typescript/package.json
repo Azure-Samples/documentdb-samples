@@ -14,7 +14,7 @@
     "start:diskann": "node --env-file ../../.env dist/diskann.js"
   },
   "dependencies": {
-    "@azure/identity": "^4.11.1",
+    "@azure/identity": "^4.13.1",
     "mongodb": "^6.18.0",
     "openai": "^5.16.0"
   },
