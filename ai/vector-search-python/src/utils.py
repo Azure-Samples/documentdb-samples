@@ -102,17 +102,6 @@ def get_clients_passwordless() -> Tuple[MongoClient, AzureOpenAI]:
     return mongo_client, azure_openai_client
 
 
-def azure_identity_token_callback(credential: DefaultAzureCredential) -> str:
-
-    # DocumentDB requires this specific scope
-    token_scope = "https://cosmos.azure.com/.default"
-
-    # Get token from Azure AD
-    token = credential.get_token(token_scope)
-
-    return token.token
-
-
 def read_file_return_json(file_path: str) -> List[Dict[str, Any]]:
 
     try:
