@@ -82,7 +82,7 @@ def get_clients_passwordless() -> Tuple[MongoClient, AzureOpenAI]:
         f"mongodb+srv://{cluster_name}.global.mongocluster.cosmos.azure.com/",
         connectTimeoutMS=120000,
         tls=True,
-        retryWrites=True,
+        retryWrites=False,
         authMechanism="MONGODB-OIDC",
         authMechanismProperties=authProperties
     )
