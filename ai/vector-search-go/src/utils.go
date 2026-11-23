@@ -221,6 +221,7 @@ func connectWithOIDC(ctx context.Context, mongoURI string, credential *azidentit
 func connectWithConnectionString(ctx context.Context, connectionString string) (*mongo.Client, error) {
 	clientOptions := options.Client().
 		ApplyURI(connectionString).
+		SetRetryWrites(false).
 		SetMaxPoolSize(50).
 		SetMinPoolSize(5).
 		SetMaxConnIdleTime(30 * time.Second).
