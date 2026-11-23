@@ -41,6 +41,7 @@ def get_clients() -> Tuple[MongoClient, AzureOpenAI]:
     # Create MongoDB client with optimized settings for DocumentDB
     mongo_client = MongoClient(
         mongo_connection_string,
+        retryWrites=False,
         maxPoolSize=50,  # Allow up to 50 connections for better performance
         minPoolSize=5,   # Keep minimum 5 connections open
         maxIdleTimeMS=30000,  # Close idle connections after 30 seconds
