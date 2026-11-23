@@ -31,7 +31,7 @@ async function testMongoConnection() {
   const client = new MongoClient(connectionString, {
     connectTimeoutMS: 30000,
     tls: true,
-    retryWrites: true,
+    retryWrites: false,
     authMechanism: 'MONGODB-OIDC',
     authMechanismProperties: {
       OIDC_CALLBACK: (params: OIDCCallbackParams) => azureIdentityTokenCallback(params, credential),
