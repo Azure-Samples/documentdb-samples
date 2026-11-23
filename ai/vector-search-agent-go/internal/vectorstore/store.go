@@ -88,7 +88,7 @@ func NewVectorStore(ctx context.Context, config *VectorStoreConfig) (*VectorStor
 		if config.ConnectionString == "" {
 			return nil, fmt.Errorf("AZURE_DOCUMENTDB_CONNECTION_STRING is required when USE_PASSWORDLESS is not enabled")
 		}
-		clientOptions := options.Client().ApplyURI(config.ConnectionString)
+		clientOptions := options.Client().ApplyURI(config.ConnectionString).SetRetryWrites(false)
 		client, err = mongo.Connect(ctx, clientOptions)
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect to MongoDB: %w", err)
