@@ -190,7 +190,7 @@ export function createClientsPasswordless() {
       {
         connectTimeoutMS: 30000,
         tls: true,
-        retryWrites: true,
+        retryWrites: false,
         authMechanism: 'MONGODB-OIDC',
         authMechanismProperties: {
           OIDC_CALLBACK: (params: OIDCCallbackParams) => azureIdentityTokenCallback(params, CREDENTIAL),
