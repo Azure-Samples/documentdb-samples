@@ -157,7 +157,7 @@ func connectWithOIDC(ctx context.Context, clusterName string, debug bool) (*mong
 		ApplyURI(mongoURI).
 		SetConnectTimeout(30 * time.Second).
 		SetServerSelectionTimeout(30 * time.Second).
-		SetRetryWrites(true).
+		SetRetryWrites(false).
 		SetAuth(options.Credential{
 			AuthMechanism: "MONGODB-OIDC",
 			// For local development, don't set ENVIRONMENT=azure to allow custom callbacks
