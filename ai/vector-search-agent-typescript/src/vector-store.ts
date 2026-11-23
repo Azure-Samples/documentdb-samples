@@ -194,7 +194,7 @@ export async function deleteCosmosMongoDatabase(): Promise<void> {
         throw new Error('Environment variable AZURE_DOCUMENTDB_CONNECTION_STRING is not set.');
     }
 
-    const client = new MongoClient(connectionString);
+    const client = new MongoClient(connectionString, { retryWrites: false });
     try {
         await client.connect();
         const db = client.db(databaseName);
