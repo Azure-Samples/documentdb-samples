@@ -37,7 +37,7 @@ export function getClients(): { aiClient: AzureOpenAI; dbClient: MongoClient } {
         maxIdleTimeMS: 30000,    // Close idle connections after 30 seconds
         connectTimeoutMS: 30000, // Connection timeout
         socketTimeoutMS: 360000, // Socket timeout (for long-running operations)
-        retryWrites: false       // Set retry writes to false just for consistency purposes
+        retryWrites: false,       // Set retry writes to false just for consistency purposes
         writeConcern: {          // Optimize write concern for bulk operations
             w: 1,                // Acknowledge writes after primary has written
             j: false             // Don't wait for journal commit
