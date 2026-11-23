@@ -101,6 +101,7 @@ func GetClients() (*mongo.Client, openai.Client, error) {
 	// Create MongoDB client with optimized settings for DocumentDB
 	clientOptions := options.Client().
 		ApplyURI(mongoConnectionString).
+		SetRetryWrites(false).
 		SetMaxPoolSize(50).
 		SetMinPoolSize(5).
 		SetMaxConnIdleTime(30 * time.Second).
