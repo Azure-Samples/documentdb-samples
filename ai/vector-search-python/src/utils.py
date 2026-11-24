@@ -41,6 +41,7 @@ def get_clients() -> Tuple[MongoClient, AzureOpenAI]:
     # Create MongoDB client with optimized settings for DocumentDB
     mongo_client = MongoClient(
         mongo_connection_string,
+        retryWrites=False,
         maxPoolSize=50,  # Allow up to 50 connections for better performance
         minPoolSize=5,   # Keep minimum 5 connections open
         maxIdleTimeMS=30000,  # Close idle connections after 30 seconds
@@ -82,7 +83,7 @@ def get_clients_passwordless() -> Tuple[MongoClient, AzureOpenAI]:
         f"mongodb+srv://{cluster_name}.global.mongocluster.cosmos.azure.com/",
         connectTimeoutMS=120000,
         tls=True,
-        retryWrites=True,
+        retryWrites=False,
         authMechanism="MONGODB-OIDC",
         authMechanismProperties=authProperties
     )

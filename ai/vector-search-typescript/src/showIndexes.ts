@@ -45,6 +45,7 @@ async function main() {
         maxIdleTimeMS: 30000,
         connectTimeoutMS: 30000,
         socketTimeoutMS: 60000,
+        retryWrites: false,
     });
 
     try {

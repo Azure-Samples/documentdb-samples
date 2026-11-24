@@ -198,7 +198,7 @@ AZURE_OPENAI_ENDPOINT=https://your-openai-instance.openai.azure.com/
 AZURE_OPENAI_API_KEY=your-azure-openai-api-key
 
 # Azure DocumentDB (connection string)
-AZURE_DOCUMENTDB_CONNECTION_STRING=mongodb+srv://username:password@cluster.mongocluster.cosmos.azure.com/
+AZURE_DOCUMENTDB_CONNECTION_STRING=mongodb+srv://username:password@cluster.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000
 AZURE_DOCUMENTDB_DATABASENAME=vectorSearchDB
 AZURE_DOCUMENTDB_COLLECTION=hotel_data
 AZURE_DOCUMENTDB_INDEX_NAME=vectorIndex

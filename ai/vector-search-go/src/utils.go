@@ -101,6 +101,7 @@ func GetClients() (*mongo.Client, openai.Client, error) {
 	// Create MongoDB client with optimized settings for DocumentDB
 	clientOptions := options.Client().
 		ApplyURI(mongoConnectionString).
+		SetRetryWrites(false).
 		SetMaxPoolSize(50).
 		SetMinPoolSize(5).
 		SetMaxConnIdleTime(30 * time.Second).
@@ -198,7 +199,7 @@ func connectWithOIDC(ctx context.Context, mongoURI string, credential *azidentit
 		ApplyURI(mongoURI).
 		SetConnectTimeout(30 * time.Second).
 		SetServerSelectionTimeout(30 * time.Second).
-		SetRetryWrites(true).
+		SetRetryWrites(false).
 		SetAuth(options.Credential{
 			AuthMechanism: "MONGODB-OIDC",
 			// For local development, don't set ENVIRONMENT=azure to allow custom callbacks
@@ -220,6 +221,7 @@ func connectWithOIDC(ctx context.Context, mongoURI string, credential *azidentit
 func connectWithConnectionString(ctx context.Context, connectionString string) (*mongo.Client, error) {
 	clientOptions := options.Client().
 		ApplyURI(connectionString).
+		SetRetryWrites(false).
 		SetMaxPoolSize(50).
 		SetMinPoolSize(5).
 		SetMaxConnIdleTime(30 * time.Second).

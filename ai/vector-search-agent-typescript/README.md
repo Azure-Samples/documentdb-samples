@@ -211,7 +211,7 @@ AZURE_OPENAI_EMBEDDING_API_VERSION=2023-05-15
 
 # Azure DocumentDB (connection string)
 AZURE_DOCUMENTDB_CLUSTER=your-mongo-cluster-name
-AZURE_DOCUMENTDB_CONNECTION_STRING=mongodb+srv://username:password@cluster.mongocluster.cosmos.azure.com/
+AZURE_DOCUMENTDB_CONNECTION_STRING=mongodb+srv://username:password@cluster.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000
 AZURE_DOCUMENTDB_DATABASENAME=Hotels
 AZURE_DOCUMENTDB_COLLECTION=hotel_data
 
